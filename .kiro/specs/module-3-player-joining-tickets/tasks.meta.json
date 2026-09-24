@@ -1,0 +1,539 @@
+{
+  "pbtResults": {
+    "6.2 Write property test for cell-state derivation": {
+      "status": "passed",
+      "lastRunTimestamp": 1790107794913
+    },
+    "3.2 Write property tests for the ticket generator": {
+      "status": "passed",
+      "lastRunTimestamp": 1790108004086
+    },
+    "4.2 Write property tests for persistence": {
+      "status": "passed",
+      "lastRunTimestamp": 1790107977864
+    },
+    "8.3 Write property tests for the reducer": {
+      "status": "passed",
+      "lastRunTimestamp": 1790108717556
+    }
+  },
+  "executionHistory": {
+    "1. Set up test tooling and wire the test script": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107286268
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107306837
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107516485
+      }
+    ],
+    "2.1 Add `gameId` to `Player` and `row`/`col` to `TicketCell`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107286516
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107308714
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107517315
+      }
+    ],
+    "3.1 Implement `src/utils/ticketGenerator.ts`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107286666
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107527711
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108036348
+      }
+    ],
+    "4.1 Implement `src/state/persistence.ts`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107286926
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107529151
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108037309
+      }
+    ],
+    "5.1 Implement `src/state/joinService.ts`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107287110
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108047209
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108302454
+      }
+    ],
+    "6.1 Implement `deriveCellState`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107287247
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107530231
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107818548
+      }
+    ],
+    "7. Checkpoint — pure logic passes": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107287410
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108361329
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108780154
+      }
+    ],
+    "8.1 Update `gameSessionInitialState.ts`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107287643
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108049124
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108303789
+      }
+    ],
+    "8.2 Extend the reducer with JOIN_PLAYER, RESTORE_PLAYER, and RESET_GAME": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107287797
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108362271
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108781308
+      }
+    ],
+    "9.1 Update `GameSessionContext.tsx`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107287962
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108820573
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108935871
+      }
+    ],
+    "10. Checkpoint — state + persistence integrate": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107288127
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108944841
+      }
+    ],
+    "11.1 Rewrite `PlayerJoin.tsx`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107288325
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108946014
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109285097
+      }
+    ],
+    "12.1 Rewrite `PlayerGame.tsx`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107288569
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108947488
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109286532
+      }
+    ],
+    "13.1 Update `HostDashboard.tsx`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107288779
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108948435
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109282806
+      }
+    ],
+    "13.2 Confirm `PresentationView.tsx` exposes no employee id": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107289029
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108949888
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109283710
+      }
+    ],
+    "14.1 Retire live use of `mockPlayers.ts` / `mockTickets.ts`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107289184
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109302041
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116353074
+      }
+    ],
+    "15.1 Update `AnswerReveal.css`": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107289343
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108951135
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109287527
+      }
+    ],
+    "17. Final checkpoint — full build and manual test scenarios": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107289499
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116659394
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116700054
+      }
+    ],
+    "2. Extend domain types for players and ticket cells": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107517683
+      }
+    ],
+    "6. Implement reveal-driven cell-state derivation": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790107818907
+      }
+    ],
+    "3. Implement the pure ticket generator": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108036662
+      }
+    ],
+    "4. Implement the versioned persistence codec": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108037593
+      }
+    ],
+    "5. Implement the join service": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108302747
+      }
+    ],
+    "8. Extend central session state and reducer": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108781569
+      }
+    ],
+    "8.3 Write property tests for the reducer": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108805654
+      }
+    ],
+    "8.4 Write unit test for zeroed initial prize progress": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108806871
+      }
+    ],
+    "3.2 Write property tests for the ticket generator": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108807942
+      }
+    ],
+    "4.2 Write property tests for persistence": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108809315
+      }
+    ],
+    "5.2 Write property tests for the join service": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108810205
+      }
+    ],
+    "5.3 Write unit tests for `localId` fallback and error messages": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108811967
+      }
+    ],
+    "6.2 Write property test for cell-state derivation": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108813000
+      }
+    ],
+    "9. Wire persistence and selectors into the context provider": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790108936193
+      }
+    ],
+    "13. Update Host Dashboard and confirm Presentation View": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109283998
+      }
+    ],
+    "11. Rewrite the Player Join screen": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109285476
+      }
+    ],
+    "12. Rewrite the Player Game screen": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109286818
+      }
+    ],
+    "15. Fix long-answer responsive typography (Module 2 carry-over)": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109287777
+      }
+    ],
+    "11.2 Write component tests for PlayerJoin": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109288890
+      }
+    ],
+    "12.2 Write component tests for PlayerGame": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109290324
+      }
+    ],
+    "13.3 Write component tests for HostDashboard and PresentationView": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109291757
+      }
+    ],
+    "15.2 Write component test for AnswerReveal long-answer text": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790109292755
+      }
+    ],
+    "14. Remove live mock usage and dangling imports": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116353461
+      }
+    ],
+    "16.1 Write persistence round-trip integration test through the provider": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116377196
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116654403
+      }
+    ],
+    "16.2 Write stale-data fallback integration test": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116378445
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116655712
+      }
+    ],
+    "16.3 Write three-distinct-players integration test": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116379282
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116656788
+      }
+    ],
+    "16.4 Write reset integration test": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116380576
+      },
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116658140
+      }
+    ],
+    "16. Integration wiring and end-to-end automated coverage": [
+      {
+        "executionId": "5472e010-1a96-438a-b070-5942c93e9955",
+        "chatSessionId": "sess_96795485-b76c-414c-88e1-20675fb6edfa",
+        "timestamp": 1790116654707
+      }
+    ]
+  }
+}

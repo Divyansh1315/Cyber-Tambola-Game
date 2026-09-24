@@ -1,0 +1,343 @@
+.host {
+  background: var(--color-surface-muted);
+  padding: var(--space-5);
+}
+
+.host__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Local-only-mode notice */
+.host__local-only-notice {
+  background: var(--color-warning-soft, #fff3cd);
+  border: 1px solid var(--color-warning, #f0b429);
+  border-radius: var(--radius-md, 6px);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-ink, #1a1a1a);
+}
+
+/* Session header */
+.host__header {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.host__session-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.host__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.host__stat-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.host__stat-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.host__code {
+  letter-spacing: 0.08em;
+  color: var(--color-primary-strong);
+}
+
+/* Layout grid */
+.host__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+
+.host__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+@media (min-width: 960px) {
+  .host__grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+  }
+}
+
+/* Controls */
+.host__controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+/* Join card */
+.host__join-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.host__join-code {
+  font-size: 2.25rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--color-ink);
+}
+
+.host__join-text {
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+/* Reveal history */
+.host__history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.host__history-item {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+/* Claims */
+.host__claims-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.host__claims-section + .host__claims-section {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.host__claims-section-title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.host__claims {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.host__claim {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.host__claim-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.host__claim-prize {
+  font-weight: 800;
+  color: var(--color-primary-strong);
+}
+
+.host__claim-player {
+  font-weight: 700;
+}
+
+.host__claim-ticket {
+  font-size: 0.85rem;
+  color: var(--color-ink-faint);
+}
+
+.host__claim-time {
+  font-size: 0.8rem;
+  color: var(--color-ink-faint);
+}
+
+.host__claim-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.host__claim-buttons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.host__claim-buttons .btn {
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  font-size: 0.9rem;
+}
+
+/* Winners */
+.host__winners {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.host__winner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: rgba(18, 184, 134, 0.1);
+  font-size: 1.05rem;
+}
+
+.host__empty {
+  color: var(--color-ink-faint);
+  font-style: italic;
+}
+
+/* Development / demo-only controls — kept understated below the main controls */
+.host__dev-controls {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.host__dev-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  opacity: 0.7;
+}
+
+/* Participants roster — display names only (Req 17.2) */
+.host__participants {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.host__participant {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+}
+
+
+/* Winner History (winner-history-and-game-reset) */
+.host__winner-history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.host__winner-history-group + .host__winner-history-group {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.host__winner-history-group-title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--color-ink);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.host__winner-history-group-time {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-ink-faint);
+}
+
+.host__winner-history-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.host__winner-history-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  font-size: 0.85rem;
+  padding: var(--space-2) 0;
+}
+
+.host__winner-history-prize {
+  font-weight: 700;
+  color: var(--color-primary-strong);
+}
+
+.host__winner-history-player {
+  font-weight: 700;
+}
+
+.host__winner-history-ticket,
+.host__winner-history-time {
+  color: var(--color-ink-faint);
+}

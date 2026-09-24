@@ -1,0 +1,95 @@
+.ticket-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ticket-grid__row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+}
+
+.ticket-grid__row > [role='gridcell'] {
+  min-width: 0; /* allow cells to shrink so long terms can wrap, no overflow */
+}
+
+.ticket-cell {
+  width: 100%;
+  min-height: 72px;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+  background: var(--state-locked-bg);
+  color: var(--state-locked-ink);
+  transition: transform 0.08s ease, background-color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.ticket-cell:active {
+  transform: scale(0.97);
+}
+
+.ticket-cell__icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.ticket-cell__term {
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  /* Wrap long terms like "Social Engineering" gracefully */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.ticket-cell__state {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* State: locked */
+.ticket-cell--locked {
+  background: var(--state-locked-bg);
+  border-color: var(--color-border);
+  color: var(--state-locked-ink);
+  cursor: not-allowed;
+}
+
+/* State: available */
+.ticket-cell--available {
+  background: var(--state-available-bg);
+  border-color: var(--color-primary);
+  color: var(--state-available-ink);
+}
+
+/* State: marked */
+.ticket-cell--marked {
+  background: var(--state-marked-bg);
+  border-color: var(--color-accent-strong);
+  color: var(--state-marked-ink);
+}
+
+/* Slightly larger cells from small-tablet width upward */
+@media (min-width: 480px) {
+  .ticket-cell {
+    min-height: 84px;
+  }
+  .ticket-cell__term {
+    font-size: 0.82rem;
+  }
+  .ticket-cell__icon {
+    font-size: 1.1rem;
+  }
+}

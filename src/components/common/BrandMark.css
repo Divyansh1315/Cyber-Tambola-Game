@@ -1,0 +1,67 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-ink);
+}
+
+.brand__glyph {
+  display: inline-flex;
+  color: var(--color-primary);
+  font-size: 2rem;
+}
+
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.brand__title {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-size: 1.25rem;
+}
+
+.brand__v2 {
+  color: var(--color-primary);
+}
+
+.brand__subtitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ink-faint);
+  letter-spacing: 0.02em;
+}
+
+/* Sizes */
+.brand--sm .brand__glyph {
+  font-size: 1.5rem;
+}
+.brand--sm .brand__title {
+  font-size: 1.05rem;
+}
+
+.brand--hero .brand__glyph {
+  font-size: 3.25rem;
+}
+.brand--hero .brand__title {
+  font-size: 2rem;
+}
+.brand--hero .brand__subtitle {
+  font-size: 1.05rem;
+}
+
+/* On dark backgrounds */
+.brand--on-dark {
+  color: var(--color-on-dark);
+}
+.brand--on-dark .brand__glyph {
+  color: var(--color-accent);
+}
+.brand--on-dark .brand__v2 {
+  color: var(--color-accent);
+}
+.brand--on-dark .brand__subtitle {
+  color: var(--color-on-dark-soft);
+}

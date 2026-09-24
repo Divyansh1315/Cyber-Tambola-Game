@@ -1,0 +1,572 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create `supabase/migrations/0001_schema.sql`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186578618
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186597625
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186724585
+      }
+    ],
+    "1.2 Write a structural lint test for the schema migration": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186578811
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186732576
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187192359
+      }
+    ],
+    "2.1 Create `supabase/migrations/0002_rls.sql`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186578976
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186733708
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187193658
+      }
+    ],
+    "3.1 Create `supabase/migrations/0003_rpc_join_and_tickets.sql`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186579085
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187209972
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187492977
+      }
+    ],
+    "4.1 Create `supabase/migrations/0004_rpc_word_and_marks.sql`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186579218
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187555361
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790188157722
+      }
+    ],
+    "5.1 Create `supabase/migrations/0005_rpc_lifecycle_and_claims.sql`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186579341
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790188167420
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189876136
+      }
+    ],
+    "6. Checkpoint — schema, RLS, and RPC authoring complete": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186579533
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189935891
+      }
+    ],
+    "7.1 Add `@supabase/supabase-js` to `package.json` dependencies (pinned exact or caret-minor version matching the version researched in design.md) and run install": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186579662
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186598640
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186725860
+      }
+    ],
+    "7.2 Create `src/state/testSupport/mockSupabaseClient.ts`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186579787
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186734626
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187192846
+      }
+    ],
+    "7.3 Write unit tests for the mock client fixture itself": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186579930
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187210638
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187362958
+      }
+    ],
+    "8.1 Create `src/state/realtimeClient.ts`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186580094
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187211038
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187364094
+      }
+    ],
+    "9.1 Update `src/state/gameSessionReducer.ts`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186580228
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187556278
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790188158176
+      }
+    ],
+    "10. Checkpoint — reducer extension integrates": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186580443
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189936775
+      }
+    ],
+    "11.1 Update `src/state/GameSessionContext.tsx`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186580624
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790188168252
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189683324
+      }
+    ],
+    "12. Checkpoint — context provider integrates with mocked Supabase": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186580747
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189937573
+      }
+    ],
+    "13.1 Update `src/pages/PlayerJoin/PlayerJoin.tsx`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186580972
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189944637
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190128250
+      }
+    ],
+    "13.2 Update `src/pages/HostDashboard/HostDashboard.tsx`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186581146
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189945628
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190127149
+      }
+    ],
+    "13.3 Verify `src/pages/PlayerGame/PlayerGame.tsx` and `src/pages/PresentationView/PresentationView.tsx` require no JSX/selector changes": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186581289
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189947062
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190130426
+      }
+    ],
+    "14. Checkpoint — all four screens integrate with the restructured sync path": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186581458
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190140999
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190184631
+      }
+    ],
+    "15.1 Create `.env.example` at the project root": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186581623
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189947855
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190129334
+      }
+    ],
+    "15.2 Add a local-only-mode notice to `src/pages/HostDashboard/HostDashboard.tsx`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186581802
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190139980
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190266186
+      }
+    ],
+    "16. Checkpoint — environment configuration integrates": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186582136
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190274077
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190287503
+      }
+    ],
+    "17.1 Write regression test: a new word call never alters existing marks": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186582283
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190275361
+      },
+      {
+        "executionId": "a631c4fb-b47a-4b93-9b21-6c550d76f90c",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790199471610
+      }
+    ],
+    "17.2 Write regression test: no Host/Presentation-facing action redirects a Player with a valid `currentPlayerId`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186582407
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190277993
+      },
+      {
+        "executionId": "a631c4fb-b47a-4b93-9b21-6c550d76f90c",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790199472671
+      }
+    ],
+    "17.3 Write regression test: refresh/reconnect restores the same ticket, never a different one": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186582539
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190278614
+      },
+      {
+        "executionId": "a631c4fb-b47a-4b93-9b21-6c550d76f90c",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790199473738
+      }
+    ],
+    "17.4 Write regression test: a new word call never decreases any prize's progress": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186582751
+      },
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190279513
+      },
+      {
+        "executionId": "a631c4fb-b47a-4b93-9b21-6c550d76f90c",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790199474609
+      }
+    ],
+    "17.5 Write regression test: claim/winner status survives a simulated refresh": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186582971
+      }
+    ],
+    "17.6 Write regression test: the direct-word-call gameplay model is unchanged": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186583099
+      }
+    ],
+    "18. Final checkpoint — full verification": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186583235
+      }
+    ],
+    "19. Provision the real Supabase project and apply migrations": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186583358
+      }
+    ],
+    "20. Populate local environment configuration": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186583489
+      }
+    ],
+    "21. Acceptance runbook — multi-device live session (Requirement 21)": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186583622
+      }
+    ],
+    "22. Acceptance runbook — disconnect and reconnect (Requirement 22)": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186583756
+      }
+    ],
+    "23. Acceptance runbook — simultaneous players (Requirement 23)": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186583990
+      }
+    ],
+    "24. Write the module completion report": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790186584167
+      }
+    ],
+    "1. Author the core schema migration": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187192669
+      }
+    ],
+    "2. Author the Row Level Security migration": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187193809
+      }
+    ],
+    "7. Add the Supabase client dependency and mocked-client test infrastructure": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187363238
+      }
+    ],
+    "8. Implement `realtimeClient.ts`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187364297
+      }
+    ],
+    "3. Author the join and ticket-assignment RPC functions": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790187493257
+      }
+    ],
+    "4. Author the next-word and mark-submission RPC functions": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790188158034
+      }
+    ],
+    "9. Extend the reducer with `SYNC_REMOTE`, `HYDRATE_FROM_REMOTE`, and `ROLLBACK_OPTIMISTIC`": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790188158360
+      }
+    ],
+    "11. Restructure `GameSessionContext.tsx` for fetch/subscribe/reconcile": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189683606
+      }
+    ],
+    "5. Author the remaining host-lifecycle and claim/winner RPC functions": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790189876305
+      }
+    ],
+    "13. Wire the four screens to the restructured context": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190130637
+      }
+    ],
+    "15. Add environment configuration and the local-only-mode notice": [
+      {
+        "executionId": "1e7eff2f-7212-4cf3-9152-4f71f7ce8d90",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790190266394
+      }
+    ]
+  }
+}

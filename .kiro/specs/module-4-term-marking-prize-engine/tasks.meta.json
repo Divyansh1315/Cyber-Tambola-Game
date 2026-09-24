@@ -1,0 +1,122 @@
+{
+  "pbtResults": {
+    "3.2 Write property test for cell-state derivation": {
+      "status": "passed",
+      "lastRunTimestamp": 1790139010855
+    }
+  },
+  "executionHistory": {
+    "2.2 Write property tests for prize formulas": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790138914520
+      }
+    ],
+    "2.4 Write property test for mark validation gates and accepted-branch shape": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790138915878
+      }
+    ],
+    "3.2 Write property test for cell-state derivation": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790138917044
+      }
+    ],
+    "4.3 Write property tests for reducer purity, sync, and reset": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790138918050
+      }
+    ],
+    "5.2 Write unit test for seeded empty marks": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790138919018
+      }
+    ],
+    "7.2 Write property test for marks persistence round-trip and fail-safe defaulting": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139197430
+      }
+    ],
+    "10.2 Write component tests for PlayerGame marking and prize display": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139198189
+      }
+    ],
+    "11.1 Write component/unit test confirming `RESET_GAME` zeroes prize progress end to end": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139199641
+      }
+    ],
+    "12.1 Write mark-persistence-across-refresh integration test": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139200662
+      }
+    ],
+    "12.2 Write legacy-envelope-upgrade integration test": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139201477
+      }
+    ],
+    "12.3 Write cross-tab mark sync integration test": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139551215
+      }
+    ],
+    "12.4 Write five-distinct-terms Cyber Five eligibility integration test": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139552327
+      }
+    ],
+    "12.5 Write full-row Line prize eligibility integration test": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139553458
+      }
+    ],
+    "12.6 Write full-ticket Cyber Full House eligibility integration test": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139554603
+      }
+    ],
+    "12.7 Write locked-tap and duplicate-tap rejection integration tests": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139555623
+      }
+    ],
+    "12. Integration tests for marking, persistence, sync, and prize eligibility": [
+      {
+        "executionId": "3f3cae87-9c6c-4f77-95cb-080b0cd877d4",
+        "chatSessionId": "sess_c94996c0-e53a-46a6-99c7-48d8a12c42cc",
+        "timestamp": 1790139940807
+      }
+    ]
+  }
+}

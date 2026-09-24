@@ -1,0 +1,38 @@
+.claim-tag-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.claim-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.claim-tag--valid {
+  background: rgba(18, 184, 134, 0.16);
+  color: var(--color-accent-strong);
+}
+.claim-tag--pending {
+  background: rgba(217, 138, 0, 0.16);
+  color: var(--color-warning);
+}
+.claim-tag--confirmed {
+  background: var(--color-accent);
+  color: #fff;
+}
+.claim-tag--rejected {
+  background: rgba(214, 69, 69, 0.16);
+  color: var(--color-danger-strong);
+}
+.claim-tag--invalid {
+  background: rgba(214, 69, 69, 0.16);
+  color: var(--color-danger-strong);
+}

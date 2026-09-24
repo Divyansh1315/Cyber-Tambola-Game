@@ -1,0 +1,82 @@
+.cyber-word-card {
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  border: 2px solid var(--color-accent);
+  background: rgba(18, 184, 134, 0.08);
+  text-align: left;
+}
+
+.cyber-word-card__eyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent-strong);
+  margin-bottom: var(--space-2);
+}
+
+.cyber-word-card__term {
+  /* Fluid typography: grows with viewport but clamped to the player scale
+     bounds (min 1.25rem / max 2.5rem). Short terms like "MFA" land at the
+     max; long terms like "Suspicious Attachment" settle toward the min and
+     wrap (carried over from the old AnswerReveal treatment). */
+  font-size: clamp(1.25rem, 6vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--color-ink);
+  text-transform: uppercase;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.cyber-word-card__definition {
+  margin-top: var(--space-3);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-ink);
+}
+
+.cyber-word-card__tip {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(12, 143, 106, 0.25);
+}
+
+.cyber-word-card__tip-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-accent-strong);
+  margin-bottom: var(--space-1);
+}
+
+.cyber-word-card__tip-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+/* Stage scale for host dashboard / projector */
+.cyber-word-card--stage {
+  text-align: center;
+}
+.cyber-word-card--stage .cyber-word-card__term {
+  /* Stage scale bounds (min 2rem / max 6rem). */
+  font-size: clamp(2rem, 12vw, 6rem);
+}
+.cyber-word-card--stage .cyber-word-card__definition {
+  font-size: 1.35rem;
+}
+.cyber-word-card--stage .cyber-word-card__tip {
+  border-top: none;
+  padding-top: var(--space-4);
+}
+.cyber-word-card--stage .cyber-word-card__tip-text {
+  font-size: 1.2rem;
+}

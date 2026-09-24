@@ -1,0 +1,737 @@
+{
+  "pbtResults": {
+    "9.2 Write a property test for complete, non-duplicated winner coverage (Property 2)": {
+      "status": "passed",
+      "lastRunTimestamp": 1790229863660
+    },
+    "7.4 Write a property test for the channel-swap invariant (Property 9)": {
+      "status": "passed",
+      "lastRunTimestamp": 1790231710214
+    }
+  },
+  "executionHistory": {
+    "1.1 Create `supabase/migrations/0006_active_game_and_winner_history.sql`": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226744068
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226771045
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226833115
+      }
+    ],
+    "1.2 Write a structural lint test for the new migration": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226744332
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226844966
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227199068
+      }
+    ],
+    "1.3 Write a conditional integration test for the pointer's at-most-one-row guarantee (Property 5, schema half)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226744559
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226847598
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227200104
+      }
+    ],
+    "2.1 Append the three new RPC functions to `supabase/migrations/0006_active_game_and_winner_history.sql`": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226744751
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227212934
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227285490
+      }
+    ],
+    "2.2 Update `confirm_claim` in `supabase/migrations/0005_rpc_lifecycle_and_claims.sql` to populate `ticket_ref`": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226745004
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227296388
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227542159
+      }
+    ],
+    "2.3 Write a structural lint test for the new RPC functions": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226745181
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227296848
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227543250
+      }
+    ],
+    "2.4 Write a conditional integration test for atomic reset and winner retention (Properties 1 and 6)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226745338
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227297325
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227544259
+      }
+    ],
+    "2.5 Write a conditional integration test for host-secret gating on Reset (Property 8)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226745577
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227298547
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227545370
+      }
+    ],
+    "2.6 Write a conditional integration test for New_Game_Code format and uniqueness (Property 7)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226745753
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227299994
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227546471
+      }
+    ],
+    "3. Checkpoint — schema and RPC authoring complete": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226745965
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233393548
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233442189
+      }
+    ],
+    "4.1 Add `getActiveGame`, `resetGameToNew`, `subscribeToActiveGamePointer`, and `fetchAllWinnersWithGames` to `src/state/realtimeClient.ts`": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226746203
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227565194
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227758525
+      }
+    ],
+    "4.2 Write unit tests for the four new `realtimeClient.ts` exports using the existing mock Supabase client": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226746410
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790228655145
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229196931
+      }
+    ],
+    "5.1 Add the `NO_ACTIVE_GAME` action and `hasActiveGame` flag": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226746573
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227566120
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227759656
+      }
+    ],
+    "5.2 Add `winnerHistory` to `GameSessionState` and rework the Local Fallback `RESET_GAME` case": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226746814
+      },
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227769341
+      }
+    ],
+    "5.3 Write reducer unit tests for `NO_ACTIVE_GAME`": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226747061
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790228656057
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229198155
+      }
+    ],
+    "5.4 Write a property test for Local Fallback winner retention across resets (Property 13)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226747287
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790228657168
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229199346
+      }
+    ],
+    "5.5 Write a property test for Local Fallback reset producing a fresh, correctly formatted game identity (Property 14)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226747528
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790228658353
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229200377
+      }
+    ],
+    "6. Checkpoint — reducer and Local Fallback extensions integrate": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226747902
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233459125
+      }
+    ],
+    "7.1 Replace the `get_or_create_game(SEED_GAME_CODE)` mount call with the pointer-follow effect": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226748118
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790228659427
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229201513
+      }
+    ],
+    "7.2 Wire the Host Dashboard's Reset action through `resetGameToNew`": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226748289
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229211527
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229778324
+      }
+    ],
+    "7.3 Write integration tests for the pointer-follow effect using the mock Supabase client": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226748470
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229788901
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231258461
+      }
+    ],
+    "7.4 Write a property test for the channel-swap invariant (Property 9)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226748690
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231273319
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231873347
+      }
+    ],
+    "8. Checkpoint — pointer-follow context integrates with mocked Supabase": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226749118
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233467155
+      }
+    ],
+    "9.1 Create `src/pages/HostDashboard/hostWinnerHistoryViewModel.ts`": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226749369
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229212426
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229779172
+      }
+    ],
+    "9.2 Write a property test for complete, non-duplicated winner coverage (Property 2)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226749561
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229790145
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231259202
+      }
+    ],
+    "9.3 Write a property test for group ordering and labeling (Property 3)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226749757
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229791317
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231260312
+      }
+    ],
+    "9.4 Write a property test for row field narrowing and employee/demo-id exclusion (Property 4)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226749942
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229792385
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231261384
+      }
+    ],
+    "9.5 Write unit tests for both Supabase-row and Local-Fallback inputs feeding the same view-model": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226750145
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229793094
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231262204
+      }
+    ],
+    "10.1 Add the second, unfiltered winners subscription and render the Winner_History section": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226750332
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231273851
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231872452
+      }
+    ],
+    "10.2 Write component tests for the Winner_History section's rendering and live update": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226750569
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231883170
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232231997
+      }
+    ],
+    "11. Checkpoint — Host Dashboard Winner_History integrates": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226750746
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233477464
+      }
+    ],
+    "12.1 Verify `PresentationView.tsx` already resolves its game exclusively through `useGameSession()` (the shared `GameSessionContext`) and has no separate mount-time `get_or_create_game`/`getActiveGame` call of its own": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226750932
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231884274
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232234302
+      }
+    ],
+    "12.2 Extend `PresentationView.test.tsx` with a regression assertion that Winner_History is never rendered": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226751126
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232244932
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232699169
+      }
+    ],
+    "12.3 Write a component test that the QR/join-code display updates live on a pointer change": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226751329
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232245368
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232696030
+      }
+    ],
+    "12.4 Write a property test for Player Join's code field being unaffected by pointer changes (Property 12)": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226751609
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232246362
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232698152
+      }
+    ],
+    "12.5 Write a regression test confirming `PlayerJoin.tsx` never imports the new pointer functions": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226751805
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232247027
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232696677
+      }
+    ],
+    "13. Checkpoint — Presentation View and Player Join regressions confirmed": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226751999
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233492094
+      }
+    ],
+    "14.1 Write an integration test for a Reset propagating live to multiple open Host/Presentation clients": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226752232
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232710699
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233126604
+      }
+    ],
+    "14.2 Write an integration test confirming winners survive multiple consecutive resets": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226752465
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232711508
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233127278
+      }
+    ],
+    "14.3 Write an integration test confirming Winner_History shows entries from more than one past game after resets": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226752734
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233137684
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233376743
+      }
+    ],
+    "15. Final checkpoint — full verification": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790226752936
+      },
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233511345
+      }
+    ],
+    "1. Author the migration adding `active_game_pointer` and `winners.ticket_ref`": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227200345
+      }
+    ],
+    "2. Author `get_active_game()`, `generate_new_game_code()`, and `reset_game_to_new()`, and update `confirm_claim`": [
+      {
+        "executionId": "fad5643b-5d57-4180-b311-716620eedb07",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790227546746
+      }
+    ],
+    "4. Add `realtimeClient.ts` exports for the Active_Game pointer and winner history": [
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790229197644
+      }
+    ],
+    "9. Implement `hostWinnerHistoryViewModel.ts`": [
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231262592
+      }
+    ],
+    "7. Rework `GameSessionContext.tsx`'s mount effect to follow the Active_Game via the pointer": [
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790231873710
+      }
+    ],
+    "10. Wire the Winner_History section into `HostDashboard.tsx`": [
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232232448
+      }
+    ],
+    "12. Confirm and, if needed, adjust `PresentationView.tsx`'s mount logic to follow the Active_Game via context": [
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790232699632
+      }
+    ],
+    "14. Write integration tests for multi-tab pointer propagation and cross-reset winner accumulation": [
+      {
+        "executionId": "7a21676f-dc41-4495-933c-a7b71d08734b",
+        "chatSessionId": "sess_0e611326-fff6-4aa7-9964-9e053d104bf5",
+        "timestamp": 1790233377232
+      }
+    ]
+  }
+}

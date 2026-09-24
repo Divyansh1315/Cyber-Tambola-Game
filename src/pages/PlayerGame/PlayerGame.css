@@ -1,0 +1,189 @@
+.player {
+  background: var(--color-surface-muted);
+  display: flex;
+  justify-content: center;
+  padding: var(--space-3) var(--space-3) var(--space-7);
+}
+
+.player__inner {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Header */
+.player__header {
+  background: var(--color-bg);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.player__header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.player__game {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.player__header-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.player__name {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.player__ticket-ref {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-on-dark-soft);
+}
+
+/* Reveal toggle (demo control) */
+.player__reveal-toggle {
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
+/* Ticket card extras */
+.player__locked-hint {
+  margin-top: var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-warning);
+}
+
+.player__legend {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3) 0 0;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+.player__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Claim blocks — one independent, self-contained block per Prize_Id (Req 13.2) */
+.player__claims {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.player__claim-block {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.player__claim-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.player__claim-block-label {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.player__claim-message {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+/* Status-specific accents pair color with the message text itself (Req
+   12.9) — no status is ever communicated by color alone. */
+.player__claim-block--eligible {
+  border-color: var(--color-accent-strong);
+}
+.player__claim-message--eligible {
+  color: var(--color-accent-strong);
+}
+
+.player__claim-block--pending {
+  border-color: var(--color-warning);
+}
+.player__claim-message--pending {
+  color: var(--color-warning);
+}
+
+.player__claim-block--confirmed {
+  border-color: var(--color-accent-strong);
+}
+.player__claim-message--confirmed {
+  color: var(--color-accent-strong);
+  font-weight: 700;
+}
+
+.player__claim-block--rejected {
+  border-color: var(--color-danger-strong);
+}
+.player__claim-message--rejected {
+  color: var(--color-danger-strong);
+}
+
+.player__claim-btn {
+  width: 100%;
+}
+
+/* Paused / completed / waiting notices shown in place of the clue area */
+.player__notice {
+  text-align: center;
+}
+
+.player__notice-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.player__notice-sub {
+  margin: var(--space-2) 0 0;
+  font-size: 0.9375rem;
+  color: var(--color-ink-soft);
+}
+
+.player__notice--error {
+  border-color: var(--color-danger-strong);
+  background: rgba(214, 69, 69, 0.08);
+}
+.player__notice--error .player__notice-title {
+  color: var(--color-danger-strong);
+}
+.player__notice--error .btn {
+  margin-top: var(--space-2);
+}

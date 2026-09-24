@@ -1,0 +1,892 @@
+{
+  "pbtResults": {
+    "3.2 Write property tests for `isPrizeClosed` and `canConfirmClaim`": {
+      "status": "passed",
+      "lastRunTimestamp": 1790178592764
+    },
+    "3.6 Write property test for `derivePlayerClaimStatus`": {
+      "status": "passed",
+      "lastRunTimestamp": 1790178600538
+    },
+    "3.4 Write property tests for sorting and grouping": {
+      "status": "passed",
+      "lastRunTimestamp": 1790178609705
+    },
+    "2.2 Write property test for the claim validation pipeline": {
+      "status": "passed",
+      "lastRunTimestamp": 1790178754234
+    },
+    "6.2 Write property test extending `RESET_GAME` coverage to claims/winners": {
+      "status": "passed",
+      "lastRunTimestamp": 1790179128968
+    },
+    "7.2 Write property test for claims/winners persistence round-trip and fail-safe defaulting": {
+      "status": "passed",
+      "lastRunTimestamp": 1790179409082
+    },
+    "5.4 Write property test for cross-tab sync of claims/winners": {
+      "status": "passed",
+      "lastRunTimestamp": 1790179434451
+    },
+    "5.2 Write property tests for the three reducer actions and side-effect isolation": {
+      "status": "passed",
+      "lastRunTimestamp": 1790179580908
+    },
+    "10.3 Write property/example test for the INVALID-claim progress message": {
+      "status": "passed",
+      "lastRunTimestamp": 1790180942011
+    },
+    "13.3 Write property tests for the announcement view-model and dismiss-rendering equivalence": {
+      "status": "passed",
+      "lastRunTimestamp": 1790182386885
+    },
+    "11.6 Write property/example tests for the inbox row and winner panel view-models": {
+      "status": "passed",
+      "lastRunTimestamp": 1790182731878
+    }
+  },
+  "executionHistory": {
+    "1.1 Update `src/types/claim.ts`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177923279
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177942283
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178106869
+      }
+    ],
+    "1.2 Update `src/types/prize.ts`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177923461
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177943056
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178108079
+      }
+    ],
+    "1.3 Write unit test asserting the extended type shapes compile": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177923680
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178115308
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178204374
+      }
+    ],
+    "2.1 Implement `src/utils/claimEngine.ts`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177923846
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178212418
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178373165
+      }
+    ],
+    "2.2 Write property test for the claim validation pipeline": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177924085
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178391110
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178783562
+      }
+    ],
+    "3.1 Implement `isPrizeClosed`, `getWinnerForPrize`, and `canConfirmClaim` in `src/utils/winnerEngine.ts`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177924220
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178116385
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178205438
+      }
+    ],
+    "3.2 Write property tests for `isPrizeClosed` and `canConfirmClaim`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177924429
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178213169
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178785593
+      }
+    ],
+    "3.3 Implement `getPlayerWinningPrizes`, `sortClaimsForInbox`, and `groupClaimsForHistory` in `src/utils/winnerEngine.ts`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177924569
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178214512
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178374306
+      }
+    ],
+    "3.4 Write property tests for sorting and grouping": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177924735
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178400788
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178784367
+      }
+    ],
+    "3.5 Implement `derivePlayerClaimStatus` in `src/utils/winnerEngine.ts`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177924883
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178390074
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178489898
+      }
+    ],
+    "3.6 Write property test for `derivePlayerClaimStatus`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177925002
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178496798
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178784674
+      }
+    ],
+    "4. Checkpoint — pure engines pass": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177925226
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178801471
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178834773
+      }
+    ],
+    "5.1 Add `SUBMIT_PRIZE_CLAIM`, `CONFIRM_CLAIM`, `REJECT_CLAIM` to `src/state/gameSessionReducer.ts`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177925343
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178850960
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179007716
+      }
+    ],
+    "5.2 Write property tests for the three reducer actions and side-effect isolation": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177925451
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179027584
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179646142
+      }
+    ],
+    "5.3 Extend `SyncPayload` and `SYNC_STATE` with `claims`/`winners`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177925584
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179028595
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179262055
+      }
+    ],
+    "5.4 Write property test for cross-tab sync of claims/winners": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177925747
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179290730
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179647228
+      }
+    ],
+    "6.1 Update `src/state/gameSessionInitialState.ts` and delete `src/data/mockClaims.ts`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177925898
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178852080
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179008783
+      }
+    ],
+    "6.2 Write property test extending `RESET_GAME` coverage to claims/winners": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177926072
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179029673
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179262612
+      }
+    ],
+    "7.1 Update `src/state/persistence.ts`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177926286
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179030709
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179262924
+      }
+    ],
+    "7.2 Write property test for claims/winners persistence round-trip and fail-safe defaulting": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177926443
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179291842
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179648345
+      }
+    ],
+    "8.1 Update `src/state/GameSessionContext.tsx`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177926609
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179293675
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179649363
+      }
+    ],
+    "9. Checkpoint — state, persistence, and sync integrate": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177926878
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179665096
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180106444
+      }
+    ],
+    "10.1 Update `src/pages/PlayerGame/PlayerGame.tsx`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177927089
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180133186
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180797223
+      }
+    ],
+    "10.2 Write component tests for PlayerGame's per-prize claim UI": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177927212
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180819325
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790181957675
+      }
+    ],
+    "10.3 Write property/example test for the INVALID-claim progress message": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177927325
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180820432
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790181958736
+      }
+    ],
+    "11.1 Update `ClaimStatusTag` to accept `{validationStatus, hostDecision}`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177927450
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180134322
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180799013
+      }
+    ],
+    "11.2 Write unit test for the updated `ClaimStatusTag`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177927582
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180825632
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790181956989
+      }
+    ],
+    "11.3 Update `src/pages/HostDashboard/HostDashboard.tsx` — Claim Inbox": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177927704
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180826364
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182228539
+      }
+    ],
+    "11.4 Update `src/pages/HostDashboard/HostDashboard.tsx` — Winner Panel": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177927814
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182237686
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182479099
+      }
+    ],
+    "11.5 Write component tests for HostDashboard's Claim Inbox and Winner Panel": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177927944
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182488612
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182823878
+      }
+    ],
+    "11.6 Write property/example tests for the inbox row and winner panel view-models": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177928072
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182489548
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182826187
+      }
+    ],
+    "12. Checkpoint — player and host claim/winner UI integrate": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177928181
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182846446
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182870779
+      }
+    ],
+    "13.1 Update `src/pages/PresentationView/PresentationView.tsx`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177928345
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180135435
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180797990
+      }
+    ],
+    "13.2 Write component tests for the Presentation View winner announcement": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177928465
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790180826760
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790181959848
+      }
+    ],
+    "13.3 Write property tests for the announcement view-model and dismiss-rendering equivalence": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177928599
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182238632
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182480107
+      }
+    ],
+    "14. Checkpoint — Presentation View integrates": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177928758
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182847321
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182871475
+      }
+    ],
+    "15.1 Write claim submission → host confirm → cross-screen propagation integration test": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177928917
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182881003
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183234820
+      }
+    ],
+    "15.2 Write claims/winners persistence-across-refresh integration test": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177929048
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182882180
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183235833
+      }
+    ],
+    "15.3 Write legacy-envelope-upgrade integration test": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177929187
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182883323
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183236901
+      }
+    ],
+    "15.4 Write cross-tab claim/winner sync integration test": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177929328
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182884137
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183238019
+      }
+    ],
+    "15.5 Write continue-playing-after-winning-one-prize integration test": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177929432
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182885072
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183239287
+      }
+    ],
+    "15.6 Write one-retry-after-rejection-then-blocked integration test": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177929565
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183247624
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183610699
+      }
+    ],
+    "15.7 Write regression tests for prior-module marks/identity/persistence/sync behavior": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177929723
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183248675
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183611840
+      }
+    ],
+    "15.8 Write example tests covering Requirement 21's specific assertions": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177929874
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183250019
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183612837
+      }
+    ],
+    "16. Final checkpoint — full verification": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790177929999
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183621637
+      },
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183715951
+      }
+    ],
+    "1. Extend the PrizeClaim and Winner domain types": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178204641
+      }
+    ],
+    "2. Implement the pure Claim_Engine validation pipeline": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178783843
+      }
+    ],
+    "3. Implement the pure Winner_Engine lookup and derivation helpers": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790178785936
+      }
+    ],
+    "6. Seed `claims`/`winners` in initial state and remove mock data": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179263195
+      }
+    ],
+    "5. Extend the reducer with claim/winner actions": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179647566
+      }
+    ],
+    "7. Extend persistence to cover `claims`/`winners`": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179648743
+      }
+    ],
+    "8. Wire claims and winners into the context provider": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790179649662
+      }
+    ],
+    "10. Rewire the Player Game screen to the five-prize claim UI": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790181959171
+      }
+    ],
+    "13. Add winner announcement to the Presentation View": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182480361
+      }
+    ],
+    "11. Rewire the Host Dashboard to real claims and winners": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790182827264
+      }
+    ],
+    "15. Integration and regression tests across screens and prior-module behavior": [
+      {
+        "executionId": "2097aa5b-98d7-4610-8488-5a43a38879ef",
+        "chatSessionId": "sess_33100959-269f-4e4c-a85d-7dc32b1bd210",
+        "timestamp": 1790183613231
+      }
+    ]
+  }
+}

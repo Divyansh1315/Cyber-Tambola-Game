@@ -1,0 +1,167 @@
+.projector {
+  background: radial-gradient(
+    circle at 50% 0%,
+    #12263a 0%,
+    #0b1a2b 55%,
+    #081524 100%
+  );
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-6) var(--space-5) var(--space-7);
+}
+
+/* Prototype-only state switcher (subtle, top of screen) */
+.projector__switcher {
+  display: inline-flex;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border-dark);
+  margin-bottom: var(--space-6);
+}
+
+.projector__switch {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-on-dark-soft);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.projector__switch.is-active {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.projector__stage {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.projector__eyebrow {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-5);
+}
+
+/* Lobby */
+.projector__lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+.projector__scan {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-on-dark);
+}
+.projector__code {
+  font-size: 1.5rem;
+  color: var(--color-on-dark-soft);
+}
+.projector__code strong {
+  color: var(--color-on-dark);
+  letter-spacing: 0.08em;
+}
+
+/* Cyber Word call — word, definition, and safe-practice tip shown together
+   as a single state (Module 5; replaces the old separate clue/reveal
+   states). */
+.projector__word-call {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.projector__eyebrow--secondary {
+  font-size: 1rem;
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-3);
+  color: var(--color-accent);
+  opacity: 0.85;
+}
+
+.projector__term {
+  font-size: clamp(4rem, 12vw, 9rem);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1;
+}
+
+.projector__definition {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-on-dark);
+  max-width: 34ch;
+  margin: 0 auto;
+}
+
+.projector__tip {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  font-weight: 600;
+  color: var(--color-accent);
+  max-width: 30ch;
+}
+
+/* Winner */
+.projector__winner,
+.projector__announcement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.projector__announcement {
+  gap: var(--space-5);
+}
+.projector__trophy {
+  font-size: 5rem;
+}
+.projector__winner-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: 0.04em;
+}
+.projector__winner-name {
+  font-size: clamp(3rem, 9vw, 7rem);
+  font-weight: 900;
+  color: #fff;
+}
+
+/* Simple centered projector messages (Paused / Completed) */
+.projector__message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+}
+
+.projector__message-icon {
+  font-size: clamp(4rem, 12vw, 9rem);
+  line-height: 1;
+}
+
+.projector__message-title {
+  margin: 0;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}

@@ -1,0 +1,135 @@
+/*
+  Cyber Tambola V2 - global design system.
+  Clean corporate cybersecurity visual language: high contrast, large type,
+  clear cards, minimal clutter. Mobile-first for players, desktop-friendly for host.
+*/
+
+:root {
+  /* Brand palette - professional, cyber-security themed (deep navy + secure teal) */
+  --color-bg: #0b1a2b;
+  --color-bg-elevated: #12263a;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f2f5f9;
+  --color-surface-alt: #e8eef5;
+
+  --color-ink: #0b1a2b;
+  --color-ink-soft: #43566b;
+  --color-ink-faint: #7386a0;
+  --color-on-dark: #eef4fb;
+  --color-on-dark-soft: #a9bdd6;
+
+  --color-primary: #0f7bb8;
+  --color-primary-strong: #0a5f90;
+  --color-accent: #12b886;
+  --color-accent-strong: #0c8f6a;
+  --color-warning: #d98a00;
+  --color-danger: #d64545;
+  --color-danger-strong: #b23434;
+
+  --color-border: #d4dde8;
+  --color-border-dark: #24405c;
+
+  /* State colors for ticket / status (paired always with icon + text) */
+  --state-locked-bg: #eceff3;
+  --state-locked-ink: #64748b;
+  --state-available-bg: #e6f4ff;
+  --state-available-ink: #0a5f90;
+  --state-marked-bg: #0c8f6a;
+  --state-marked-ink: #ffffff;
+
+  /* Typography */
+  --font-sans: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial,
+    sans-serif;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  --shadow-sm: 0 1px 2px rgba(11, 26, 43, 0.08);
+  --shadow-md: 0 6px 18px rgba(11, 26, 43, 0.12);
+
+  /* Minimum touch target */
+  --touch: 44px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-surface-muted);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* Prevent accidental horizontal scroll on mobile */
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+p {
+  margin: 0;
+}
+
+/* Accessible focus ring for all interactive elements */
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Screen-reader only helper */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Utility: page containers */
+.page {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.page--dark {
+  background: var(--color-bg);
+  color: var(--color-on-dark);
+}
