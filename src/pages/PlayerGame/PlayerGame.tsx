@@ -180,8 +180,11 @@ export function PlayerGame() {
   // This is the ONLY redirect trigger: no current player, a current player
   // whose record has vanished, or a current player with no matching ticket.
   // Game status, clue, marks, and participant-count changes never trigger it.
+  // Redirects to "/player" (the Player entry point), not "/" (the Host
+  // Dashboard) -- PlayerEntry.tsx will then render PlayerJoin since
+  // currentPlayer is gone.
   if (!currentPlayer || !currentTicket || !renderedTicket) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/player" replace />
   }
 
   /**

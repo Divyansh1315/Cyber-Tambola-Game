@@ -7,16 +7,18 @@ import { GameSessionProvider } from '../../state/GameSessionContext'
 import { PlayerJoin } from './PlayerJoin'
 
 /**
- * Renders PlayerJoin at "/" inside the real session provider and a router.
- * The "/player" route renders a visible marker so navigation can be asserted
- * from the rendered DOM (no router mocking required).
+ * Renders PlayerJoin at "/join" (an arbitrary isolated path, since this is a
+ * component test rather than an app-routing test) with a visible marker
+ * standing in for the Player Game screen at "/player" -- PlayerJoin always
+ * calls navigate('/player') on a successful join regardless of where it
+ * itself is mounted, matching the app's real Player entry point.
  */
-function renderJoin(initialPath: string = '/') {
+function renderJoin(initialPath: string = '/join') {
   return render(
     <GameSessionProvider>
       <MemoryRouter initialEntries={[initialPath]}>
         <Routes>
-          <Route path="/" element={<PlayerJoin />} />
+          <Route path="/join" element={<PlayerJoin />} />
           <Route path="/player" element={<div>PLAYER GAME SCREEN</div>} />
         </Routes>
       </MemoryRouter>
@@ -90,8 +92,8 @@ describe('PlayerJoin', () => {
     expect(await screen.findByText('PLAYER GAME SCREEN')).toBeInTheDocument()
   })
 
-  it("prefills the game code from the URL's code query param, e.g. after scanning a QR (winner-history-and-game-reset)", () => {
-    renderJoin('/?code=ahma29')
+  it("prefills the game code from the URL's game query param, e.g. after scanning a QR (JoinQrCode encodes ?game=)", () => {
+    renderJoin('/join?game=ahma29')
 
     // Codes rotate on every Reset; a stale hardcoded prefill would silently
     // point a returning player at the wrong game. The field also normalizes
@@ -100,8 +102,14 @@ describe('PlayerJoin', () => {
     expect(screen.getByLabelText('Game Code')).toHaveValue('AHMA29')
   })
 
-  it('falls back to the seed game code when no code query param is present', () => {
-    renderJoin('/')
+  it("still prefills from the legacy code query param for backward compatibility", () => {
+    renderJoin('/join?code=ahma29')
+
+    expect(screen.getByLabelText('Game Code')).toHaveValue('AHMA29')
+  })
+
+  it('falls back to the seed game code when no game/code query param is present', () => {
+    renderJoin('/join')
 
     expect(screen.getByLabelText('Game Code')).toHaveValue('CYBER24')
   })

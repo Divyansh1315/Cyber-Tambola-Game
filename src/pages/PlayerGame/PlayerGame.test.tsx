@@ -8,8 +8,7 @@ import {
   GameSessionProvider,
   useGameSession as useGameSessionForTest,
 } from '../../state/GameSessionContext'
-import { PlayerGame } from './PlayerGame'
-import { PlayerJoin } from '../PlayerJoin/PlayerJoin'
+import { PlayerEntry } from '../PlayerEntry'
 import { buildJoinOutcome } from '../../state/joinService'
 import { createSeedGame } from '../../state/gameSessionInitialState'
 import {
@@ -139,8 +138,13 @@ function renderPlayerGame(options?: {
     <GameSessionProvider>
       <MemoryRouter initialEntries={[initialEntry]}>
         <Routes>
-          <Route path="/" element={<PlayerJoin />} />
-          <Route path="/player" element={<PlayerGame />} />
+          {/* PlayerGame redirects to "/player" (not "/") when there is no
+              current player/ticket -- "/" is the Host Dashboard in the real
+              app. PlayerEntry is the real production wrapper that renders
+              PlayerJoin/PlayerGame at "/player" based on currentPlayer, so
+              using it here (rather than PlayerGame in isolation) keeps this
+              test's redirect assertions faithful to production routing. */}
+          <Route path="/player" element={<PlayerEntry />} />
         </Routes>
       </MemoryRouter>
     </GameSessionProvider>,
@@ -824,14 +828,15 @@ describe('PlayerGame survives Host lifecycle dispatches without redirecting (bug
         currentPlayerId: player.id,
       })
 
-      // The Player tab: mounts PlayerGame for real, seeded with the joined
-      // player above (loaded from localStorage on mount).
+      // The Player tab: mounts the real PlayerEntry wrapper at "/player",
+      // seeded with the joined player above (loaded from localStorage on
+      // mount) -- matches production routing, where "/" is the Host
+      // Dashboard and "/player" is the sole Player entry point.
       render(
         <GameSessionProvider>
           <MemoryRouter initialEntries={['/player']}>
             <Routes>
-              <Route path="/" element={<PlayerJoin />} />
-              <Route path="/player" element={<PlayerGame />} />
+              <Route path="/player" element={<PlayerEntry />} />
             </Routes>
           </MemoryRouter>
         </GameSessionProvider>,

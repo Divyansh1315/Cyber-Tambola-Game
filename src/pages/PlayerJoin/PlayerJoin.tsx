@@ -28,18 +28,22 @@ export function PlayerJoin() {
   const location = useLocation()
   const { state, dispatch, joinGame } = useGameSession()
 
-  // Prefills from the code query param when present -- e.g. a player who
-  // scanned the QR shown on the Host/Presentation screen, which always
-  // encodes the CURRENT game's code (JoinQrCode.tsx). Game codes rotate on
-  // every Reset (winner-history-and-game-reset), so this must never be a
-  // fixed constant: a returning/bookmarked player who follows the QR again
-  // after a reset needs the field to reflect the NEW code, not a stale one.
-  // Falls back to SEED_GAME_CODE only when no code param is present at
-  // all (e.g. someone typed the bare site URL directly) -- the field is
-  // still always editable either way, and submitting still requires the
-  // player's own explicit action (Req 7: never auto-joins from a URL).
+  // Prefills from the `game` query param when present -- e.g. a player who
+  // scanned the QR shown on the Presentation/Host screen, which always
+  // encodes the CURRENT game's code (JoinQrCode.tsx) as `?game=<CODE>`.
+  // `code` is also accepted for backward compatibility with any
+  // already-printed/cached QR codes from before the query param was
+  // renamed. Game codes rotate on every Reset (winner-history-and-game-
+  // reset), so this must never be a fixed constant: a returning/bookmarked
+  // player who follows the QR again after a reset needs the field to
+  // reflect the NEW code, not a stale one. Falls back to SEED_GAME_CODE
+  // only when neither param is present at all (e.g. someone typed the bare
+  // /player URL directly) -- the field is still always editable either
+  // way, and submitting still requires the player's own explicit action
+  // (Req 7: never auto-joins from a URL).
   const [gameCode, setGameCode] = useState(() => {
-    const fromUrl = new URLSearchParams(location.search).get('code')
+    const params = new URLSearchParams(location.search)
+    const fromUrl = params.get('game') ?? params.get('code')
     return fromUrl ? fromUrl.toUpperCase() : SEED_GAME_CODE
   })
   const [employeeName, setEmployeeName] = useState('')
@@ -148,7 +152,7 @@ export function PlayerJoin() {
         </header>
 
         <p className="join__intro">
-          Match cyber clues to the terms on your ticket.
+          Match called cyber words with the terms on your ticket.
         </p>
 
         <form className="join__form" onSubmit={handleSubmit} noValidate>

@@ -291,6 +291,23 @@ export function HostDashboard() {
               </span>
             </span>
           </div>
+          {/*
+           * Opens the Presentation/Projector view in a separate browser
+           * tab so the Host never navigates away from the Dashboard --
+           * game controls, participant count, claims, and winner
+           * confirmation all stay visible and usable while the
+           * Presentation screen runs independently on the projector. The
+           * new tab connects to the same active game through the existing
+           * Supabase/shared-state architecture (GameSessionProvider
+           * resolves the current Active_Game on its own mount); no game
+           * session/state is passed or duplicated here.
+           */}
+          <Button
+            variant="secondary"
+            onClick={() => window.open('/presentation', '_blank', 'noopener,noreferrer')}
+          >
+            Open Presentation View
+          </Button>
         </header>
 
         <div className="host__grid">
