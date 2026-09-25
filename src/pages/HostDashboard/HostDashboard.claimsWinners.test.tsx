@@ -325,6 +325,7 @@ describe('HostDashboard Claim Inbox + Winner Panel (Task 11.5)', () => {
         confirmedAt: '2026-01-01T10:05:00.000Z',
         prizeLabel: 'Cyber Five',
         playerName: 'Asha',
+        ticketRef: 't-p1-ref',
       },
     ]
 

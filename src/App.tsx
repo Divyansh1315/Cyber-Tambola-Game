@@ -12,7 +12,9 @@ import { PresentationView } from './pages/PresentationView/PresentationView'
  *   /player        Player Game   (Screen B)
  *   /host          Host Dashboard(Screen C)
  *   /presentation  Projector View(Screen D)
- * DevNav is a temporary demo aid for moving between screens.
+ * DevNav is a temporary demo aid for moving between screens. It is only
+ * rendered outside production builds (import.meta.env.PROD) so a public
+ * deployment does not expose an internal screen-switcher to every visitor.
  */
 export default function App() {
   return (
@@ -25,7 +27,7 @@ export default function App() {
         {/* Fallback to the join screen for any unknown route */}
         <Route path="*" element={<PlayerJoin />} />
       </Routes>
-      <DevNav />
+      {!import.meta.env.PROD && <DevNav />}
     </>
   )
 }

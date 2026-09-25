@@ -442,7 +442,16 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       })
     }
 
-    ;(async () => {
+    setRemoteSyncStatus('syncing')
+
+    // Req 17.1/24.5: a phone on flaky Wi-Fi/4G should retry the initial
+    // resolve+fetch a few times (with a short backoff) before surfacing
+    // 'error' -- a single transient failure must not strand the player on
+    // stale/empty local state with no indication anything is wrong.
+    const MAX_INITIAL_ATTEMPTS = 3
+    const RETRY_DELAY_MS = 1500
+
+    async function resolveInitialGame(attempt: number): Promise<void> {
       try {
         const activeGame = await getActiveGame()
         if (cancelled) return
@@ -455,12 +464,22 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
           setHasActiveGame(false)
           dispatch({ type: 'NO_ACTIVE_GAME' })
         }
+        setRemoteSyncStatus('synced')
       } catch {
-        // Initial resolve/fetch failed (e.g. a transient network issue) —
-        // the app keeps rendering the local/seed fallback already in state
-        // rather than crashing.
+        if (cancelled) return
+        if (attempt < MAX_INITIAL_ATTEMPTS) {
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS))
+          if (cancelled) return
+          await resolveInitialGame(attempt + 1)
+          return
+        }
+        // Every retry exhausted — surface the error state rather than
+        // silently keeping stale/empty local data forever (Req 18).
+        setRemoteSyncStatus('error')
       }
-    })()
+    }
+
+    void resolveInitialGame(1)
 
     // Req 4.4, 6.1: keep listening for pointer changes for the lifetime of
     // this provider, whether or not an Active_Game is currently held.

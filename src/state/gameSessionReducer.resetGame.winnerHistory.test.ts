@@ -29,15 +29,13 @@ function makeWinner(id: string): Winner {
     confirmedAt: '2026-01-01T00:00:00.000Z',
     prizeLabel: 'Cyber Five',
     playerName: `Player ${id}`,
+    ticketRef: `Ticket #${id}`,
   }
 }
 
-/**
- * One cycle: add a batch of winners directly onto state.winners (mirroring
- * what CONFIRM_CLAIM would have produced), then dispatch RESET_GAME.
- */
-type Cycle = { winnerIds: string[] }
-
+// One cycle: add a batch of winners directly onto state.winners (mirroring
+// what CONFIRM_CLAIM would have produced), then dispatch RESET_GAME.
+//
 // Each cycle adds between 0 and 4 winners, with globally-unique ids so
 // "every winner ever added" is unambiguous to check for across cycles.
 const cycleArb = fc.array(fc.integer({ min: 0, max: 4 }), { minLength: 0, maxLength: 8 })

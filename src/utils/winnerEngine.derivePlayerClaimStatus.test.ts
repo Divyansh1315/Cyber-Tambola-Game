@@ -99,6 +99,7 @@ function makeWinner(overrides: { playerId: string; prizeId: PrizeId }): Winner {
     confirmedAt: '2024-01-01T00:00:00.000Z',
     prizeLabel: 'Prize',
     playerName: 'Player',
+    ticketRef: 'Ticket #TEST',
   }
 }
 

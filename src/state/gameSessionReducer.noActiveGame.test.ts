@@ -103,6 +103,7 @@ function makeWinner(id: string, playerId: string, ticketId: string, claimId: str
     confirmedAt: '2026-01-01T00:10:00.000Z',
     prizeLabel: 'Cyber Five',
     playerName: 'Player A',
+    ticketRef: 'Ticket #A',
   }
 }
 

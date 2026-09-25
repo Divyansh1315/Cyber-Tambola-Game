@@ -93,6 +93,7 @@ const winnerArb: fc.Arbitrary<Winner> = fc.record({
   confirmedAt: fc.constant('2026-01-01T00:10:00.000Z'),
   prizeLabel: fc.string({ minLength: 1, maxLength: 20 }),
   playerName: fc.string({ minLength: 1, maxLength: 20 }),
+  ticketRef: fc.string({ minLength: 1, maxLength: 10 }),
 })
 
 /** An arbitrary starting session state, including an arbitrary `game.id` so

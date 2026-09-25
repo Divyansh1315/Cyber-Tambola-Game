@@ -110,6 +110,7 @@ function buildWinner(
     confirmedAt: new Date().toISOString(),
     prizeLabel: prizeId,
     playerName: player.displayName,
+    ticketRef: ticket.id,
     ...overrides,
   }
 }

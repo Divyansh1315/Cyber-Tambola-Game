@@ -111,6 +111,7 @@ function makeWinner(id: string, playerId: string, ticketId: string, prizeId: 'CY
     confirmedAt: '2026-01-01T00:05:00.000Z',
     prizeLabel: PRIZES.find((p) => p.id === prizeId)!.label,
     playerName: `Player ${playerId}`,
+    ticketRef: `Ticket #${ticketId}`,
   }
 }
 

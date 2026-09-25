@@ -511,6 +511,7 @@ export function gameSessionReducer(
         confirmedAt: decidedAt,
         prizeLabel: claim.prizeLabel,
         playerName: claim.playerName,
+        ticketRef: claim.ticketRef,
       }
       return {
         ...state,

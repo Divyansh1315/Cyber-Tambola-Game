@@ -32,6 +32,7 @@ const winnerArb: fc.Arbitrary<Winner> = fc.record({
     'Cyber Full House',
   ),
   playerName: fc.string({ minLength: 1, maxLength: 20 }),
+  ticketRef: fc.string({ minLength: 1, maxLength: 20 }),
 })
 
 describe('toAnnouncementViewModel (property 12)', () => {

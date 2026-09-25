@@ -73,6 +73,7 @@ describe('PrizeClaim and Winner extended type shapes', () => {
       confirmedAt: '2024-01-01T00:10:00.000Z',
       prizeLabel: 'Firewall Line',
       playerName: 'Meera Iyer',
+      ticketRef: 'T-003',
     }
 
     // Round-trip through a plain object spread copy.

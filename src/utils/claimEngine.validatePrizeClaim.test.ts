@@ -100,6 +100,7 @@ function makeWinner(overrides: Partial<Winner> = {}): Winner {
     confirmedAt: '2024-01-01T00:00:00.000Z',
     prizeLabel: 'Cyber Five',
     playerName: 'Someone Else',
+    ticketRef: 'Ticket #Other',
     ...overrides,
   }
 }

@@ -105,6 +105,7 @@ function makeWinner(overrides: Partial<Winner> = {}): Winner {
     confirmedAt: new Date('2026-01-01T09:05:00.000Z').toISOString(),
     prizeLabel: 'Cyber Five',
     playerName: 'Asha',
+    ticketRef: 't-p1-ref',
     ...overrides,
   }
 }

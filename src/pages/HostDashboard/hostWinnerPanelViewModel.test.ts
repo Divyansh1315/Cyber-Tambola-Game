@@ -23,6 +23,7 @@ const winnerArb: fc.Arbitrary<Winner> = fc.record({
   confirmedAt: fc.constant('2026-01-01T09:05:00.000Z'),
   prizeLabel: fc.string({ minLength: 1, maxLength: 20 }),
   playerName: fc.string({ minLength: 1, maxLength: 20 }),
+  ticketRef: fc.string({ minLength: 1, maxLength: 20 }),
 })
 
 /**
@@ -46,6 +47,7 @@ const noiseWinnerArb: fc.Arbitrary<Winner> = fc.record({
   confirmedAt: fc.constant('2026-01-01T09:05:00.000Z'),
   prizeLabel: fc.string({ minLength: 1, maxLength: 20 }),
   playerName: fc.string({ minLength: 1, maxLength: 20 }),
+  ticketRef: fc.string({ minLength: 1, maxLength: 20 }),
 })
 
 const scenarioArb = fc.record({

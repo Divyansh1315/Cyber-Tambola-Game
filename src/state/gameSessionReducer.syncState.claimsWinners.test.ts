@@ -105,6 +105,7 @@ const winnerArb: fc.Arbitrary<Winner> = fc.record({
   confirmedAt: fc.constant('2026-01-01T00:00:00.000Z'),
   prizeLabel: fc.string({ minLength: 1, maxLength: 10 }),
   playerName: fc.string({ minLength: 1, maxLength: 10 }),
+  ticketRef: fc.string({ minLength: 1, maxLength: 10 }),
 })
 
 /**
