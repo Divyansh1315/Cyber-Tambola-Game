@@ -270,7 +270,12 @@ export function HostDashboard() {
 
         {/* Session header */}
         <header className="host__header">
-          <BrandMark size="md" />
+          <BrandMark
+            size="md"
+            withSubtitle
+            title="Cyber Awareness Month"
+            subtitle="Cyber Tambola"
+          />
           <div className="host__session-meta">
             <span className="host__stat">
               <span className="host__stat-label">Game Code</span>

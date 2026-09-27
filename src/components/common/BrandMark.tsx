@@ -7,6 +7,12 @@ interface BrandMarkProps {
   withSubtitle?: boolean
   /** Render title/subtitle in light colors for dark backgrounds. */
   onDark?: boolean
+  /** Override the default "Cyber Tambola V2" title (e.g. Host screen's
+   * "Cyber Awareness Month" campaign branding). Defaults to the standard
+   * wordmark so every other screen is unaffected. */
+  title?: string
+  /** Override the default subtitle text shown when `withSubtitle` is true. */
+  subtitle?: string
 }
 
 /**
@@ -17,6 +23,8 @@ export function BrandMark({
   size = 'md',
   withSubtitle = false,
   onDark = false,
+  title,
+  subtitle = 'Cyber Word Tambola',
 }: BrandMarkProps) {
   return (
     <div className={`brand brand--${size} ${onDark ? 'brand--on-dark' : ''}`}>
@@ -46,11 +54,13 @@ export function BrandMark({
       </span>
       <span className="brand__text">
         <span className="brand__title">
-          Cyber Tambola <span className="brand__v2">V2</span>
+          {title ?? (
+            <>
+              Cyber Tambola <span className="brand__v2">V2</span>
+            </>
+          )}
         </span>
-        {withSubtitle && (
-          <span className="brand__subtitle">Cyber Word Tambola</span>
-        )}
+        {withSubtitle && <span className="brand__subtitle">{subtitle}</span>}
       </span>
     </div>
   )
