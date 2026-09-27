@@ -56,25 +56,160 @@
   margin-bottom: var(--space-5);
 }
 
-/* Lobby */
+/*
+ * Lobby / "Scan to Join" screen -- Cyber Awareness Month branding.
+ * A dedicated full-bleed midnight-navy stage (own background, independent
+ * of `.projector`'s shared gradient) with restrained decorative circuit
+ * traces + a teal radial glow behind the QR. All decoration is
+ * `pointer-events: none` and purely visual; it never affects layout.
+ */
 .projector__lobby {
+  /* `fixed` (rather than fighting `.projector`/`.projector__stage`'s own
+   * padding and max-width/grid-centering with negative margins) is the
+   * simplest reliable way to get a true full-bleed stage regardless of the
+   * parent layout: it always covers the full viewport, independent of
+   * where it sits in the document flow. `overflow-y: auto` lets the page
+   * scroll rather than clip on short/mobile viewports (Req 4), while
+   * `overflow-x: hidden` keeps the decorative circuit traces from ever
+   * introducing horizontal scroll. */
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #031526;
+  padding: var(--space-6) var(--space-5) var(--space-7);
+  z-index: 1;
+}
+
+.projector__lobby-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(70vw, 900px);
+  height: min(70vw, 900px);
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(18, 184, 134, 0.22) 0%,
+    rgba(18, 184, 134, 0.08) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.projector__circuits {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(18, 184, 134, 0.4);
+  pointer-events: none;
+  z-index: 0;
+}
+.projector__circuit-nodes {
+  color: rgba(56, 224, 184, 0.65);
+}
+
+.projector__lobby-content {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-5);
+  gap: clamp(10px, 1.6vh, var(--space-4));
+  max-width: min(90vw, 640px);
+  text-align: center;
 }
-.projector__scan {
-  font-size: 2rem;
+
+.projector__shield {
+  width: clamp(40px, 6vh, 64px);
+  height: clamp(40px, 6vh, 64px);
+  color: var(--color-accent);
+  margin-bottom: clamp(4px, 0.6vh, 10px);
+}
+
+.projector__lobby-title {
+  font-size: clamp(1.75rem, 3.2vh, 2.75rem);
   font-weight: 800;
-  color: var(--color-on-dark);
+  color: #ffffff;
+  line-height: 1.15;
+  white-space: nowrap;
 }
-.projector__code {
-  font-size: 1.5rem;
+
+.projector__lobby-subtitle {
+  font-size: clamp(0.85rem, 1.4vh, 1.15rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-top: -4px;
+}
+
+.projector__scan {
+  font-size: clamp(1.25rem, 2.4vh, 1.85rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin-top: clamp(6px, 1vh, 14px);
+}
+
+.projector__code-label {
+  font-size: clamp(0.75rem, 1.1vh, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   color: var(--color-on-dark-soft);
+  margin-top: clamp(4px, 0.8vh, 10px);
 }
-.projector__code strong {
-  color: var(--color-on-dark);
-  letter-spacing: 0.08em;
+
+.projector__code {
+  font-size: clamp(1.5rem, 3vh, 2.25rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+}
+
+/* Presentation-only QR container: larger, borderless, softly rounded white
+ * square with a generous quiet zone -- layered on top of `.join-qr`'s base
+ * white/rounded look (JoinQrCode.css) without changing it for other
+ * callers (e.g. Host Dashboard keeps its smaller bordered version).
+ * JoinQrCode is given a single fixed `size` (see PresentationView.tsx) that
+ * already sits inside the 360-420px target at 1920x1080 and still fits
+ * comfortably at 1366x768; on narrower/shorter viewports (the media query
+ * below) it is handed a smaller `size` instead of being fought with CSS,
+ * since the inner QRCodeSVG must render at its real pixel size to stay
+ * sharp and undistorted -- scaling the wrapper via CSS alone would clip or
+ * blur the modules inside it. */
+.join-qr--projector {
+  border: none;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 20px 60px rgba(0, 0, 0, 0.45);
+  padding: clamp(14px, 2vh, 24px);
+}
+
+/* Narrow screens: allow the title to wrap naturally instead of forcing a
+ * single line that would otherwise overflow (Req 4). */
+@media (max-width: 480px) {
+  .projector__lobby-title {
+    white-space: normal;
+  }
+}
+
+/* Short viewports (e.g. a small laptop window, or a phone in landscape):
+ * tighten spacing so the full stack keeps fitting without clipping,
+ * falling back to page scroll only if truly necessary (Req 4). */
+@media (max-height: 480px) {
+  .projector__lobby-content {
+    gap: 6px;
+  }
+  .projector__shield {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 2px;
+  }
 }
 
 /* Cyber Word call — word, definition, and safe-practice tip shown together

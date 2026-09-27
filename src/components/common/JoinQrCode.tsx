@@ -5,6 +5,10 @@ interface JoinQrCodeProps {
   /** The game code players type in if they join manually instead of scanning. */
   gameCode: string
   size?: number
+  /** Optional extra class for callers that need screen-specific container styling
+   * (e.g. the Presentation lobby's larger, border-less card) on top of the
+   * base `.join-qr` look every other usage (Host Dashboard) keeps unchanged. */
+  className?: string
 }
 
 /**
@@ -24,15 +28,15 @@ interface JoinQrCodeProps {
  * right code automatically; the player still explicitly submits the join
  * form themselves (Req 7: Player Join never auto-joins from a URL param).
  */
-export function JoinQrCode({ gameCode, size = 180 }: JoinQrCodeProps) {
+export function JoinQrCode({ gameCode, size = 180, className = '' }: JoinQrCodeProps) {
   const joinUrl = `${window.location.origin}/player?game=${encodeURIComponent(gameCode)}`
 
   return (
-    <div className="join-qr" style={{ width: size, height: size }}>
+    <div className={`join-qr ${className}`.trim()} style={{ width: size, height: size }}>
       <QRCodeSVG
         value={joinUrl}
         size={size - 20}
-        marginSize={2}
+        marginSize={4}
         level="M"
         title={`Scan to join game ${gameCode}`}
       />
