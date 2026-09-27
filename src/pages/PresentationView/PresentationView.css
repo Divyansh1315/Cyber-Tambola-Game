@@ -141,7 +141,7 @@
 }
 
 .projector__lobby-subtitle {
-  font-size: clamp(0.85rem, 1.4vh, 1.15rem);
+  font-size: clamp(1.75rem, 3.2vh, 2.75rem);
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
