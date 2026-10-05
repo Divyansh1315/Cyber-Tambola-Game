@@ -415,7 +415,7 @@ export function HostDashboard() {
               <div className="host__dev-controls">
                 <span className="host__dev-label">Dev / Demo</span>
                 <Button variant="ghost" onClick={resetGame} icon="↺">
-                  Reset Demo Game
+                  Reset Game
                 </Button>
               </div>
             </Card>

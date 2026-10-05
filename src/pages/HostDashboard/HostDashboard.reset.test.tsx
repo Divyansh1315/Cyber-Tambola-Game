@@ -135,7 +135,7 @@ describe('HostDashboard Reset Demo Game clears marks + prize progress end to end
 
     // --- 2. Trigger Reset Demo Game via the real HostDashboard button. -----
     act(() => {
-      fireEvent.click(screen.getByRole('button', { name: /reset demo game/i }))
+      fireEvent.click(screen.getByRole('button', { name: /reset game/i }))
     })
 
     // --- 3. Assert the reducer's RESET_GAME cleared everything. -------------

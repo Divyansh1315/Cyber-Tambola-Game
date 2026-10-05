@@ -334,7 +334,7 @@ describe('HostDashboard Claim Inbox + Winner Panel (Task 11.5)', () => {
     const winnersCard = screen.getByText('Winners').closest('.card') as HTMLElement
     expect(winnersCard).toHaveTextContent('Asha')
 
-    await user.click(screen.getByRole('button', { name: /reset demo game/i }))
+    await user.click(screen.getByRole('button', { name: /reset game/i }))
 
     expect(getSubsection('Pending Claims')).toHaveTextContent('No claims in this category.')
     expect(getSubsection('Confirmed')).toHaveTextContent('No claims in this category.')
