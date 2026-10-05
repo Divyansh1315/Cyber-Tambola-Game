@@ -582,23 +582,59 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       : []
 
     /**
-     * Wraps every host-only and player-mutating dispatch call site: dispatch
-     * the existing optimistic action first (unchanged), then — only when
-     * Supabase is configured — call the matching RPC. On rejection, dispatch
-     * ROLLBACK_OPTIMISTIC for the just-added optimistic entry (row-level
-     * actions only; see resolveRollbackTarget).
+     * Wraps every host-only and player-mutating dispatch call site.
+     *
+     * For most actions: dispatch the existing optimistic action first
+     * (unchanged), then — only when Supabase is configured — call the
+     * matching RPC. On rejection, dispatch ROLLBACK_OPTIMISTIC for the
+     * just-added optimistic entry (row-level actions only; see
+     * resolveRollbackTarget).
+     *
+     * START_GAME and CALL_NEXT_WORD are the exception, and ONLY when
+     * Supabase is configured: the optimistic `dispatch(action)` call is
+     * skipped entirely for these two. Both the local reducer
+     * (gameSessionReducer.ts) and the server-side `call_next_word` RPC
+     * (0004_rpc_word_and_marks.sql) independently call their own
+     * `selectNextTerm`-equivalent and pick a RANDOM next term. There is no
+     * way for the client to "optimistically" guess which term the server
+     * will pick, so dispatching optimistically here does not just risk
+     * being wrong — it is *always* a different, uncoordinated random pick
+     * from the one the server will persist a moment later. The visible
+     * symptom was exactly that: Word A renders immediately (the local
+     * random pick), then ~1s later the realtime echo of the games row
+     * (SYNC_REMOTE, which fully replaces currentTermId/currentRound from
+     * the server row) overwrites it with Word B (the server's random pick)
+     * — a word "flash" with no second click. Skipping the optimistic
+     * dispatch for these two actions makes the RPC + its realtime echo the
+     * sole source of truth, so only one term is ever shown. In Local
+     * Fallback (no Supabase configured) this distinction doesn't apply —
+     * there is no server to diverge from — so the optimistic dispatch
+     * still runs for every action, including these two, exactly as before.
      */
     function wrappedDispatch(action: GameSessionAction) {
       const before = stateRef.current
-      dispatch(action)
-
       const supabase = getSupabaseClient()
-      if (!supabase) return // local-only fallback: optimistic dispatch is the whole story
+
+      if (!supabase) {
+        // Local-only fallback: optimistic dispatch is the whole story.
+        dispatch(action)
+        return
+      }
 
       const gameId = gameIdRef.current
       const hostSecret = hostSecretRef.current
 
-      const after = gameSessionReducer(before, action)
+      // START_GAME/CALL_NEXT_WORD: skip the optimistic dispatch (see the
+      // doc comment above for why) and let the RPC + its realtime echo be
+      // the only state update. Every other action keeps today's behavior.
+      const skipOptimisticDispatch =
+        action.type === 'START_GAME' || action.type === 'CALL_NEXT_WORD'
+
+      if (!skipOptimisticDispatch) {
+        dispatch(action)
+      }
+
+      const after = skipOptimisticDispatch ? before : gameSessionReducer(before, action)
       const rollbackTarget = resolveRollbackTarget(action, before, after)
 
       function rollback() {
@@ -616,13 +652,11 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
           // Starting the game and calling the first word are the same
           // server-side operation: call_next_word's own LOBBY branch
           // handles the LOBBY -> WORD_ACTIVE transition, picks the first
-          // term, and sets started_at (0004_rpc_word_and_marks.sql). The
-          // previous version of this case made no RPC call at all here,
-          // relying on a false assumption that get_or_create_game already
-          // reached WORD_ACTIVE during hydration -- it never does, so a
-          // fresh LOBBY game's first word only ever updated the Host's own
-          // optimistic local state, never the database, leaving every
-          // other device stuck in LOBBY until the Host's NEXT click.
+          // term, and sets started_at (0004_rpc_word_and_marks.sql). No
+          // optimistic dispatch happens above for this action when Supabase
+          // is configured (see the wrappedDispatch doc comment) — the
+          // realtime echo of the resulting games row is what actually
+          // reveals the first term for every device, Host included.
           if (gameId && hostSecret) {
             rpcCallNextWord(
               gameId,
@@ -632,6 +666,11 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
           }
           break
         case 'CALL_NEXT_WORD':
+          // No optimistic dispatch happens above for this action when
+          // Supabase is configured (see the wrappedDispatch doc comment) —
+          // the realtime echo of the resulting games row is the sole source
+          // of truth for the next term, avoiding a second, independently-
+          // random local guess that would only ever be overwritten.
           if (gameId && hostSecret) {
             rpcCallNextWord(
               gameId,

@@ -205,12 +205,19 @@ export function HostDashboard() {
   // the same action, so there's no separate "reveal" gate (Module 5).
   // Guards against a double-click/tap firing the same lifecycle dispatch
   // twice before the first RPC round-trip resolves. `canCallNext` etc. below
-  // are derived from `game.status`, but the optimistic local reducer already
-  // applies the new status synchronously on the FIRST click -- so a second
-  // click milliseconds later still reads a "valid" status and would fire a
-  // second, genuinely-independent RPC call (each one lands its own real row
-  // in called_terms server-side, since call_next_word has no way to know two
-  // calls came from the same user intent). This flag is the actual gate.
+  // are derived from `game.status`, which this flag backs up: for most
+  // lifecycle actions the optimistic local reducer applies the new status
+  // synchronously on the FIRST click, so a second click milliseconds later
+  // would otherwise still read a "valid" status and fire a second,
+  // genuinely-independent RPC call (each one lands its own real row in
+  // called_terms server-side, since call_next_word has no way to know two
+  // calls came from the same user intent). For START_GAME/CALL_NEXT_WORD
+  // specifically, `game.status` does NOT flip optimistically when Supabase
+  // is configured (GameSessionContext.tsx's wrappedDispatch intentionally
+  // skips the optimistic dispatch for those two, to avoid a client-side
+  // random term pick racing the server's own) — so for those two actions
+  // this flag is the ONLY thing preventing a double-click from firing a
+  // second RPC call during that round trip, not just a backstop.
   const [lifecycleActionPending, setLifecycleActionPending] = useState(false)
 
   function dispatchLifecycleAction(action: Parameters<typeof dispatch>[0]) {
