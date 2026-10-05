@@ -19,9 +19,6 @@
   color: var(--color-on-dark);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
-  position: sticky;
-  top: 0;
-  z-index: 5;
 }
 
 .player__header-top {
