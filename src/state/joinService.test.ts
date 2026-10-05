@@ -3,6 +3,7 @@ import fc from 'fast-check'
 import {
   buildJoinOutcome,
   validateJoin,
+  findExistingPlayer,
   normalizeId,
   localId,
   shortTicketRef,
@@ -41,21 +42,42 @@ const validCodeArb = fc.constantFrom(
   'cYbEr24',
 )
 
-/** Non-empty display name / id after trimming. */
+/** Non-empty display name after trimming. */
 const nameArb = fc.string({ minLength: 1, maxLength: 40 }).filter((s) => s.trim().length > 0)
-const idArb = fc.string({ minLength: 1, maxLength: 40 }).filter((s) => s.trim().length > 0)
+/** Non-empty device join token after trimming -- same shape as `idArb` used to
+ * be for the (now-removed) Employee ID, since a device join token is just an
+ * opaque string as far as this module's matching logic is concerned. */
+const tokenArb = fc.string({ minLength: 1, maxLength: 40 }).filter((s) => s.trim().length > 0)
 
 /** Random surrounding whitespace. */
 const wsArb = fc.stringOf(fc.constantFrom(' ', '\t', '\n'), { maxLength: 4 })
 
 const JOINABLE_ARB = fc.constantFrom<GameStatus>(...JOINABLE_STATUSES)
 
-function form(
-  gameCode: string,
-  employeeName: string,
-  employeeId: string,
-): JoinFormValues {
-  return { gameCode, employeeName, employeeId }
+function form(gameCode: string, employeeName: string): JoinFormValues {
+  return { gameCode, employeeName }
+}
+
+/**
+ * Convenience wrapper matching `buildJoinOutcome`'s old 5-key call shape,
+ * defaulting `deviceJoinTokensByPlayerId` to empty (i.e. "no players on this
+ * device yet") for every test that isn't specifically exercising duplicate-
+ * join/restore behavior -- those tests build the map explicitly instead.
+ */
+function join(args: {
+  form: JoinFormValues
+  game: Game
+  players: Player[]
+  tickets: Ticket[]
+  terms: typeof TERMS
+  deviceJoinTokensByPlayerId?: Record<string, string>
+  deviceJoinToken?: string
+}) {
+  return buildJoinOutcome({
+    deviceJoinTokensByPlayerId: {},
+    deviceJoinToken: 'default-device-token',
+    ...args,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -70,30 +92,25 @@ describe('Property 8: join validation normalizes and trims correctly', () => {
       fc.property(
         validCodeArb,
         nameArb,
-        idArb,
         wsArb,
         wsArb,
         wsArb,
         wsArb,
-        wsArb,
-        wsArb,
-        (code, name, id, wa, wb, wc, wd, we, wf) => {
+        (code, name, wa, wb, wc, wd) => {
           const game = makeGame('LOBBY')
-          const padded = form(`${wa}${code}${wb}`, `${wc}${name}${wd}`, `${we}${id}${wf}`)
-          const trimmed = form(code.trim(), name.trim(), id.trim())
+          const padded = form(`${wa}${code}${wb}`, `${wc}${name}${wd}`)
+          const trimmed = form(code.trim(), name.trim())
 
-          const paddedOut = buildJoinOutcome({ form: padded, game, players: [], tickets: [], terms: TERMS })
-          const trimmedOut = buildJoinOutcome({ form: trimmed, game, players: [], tickets: [], terms: TERMS })
+          const paddedOut = join({ form: padded, game, players: [], tickets: [], terms: TERMS })
+          const trimmedOut = join({ form: trimmed, game, players: [], tickets: [], terms: TERMS })
 
           // Both should be new-player outcomes with equal player fields.
           expect(paddedOut.kind).toBe('new')
           expect(trimmedOut.kind).toBe('new')
           if (paddedOut.kind === 'new' && trimmedOut.kind === 'new') {
             expect(paddedOut.player.displayName).toBe(trimmedOut.player.displayName)
-            expect(paddedOut.player.employeeDemoId).toBe(trimmedOut.player.employeeDemoId)
             // New-player fields equal the trimmed inputs.
             expect(paddedOut.player.displayName).toBe(name.trim())
-            expect(paddedOut.player.employeeDemoId).toBe(id.trim())
           }
         },
       ),
@@ -103,7 +120,7 @@ describe('Property 8: join validation normalizes and trims correctly', () => {
 
   it('normalizeId is idempotent and equal across case/whitespace variants', () => {
     fc.assert(
-      fc.property(idArb, wsArb, wsArb, (id, wa, wb) => {
+      fc.property(tokenArb, wsArb, wsArb, (id, wa, wb) => {
         const n = normalizeId(id)
         // Idempotent.
         expect(normalizeId(n)).toBe(n)
@@ -124,19 +141,18 @@ describe('Property 8: join validation normalizes and trims correctly', () => {
 // ---------------------------------------------------------------------------
 
 describe('Property 9: unknown or empty inputs are rejected', () => {
-  it('any field empty after trim yields an error and no new player', () => {
+  it('any required field empty after trim yields an error and no new player', () => {
     fc.assert(
       fc.property(
         validCodeArb,
         nameArb,
-        idArb,
-        fc.integer({ min: 0, max: 2 }),
+        fc.integer({ min: 0, max: 1 }),
         wsArb,
-        (code, name, id, whichEmpty, ws) => {
-          const fields = [code, name, id]
+        (code, name, whichEmpty, ws) => {
+          const fields = [code, name]
           fields[whichEmpty] = ws // blank/whitespace-only
-          const out = buildJoinOutcome({
-            form: form(fields[0], fields[1], fields[2]),
+          const out = join({
+            form: form(fields[0], fields[1]),
             game: makeGame('LOBBY'),
             players: [],
             tickets: [],
@@ -155,10 +171,9 @@ describe('Property 9: unknown or empty inputs are rejected', () => {
       fc.property(
         fc.string({ minLength: 1, maxLength: 12 }).filter((s) => normalizeId(s) !== 'cyber24' && s.trim().length > 0),
         nameArb,
-        idArb,
-        (code, name, id) => {
-          const out = buildJoinOutcome({
-            form: form(code, name, id),
+        (code, name) => {
+          const out = join({
+            form: form(code, name),
             game: makeGame('LOBBY'),
             players: [],
             tickets: [],
@@ -182,9 +197,9 @@ describe('Property 9: unknown or empty inputs are rejected', () => {
 describe('Property 10: joinability depends only on status', () => {
   it('joinable statuses do not reject a valid submission on status grounds', () => {
     fc.assert(
-      fc.property(JOINABLE_ARB, validCodeArb, nameArb, idArb, (status, code, name, id) => {
-        const out = buildJoinOutcome({
-          form: form(code, name, id),
+      fc.property(JOINABLE_ARB, validCodeArb, nameArb, (status, code, name) => {
+        const out = join({
+          form: form(code, name),
           game: makeGame(status),
           players: [],
           tickets: [],
@@ -199,9 +214,9 @@ describe('Property 10: joinability depends only on status', () => {
 
   it('COMPLETED status always rejects', () => {
     fc.assert(
-      fc.property(validCodeArb, nameArb, idArb, (code, name, id) => {
-        const out = buildJoinOutcome({
-          form: form(code, name, id),
+      fc.property(validCodeArb, nameArb, (code, name) => {
+        const out = join({
+          form: form(code, name),
           game: makeGame('COMPLETED'),
           players: [],
           tickets: [],
@@ -216,50 +231,86 @@ describe('Property 10: joinability depends only on status', () => {
 })
 
 // ---------------------------------------------------------------------------
-// Property 11 — Duplicate identity restores the existing player
+// Property 11 — Duplicate device restores the existing player; a different
+// device is never merged into that same player just for sharing a name
 // Feature: module-3-player-joining-tickets, property 11 — duplicate id restores
 // Validates: Requirements 5.2, 5.3
+// (Superseded from matching by Employee ID to matching by device join token,
+// since the Employee ID field was removed from the Join screen; display
+// names are deliberately never used for this — Property 11b below asserts
+// two different devices sharing the same name never get merged.)
 // ---------------------------------------------------------------------------
 
-function existingPlayer(employeeDemoId: string): Player {
+function existingPlayer(): Player {
   return {
     id: 'p-existing',
     gameId: 'GAME_001',
     displayName: 'Existing',
-    employeeDemoId,
     ticketId: 't-existing',
     joinedAt: new Date().toISOString(),
     name: 'Existing',
-    employeeId: employeeDemoId,
     ticketRef: 'Ticket #EXIS',
   }
 }
 
 describe('Property 11: duplicate identity restores the existing player', () => {
-  it('a normalized-id match returns restore and creates no new player/ticket', () => {
+  it('the SAME device (normalized token match) returns restore and creates no new player/ticket', () => {
     fc.assert(
       fc.property(
         validCodeArb,
         nameArb,
-        idArb,
+        tokenArb,
         wsArb,
         wsArb,
-        (code, name, id, wa, wb) => {
-          const player = existingPlayer(id)
+        (code, name, token, wa, wb) => {
+          const player = existingPlayer()
           const tickets: Ticket[] = []
-          // Submit a case/whitespace variant of the same id.
-          const submittedId = `${wa}${id.toUpperCase()}${wb}`
-          const out = buildJoinOutcome({
-            form: form(code, name, submittedId),
+          const deviceJoinTokensByPlayerId = { [player.id]: token }
+          // Submit a case/whitespace variant of the same token.
+          const submittedToken = `${wa}${token.toUpperCase()}${wb}`
+          const out = join({
+            form: form(code, name),
             game: makeGame('LOBBY'),
             players: [player],
             tickets,
             terms: TERMS,
+            deviceJoinTokensByPlayerId,
+            deviceJoinToken: submittedToken,
           })
           expect(out.kind).toBe('restore')
           if (out.kind === 'restore') expect(out.playerId).toBe('p-existing')
           // No new ticket created.
           expect(tickets).toHaveLength(0)
+        },
+      ),
+      { numRuns: 100 },
+    )
+  })
+
+  it('a DIFFERENT device with the same display name is never merged into the existing player', () => {
+    fc.assert(
+      fc.property(
+        validCodeArb,
+        nameArb, // same name submitted as the existing player's displayName below
+        tokenArb,
+        tokenArb,
+        (code, name, existingToken, newToken) => {
+          fc.pre(normalizeId(existingToken) !== normalizeId(newToken))
+          const player = { ...existingPlayer(), displayName: name, name }
+          const deviceJoinTokensByPlayerId = { [player.id]: existingToken }
+          const out = join({
+            form: form(code, name),
+            game: makeGame('LOBBY'),
+            players: [player],
+            tickets: [],
+            terms: TERMS,
+            deviceJoinTokensByPlayerId,
+            deviceJoinToken: newToken,
+          })
+          // A different device token, even with an identical display name,
+          // must be treated as a brand-new participant -- never restored
+          // into the existing player's identity.
+          expect(out.kind).toBe('new')
         },
       ),
       { numRuns: 100 },
@@ -276,10 +327,10 @@ describe('Property 11: duplicate identity restores the existing player', () => {
 describe('Property 12: a built player is well-formed', () => {
   it('valid new submission yields a well-formed player and matching ticket', () => {
     fc.assert(
-      fc.property(validCodeArb, nameArb, idArb, wsArb, wsArb, (code, name, id, wa, wb) => {
+      fc.property(validCodeArb, nameArb, wsArb, wsArb, (code, name, wa, wb) => {
         const game = makeGame('WORD_ACTIVE')
-        const out = buildJoinOutcome({
-          form: form(code, `${wa}${name}${wb}`, `${wa}${id}${wb}`),
+        const out = join({
+          form: form(code, `${wa}${name}${wb}`),
           game,
           players: [],
           tickets: [],
@@ -292,11 +343,12 @@ describe('Property 12: a built player is well-formed', () => {
         expect(player.gameId).toBe(game.id)
         expect(player.gameId.length).toBeGreaterThan(0)
         expect(player.displayName.length).toBeGreaterThan(0)
-        expect(player.employeeDemoId.length).toBeGreaterThan(0)
         expect(player.ticketId.length).toBeGreaterThan(0)
         expect(player.ticketId).toBe(ticket.id)
         expect(player.displayName).toBe(name.trim())
-        expect(player.employeeDemoId).toBe(id.trim())
+        // No employee/demo id field exists on Player at all.
+        expect(player).not.toHaveProperty('employeeDemoId')
+        expect(player).not.toHaveProperty('employeeId')
         // joinedAt is a valid ISO timestamp.
         expect(new Date(player.joinedAt).toISOString()).toBe(player.joinedAt)
       }),
@@ -406,9 +458,11 @@ describe('localId', () => {
 describe('validateJoin error branches and exact messages', () => {
   it('rejects a COMPLETED game with the exact gameCompleted message', () => {
     const decision = validateJoin(
-      form('CYBER24', 'Asha', 'EMP-1001'),
+      form('CYBER24', 'Asha'),
       makeGame('COMPLETED'),
       [],
+      {},
+      'device-1',
     )
     expect(decision.kind).toBe('error')
     if (decision.kind === 'error') {
@@ -419,9 +473,11 @@ describe('validateJoin error branches and exact messages', () => {
 
   it('rejects an unknown game code with the exact gameNotFound message', () => {
     const decision = validateJoin(
-      form('WRONG99', 'Asha', 'EMP-1001'),
+      form('WRONG99', 'Asha'),
       makeGame('LOBBY'),
       [],
+      {},
+      'device-1',
     )
     expect(decision.kind).toBe('error')
     if (decision.kind === 'error') {
@@ -431,9 +487,44 @@ describe('validateJoin error branches and exact messages', () => {
   })
 
   it('rejects empty fields with the exact requiredFields message', () => {
-    const decision = validateJoin(form('CYBER24', '   ', 'EMP-1001'), makeGame('LOBBY'), [])
+    const decision = validateJoin(
+      form('CYBER24', '   '),
+      makeGame('LOBBY'),
+      [],
+      {},
+      'device-1',
+    )
     expect(decision.kind).toBe('error')
     if (decision.kind === 'error') expect(decision.message).toBe(MESSAGES.requiredFields)
+  })
+
+  it('restores an existing player when the device join token matches', () => {
+    const player = existingPlayer()
+    const decision = validateJoin(
+      form('CYBER24', 'Asha'),
+      makeGame('LOBBY'),
+      [player],
+      { [player.id]: 'device-1' },
+      'device-1',
+    )
+    expect(decision.kind).toBe('restore')
+    if (decision.kind === 'restore') expect(decision.playerId).toBe(player.id)
+  })
+})
+
+describe('findExistingPlayer', () => {
+  it('matches by normalized device join token, never by displayName', () => {
+    const player = existingPlayer()
+    const map = { [player.id]: 'Device-Token-1' }
+    expect(findExistingPlayer([player], map, 'device-token-1')).toBe(player)
+    expect(findExistingPlayer([player], map, 'DEVICE-TOKEN-1  ')).toBe(player)
+    expect(findExistingPlayer([player], map, 'some-other-token')).toBeUndefined()
+    // A player with the identical displayName but a different (or absent)
+    // device token entry must never match.
+    const samenameDifferentDevice: Player = { ...player, id: 'p-other' }
+    expect(
+      findExistingPlayer([player, samenameDifferentDevice], {}, 'device-token-1'),
+    ).toBeUndefined()
   })
 })
 

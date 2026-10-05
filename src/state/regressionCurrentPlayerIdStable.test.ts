@@ -22,11 +22,9 @@ function buildPlayer(): Player {
     id: 'PLAYER_1',
     gameId: 'GAME_001',
     displayName: 'Divyansh',
-    employeeDemoId: 'emp-001',
     ticketId: 'TICKET_1',
     joinedAt: new Date().toISOString(),
     name: 'Divyansh',
-    employeeId: 'emp-001',
     ticketRef: 'Ticket #001',
   }
 }

@@ -133,7 +133,7 @@ export interface GameSessionContextValue {
   joinGame: (args: {
     gameCode: string
     displayName: string
-    employeeDemoId: string
+    deviceJoinToken: string
   }) => Promise<{ playerId: string; ticketId: string } | undefined>
   /** The full CyberTerm currently in play, or undefined in the lobby. */
   currentTerm?: CyberTerm
@@ -695,7 +695,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
     async function joinGame(args: {
       gameCode: string
       displayName: string
-      employeeDemoId: string
+      deviceJoinToken: string
     }) {
       const supabase = getSupabaseClient()
       if (!supabase) return undefined
@@ -703,7 +703,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       const result = await rpcJoinGame(
         args.gameCode,
         args.displayName,
-        args.employeeDemoId,
+        args.deviceJoinToken,
         activeTermIds,
       )
       // Fetch this player's own player + ticket rows directly rather than

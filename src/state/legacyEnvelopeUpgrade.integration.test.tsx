@@ -67,11 +67,13 @@ describe('legacy (version 2, pre-Module-5) envelope is rejected safely (module-4
       currentRound: 1,
     }
     const outcome = buildJoinOutcome({
-      form: { gameCode: VALID_CODE, employeeName: 'Asha', employeeId: 'EMP-1001' },
+      form: { gameCode: VALID_CODE, employeeName: 'Asha' },
       game,
       players: [],
       tickets: [],
       terms: cyberTerms,
+      deviceJoinTokensByPlayerId: {},
+      deviceJoinToken: 'device-asha',
     })
     if (outcome.kind !== 'new') {
       throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -118,11 +120,13 @@ describe('legacy (version 2, pre-Module-5) envelope is rejected safely (module-4
   it('also falls back to a fresh seed game when a version:2 envelope explicitly sets marks to null or a non-array value (Req 5.4)', () => {
     const game = createSeedGame()
     const outcome = buildJoinOutcome({
-      form: { gameCode: VALID_CODE, employeeName: 'Bhavin', employeeId: 'EMP-1002' },
+      form: { gameCode: VALID_CODE, employeeName: 'Bhavin' },
       game,
       players: [],
       tickets: [],
       terms: cyberTerms,
+      deviceJoinTokensByPlayerId: {},
+      deviceJoinToken: 'device-bhavin',
     })
     if (outcome.kind !== 'new') {
       throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -181,11 +185,13 @@ describe('legacy (version 3, pre-Module-6) envelope is rejected safely (module-6
       currentRound: 1,
     }
     const outcome = buildJoinOutcome({
-      form: { gameCode: VALID_CODE, employeeName: 'Chetan', employeeId: 'EMP-1003' },
+      form: { gameCode: VALID_CODE, employeeName: 'Chetan' },
       game,
       players: [],
       tickets: [],
       terms: cyberTerms,
+      deviceJoinTokensByPlayerId: {},
+      deviceJoinToken: 'device-chetan',
     })
     if (outcome.kind !== 'new') {
       throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -254,11 +260,13 @@ describe('current-version envelope defaults claims/winners to [] (module-6-realt
       currentRound: 1,
     }
     const outcome = buildJoinOutcome({
-      form: { gameCode: VALID_CODE, employeeName: 'Chetan', employeeId: 'EMP-1003' },
+      form: { gameCode: VALID_CODE, employeeName: 'Chetan' },
       game,
       players: [],
       tickets: [],
       terms: cyberTerms,
+      deviceJoinTokensByPlayerId: {},
+      deviceJoinToken: 'device-chetan',
     })
     if (outcome.kind !== 'new') {
       throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -312,11 +320,13 @@ describe('current-version envelope defaults claims/winners to [] (module-6-realt
   it('also defaults claims/winners to [] when explicitly null or a non-array value (Req 16.4)', () => {
     const game = createSeedGame()
     const outcome = buildJoinOutcome({
-      form: { gameCode: VALID_CODE, employeeName: 'Divya', employeeId: 'EMP-1004' },
+      form: { gameCode: VALID_CODE, employeeName: 'Divya' },
       game,
       players: [],
       tickets: [],
       terms: cyberTerms,
+      deviceJoinTokensByPlayerId: {},
+      deviceJoinToken: 'device-divya',
     })
     if (outcome.kind !== 'new') {
       throw new Error(`expected a new join outcome, got: ${outcome.kind}`)

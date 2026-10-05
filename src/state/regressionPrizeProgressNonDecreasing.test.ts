@@ -52,11 +52,9 @@ function makePlayer(): Player {
     id: PLAYER_ID,
     gameId: GAME_ID,
     displayName: 'Asha',
-    employeeDemoId: 'EMP-1001',
     ticketId: TICKET_ID,
     joinedAt: '2026-01-01T00:00:00.000Z',
     name: 'Asha',
-    employeeId: 'EMP-1001',
     ticketRef: 'Ticket #1',
   }
 }

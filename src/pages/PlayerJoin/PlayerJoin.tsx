@@ -6,7 +6,15 @@ import { Button } from '../../components/common/Button'
 import { cyberTerms } from '../../data/cyberTerms'
 import { SEED_GAME_CODE } from '../../state/gameSessionInitialState'
 import { useGameSession } from '../../state/GameSessionContext'
-import { buildJoinOutcome, MESSAGES } from '../../state/joinService'
+import {
+  buildJoinOutcome,
+  MESSAGES,
+  readOrCreateDeviceJoinToken,
+} from '../../state/joinService'
+import {
+  readDeviceJoinTokensByPlayerId,
+  writeDeviceJoinTokensByPlayerId,
+} from '../../state/persistence'
 import { RpcError } from '../../state/realtimeClient'
 import './PlayerJoin.css'
 
@@ -47,13 +55,12 @@ export function PlayerJoin() {
     return fromUrl ? fromUrl.toUpperCase() : SEED_GAME_CODE
   })
   const [employeeName, setEmployeeName] = useState('')
-  const [employeeId, setEmployeeId] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   /** Trim + required-fields check only, for instant client-side feedback. */
   function requiredFieldsError(): string | null {
-    if (!gameCode.trim() || !employeeName.trim() || !employeeId.trim()) {
+    if (!gameCode.trim() || !employeeName.trim()) {
       return MESSAGES.requiredFields
     }
     return null
@@ -61,14 +68,19 @@ export function PlayerJoin() {
 
   /** Local-only fallback path: unchanged behavior when Supabase isn't configured. */
   function joinLocally() {
+    const deviceJoinToken = readOrCreateDeviceJoinToken()
+    const deviceJoinTokensByPlayerId = readDeviceJoinTokensByPlayerId()
+
     let outcome
     try {
       outcome = buildJoinOutcome({
-        form: { gameCode, employeeName, employeeId },
+        form: { gameCode, employeeName },
         game: state.game,
         players: state.players,
         tickets: state.tickets,
         terms: cyberTerms,
+        deviceJoinTokensByPlayerId,
+        deviceJoinToken,
       })
     } catch {
       // The generator only throws for developer-facing failures (insufficient
@@ -90,8 +102,15 @@ export function PlayerJoin() {
         return
       case 'new':
         // Brand-new participant: add the pre-built player + ticket, then go.
+        // Remember this device's token against the new player id so a
+        // later duplicate join from the same browser (Req 5.2) is
+        // recognized without needing an Employee ID or matching by name.
         setError(null)
         dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })
+        writeDeviceJoinTokensByPlayerId({
+          ...deviceJoinTokensByPlayerId,
+          [outcome.player.id]: deviceJoinToken,
+        })
         navigate('/player')
         return
     }
@@ -112,7 +131,7 @@ export function PlayerJoin() {
       const result = await joinGame({
         gameCode,
         displayName: employeeName,
-        employeeDemoId: employeeId,
+        deviceJoinToken: readOrCreateDeviceJoinToken(),
       })
 
       if (result === undefined) {
@@ -148,7 +167,12 @@ export function PlayerJoin() {
     <div className="page join">
       <div className="join__inner">
         <header className="join__brand">
-          <BrandMark size="hero" withSubtitle />
+          <BrandMark
+            size="hero"
+            withSubtitle
+            title="Cyber Awareness Month"
+            subtitle="Cyber Tambola"
+          />
         </header>
 
         <p className="join__intro">
@@ -187,22 +211,6 @@ export function PlayerJoin() {
               value={employeeName}
               onChange={(e) => setEmployeeName(e.target.value)}
               placeholder="Your name"
-            />
-          </div>
-
-          <div className="field">
-            <label className="field__label" htmlFor="employeeId">
-              Employee ID / Demo ID
-            </label>
-            <input
-              id="employeeId"
-              name="employeeId"
-              className="field__input"
-              autoComplete="off"
-              maxLength={64}
-              value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value)}
-              placeholder="e.g. DEMO-021"
             />
           </div>
 

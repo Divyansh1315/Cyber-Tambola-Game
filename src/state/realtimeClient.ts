@@ -178,13 +178,13 @@ export interface JoinGameResult {
 export async function joinGame(
   gameCode: string,
   displayName: string,
-  employeeDemoId: string,
+  deviceJoinToken: string,
   activeTermIds: string[],
 ): Promise<JoinGameResult> {
   const rows = await callRpc<JoinGameResult[]>('join_game', {
     p_game_code: gameCode,
     p_display_name: displayName,
-    p_employee_demo_id: employeeDemoId,
+    p_device_join_token: deviceJoinToken,
     p_active_term_ids: activeTermIds,
   })
   const row = rows[0]

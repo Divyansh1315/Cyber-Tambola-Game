@@ -62,6 +62,8 @@ function joinNew(
     players: ctx.state.players,
     tickets: ctx.state.tickets,
     terms: cyberTerms,
+    deviceJoinTokensByPlayerId: {},
+    deviceJoinToken: `device-${Math.random().toString(36).slice(2)}`,
   })
   if (outcome.kind !== 'new') {
     throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -87,7 +89,6 @@ describe('session integration (module-3-player-joining-tickets)', () => {
     const outcome = joinNew(ctx, {
       gameCode: VALID_CODE,
       employeeName: 'Asha',
-      employeeId: 'EMP-1001',
     })
     act(() => {
       ctx.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })
@@ -191,17 +192,15 @@ describe('session integration (module-3-player-joining-tickets)', () => {
   it('joins three distinct players and assigns each a distinct ticket signature (Test D, Req 6.1, 6.3, 19.4)', () => {
     const mounted = mountProvider()
 
-    const employeeIds = ['EMP-1001', 'EMP-1002', 'EMP-1003']
     const names = ['Asha', 'Bhavin', 'Chetna']
 
-    employeeIds.forEach((employeeId, i) => {
+    names.forEach((name) => {
       // Use the CURRENT state each time so existing signatures are compared
       // during generation (uniqueness across the three players).
       const ctx = mounted.sink.current!
       const outcome = joinNew(ctx, {
         gameCode: VALID_CODE,
-        employeeName: names[i],
-        employeeId,
+        employeeName: name,
       })
       act(() => {
         ctx.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })
@@ -240,7 +239,6 @@ describe('session integration (module-3-player-joining-tickets)', () => {
     const outcome = joinNew(ctx0, {
       gameCode: VALID_CODE,
       employeeName: 'Asha',
-      employeeId: 'EMP-1001',
     })
     act(() => {
       ctx0.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })

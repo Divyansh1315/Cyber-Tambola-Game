@@ -71,16 +71,13 @@ export function mapRowToGame(row: Record<string, unknown>): Game {
  */
 export function mapRowToPlayer(row: Record<string, unknown>, ticket?: Ticket): Player {
   const displayName = str(row, 'display_name')
-  const employeeDemoId = str(row, 'employee_demo_id')
   return {
     id: str(row, 'id'),
     gameId: str(row, 'game_id'),
     displayName,
-    employeeDemoId,
     ticketId: ticket?.id ?? '',
     joinedAt: str(row, 'joined_at'),
     name: displayName,
-    employeeId: employeeDemoId,
     ticketRef: ticket?.ref ?? '',
   }
 }

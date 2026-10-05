@@ -32,27 +32,28 @@ describe('PlayerJoin', () => {
     localStorage.clear()
   })
 
-  it('renders three labelled inputs each with maxLength 64', () => {
+  it('renders exactly two labelled inputs (Game Code, Employee Name), each with maxLength 64', () => {
     renderJoin()
 
     const gameCode = screen.getByLabelText('Game Code')
     const name = screen.getByLabelText('Employee Name')
-    const id = screen.getByLabelText('Employee ID / Demo ID')
 
     expect(gameCode).toBeInTheDocument()
     expect(name).toBeInTheDocument()
-    expect(id).toBeInTheDocument()
 
     expect(gameCode).toHaveAttribute('maxlength', '64')
     expect(name).toHaveAttribute('maxlength', '64')
-    expect(id).toHaveAttribute('maxlength', '64')
+
+    // The Employee ID / Demo ID field has been removed from this screen
+    // entirely -- not just hidden -- there is no such label at all.
+    expect(screen.queryByLabelText(/employee id/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/demo id/i)).not.toBeInTheDocument()
   })
 
-  it('does not prefill the name or id fields', () => {
+  it('does not prefill the name field', () => {
     renderJoin()
 
     expect(screen.getByLabelText('Employee Name')).toHaveValue('')
-    expect(screen.getByLabelText('Employee ID / Demo ID')).toHaveValue('')
     // Game code may stay prefilled for demo convenience.
     expect(screen.getByLabelText('Game Code')).toHaveValue('CYBER24')
   })
@@ -61,32 +62,31 @@ describe('PlayerJoin', () => {
     const user = userEvent.setup()
     renderJoin()
 
-    // Leave name empty; fill only the id.
-    await user.type(screen.getByLabelText('Employee ID / Demo ID'), 'EMP-1')
+    // Leave name empty; submit with only the (prefilled) game code.
     await user.click(screen.getByRole('button', { name: /join game/i }))
 
     expect(screen.getByRole('alert')).toHaveTextContent(/please fill in/i)
     expect(screen.queryByText('PLAYER GAME SCREEN')).not.toBeInTheDocument()
   })
 
-  it('shows a validation message and does not navigate when the id is empty', async () => {
+  it('shows a validation message and does not navigate when the name is whitespace-only', async () => {
     const user = userEvent.setup()
     renderJoin()
 
-    await user.type(screen.getByLabelText('Employee Name'), 'Asha')
+    await user.type(screen.getByLabelText('Employee Name'), '   ')
     await user.click(screen.getByRole('button', { name: /join game/i }))
 
     expect(screen.getByRole('alert')).toHaveTextContent(/please fill in/i)
     expect(screen.queryByText('PLAYER GAME SCREEN')).not.toBeInTheDocument()
   })
 
-  it('navigates to /player on a valid new join', async () => {
+  it('navigates to /player on a valid new join with only a Game Code and Employee Name', async () => {
     const user = userEvent.setup()
     renderJoin()
 
-    // Game code is prefilled with CYBER24; add a fresh name + id.
+    // Game code is prefilled with CYBER24; add a fresh name. No Employee ID
+    // is collected or required anywhere in this flow.
     await user.type(screen.getByLabelText('Employee Name'), 'Asha')
-    await user.type(screen.getByLabelText('Employee ID / Demo ID'), 'EMP-100')
     await user.click(screen.getByRole('button', { name: /join game/i }))
 
     expect(await screen.findByText('PLAYER GAME SCREEN')).toBeInTheDocument()
@@ -102,7 +102,7 @@ describe('PlayerJoin', () => {
     expect(screen.getByLabelText('Game Code')).toHaveValue('AHMA29')
   })
 
-  it("still prefills from the legacy code query param for backward compatibility", () => {
+  it('still prefills from the legacy code query param for backward compatibility', () => {
     renderJoin('/join?code=ahma29')
 
     expect(screen.getByLabelText('Game Code')).toHaveValue('AHMA29')
@@ -122,10 +122,37 @@ describe('PlayerJoin', () => {
     await user.clear(gameCode)
     await user.type(gameCode, 'WRONG99')
     await user.type(screen.getByLabelText('Employee Name'), 'Asha')
-    await user.type(screen.getByLabelText('Employee ID / Demo ID'), 'EMP-200')
     await user.click(screen.getByRole('button', { name: /join game/i }))
 
     expect(screen.getByRole('alert')).toHaveTextContent(/not found/i)
     expect(screen.queryByText('PLAYER GAME SCREEN')).not.toBeInTheDocument()
+  })
+
+  it('two different players who happen to share the same name join as separate players', async () => {
+    const user = userEvent.setup()
+    const { unmount } = renderJoin()
+
+    await user.type(screen.getByLabelText('Employee Name'), 'Asha')
+    await user.click(screen.getByRole('button', { name: /join game/i }))
+    expect(await screen.findByText('PLAYER GAME SCREEN')).toBeInTheDocument()
+
+    // Simulate a second, different device/browser joining with the exact
+    // same display name -- this must never be merged into the first
+    // player's identity (names are never used as the restore/match key).
+    unmount()
+    localStorage.removeItem('cyber-tambola-v2:currentPlayerId')
+    localStorage.removeItem('cyber-tambola-v2:deviceJoinToken')
+
+    renderJoin()
+    await user.type(screen.getByLabelText('Employee Name'), 'Asha')
+    await user.click(screen.getByRole('button', { name: /join game/i }))
+    expect(await screen.findByText('PLAYER GAME SCREEN')).toBeInTheDocument()
+
+    const envelope = JSON.parse(localStorage.getItem('cyber-tambola-v2:game') ?? '{}')
+    const playersNamedAsha = (envelope.players ?? []).filter(
+      (p: { displayName: string }) => p.displayName === 'Asha',
+    )
+    expect(playersNamedAsha).toHaveLength(2)
+    expect(playersNamedAsha[0].id).not.toBe(playersNamedAsha[1].id)
   })
 })

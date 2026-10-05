@@ -66,11 +66,13 @@ describe('cross-tab claim/winner sync (module-5-prize-claim-processing-winner-ma
       // claim submitted below validates as VALID/PENDING.
       const game = createSeedGame()
       const outcome = buildJoinOutcome({
-        form: { gameCode: 'CYBER24', employeeName: 'Priya Singh', employeeId: 'EMP-2001' },
+        form: { gameCode: 'CYBER24', employeeName: 'Priya Singh' },
         game,
         players: [],
         tickets: [],
         terms: cyberTerms,
+        deviceJoinTokensByPlayerId: {},
+        deviceJoinToken: 'device-priya-singh',
       })
       if (outcome.kind !== 'new') {
         throw new Error(`expected a new join outcome, got ${outcome.kind}`)

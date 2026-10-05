@@ -55,6 +55,8 @@ function joinNew(ctx: GameSessionContextValue, form: JoinFormValues) {
     players: ctx.state.players,
     tickets: ctx.state.tickets,
     terms: cyberTerms,
+    deviceJoinTokensByPlayerId: {},
+    deviceJoinToken: `device-${Math.random().toString(36).slice(2)}`,
   })
   if (outcome.kind !== 'new') {
     throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -77,7 +79,6 @@ describe('claims/winners persist across a simulated page refresh (module-5-prize
     const outcome = joinNew(ctx0, {
       gameCode: VALID_CODE,
       employeeName: 'Refresh Tester',
-      employeeId: 'EMP-REFRESH-1',
     })
     act(() => {
       ctx0.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })

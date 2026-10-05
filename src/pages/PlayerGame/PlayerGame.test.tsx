@@ -30,11 +30,13 @@ import type { Ticket } from '../../types/ticket'
 /** Build a real player + ticket from the join service (no mocks/fakes). */
 function buildJoined(game: Game): { player: Player; ticket: Ticket } {
   const outcome = buildJoinOutcome({
-    form: { gameCode: 'CYBER24', employeeName: 'Asha Kumar', employeeId: 'EMP-1001' },
+    form: { gameCode: 'CYBER24', employeeName: 'Asha Kumar' },
     game,
     players: [],
     tickets: [],
     terms: cyberTerms,
+    deviceJoinTokensByPlayerId: {},
+    deviceJoinToken: 'device-asha-kumar',
   })
   if (outcome.kind !== 'new') {
     throw new Error(`expected a new join outcome, got ${outcome.kind}`)

@@ -54,11 +54,9 @@ function makePlayer(): Player {
     id: PLAYER_ID,
     gameId: GAME_ID,
     displayName: 'Asha',
-    employeeDemoId: 'EMP-1001',
     ticketId: TICKET_ID,
     joinedAt: '2026-01-01T00:00:00.000Z',
     name: 'Asha',
-    employeeId: 'EMP-1001',
     ticketRef: 'Ticket #1',
   }
 }
@@ -262,6 +260,8 @@ function joinNew(ctx: GameSessionContextValue, form: JoinFormValues) {
     players: ctx.state.players,
     tickets: ctx.state.tickets,
     terms: cyberTerms,
+    deviceJoinTokensByPlayerId: {},
+    deviceJoinToken: `device-${Math.random().toString(36).slice(2)}`,
   })
   if (outcome.kind !== 'new') {
     throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -282,7 +282,6 @@ describe('Regression 3: a refresh after a Mark, a claim submission, or a claim c
     const outcome = joinNew(ctx0, {
       gameCode: VALID_CODE,
       employeeName: 'Mark Only Tester',
-      employeeId: 'EMP-MARK-1',
     })
     act(() => {
       ctx0.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })
@@ -315,7 +314,6 @@ describe('Regression 3: a refresh after a Mark, a claim submission, or a claim c
     const outcome = joinNew(ctx0, {
       gameCode: VALID_CODE,
       employeeName: 'Submit Only Tester',
-      employeeId: 'EMP-SUBMIT-1',
     })
     act(() => {
       ctx0.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })
@@ -376,7 +374,6 @@ describe('Regression 3: a refresh after a Mark, a claim submission, or a claim c
     const outcome = joinNew(ctx0, {
       gameCode: VALID_CODE,
       employeeName: 'Confirm Tester',
-      employeeId: 'EMP-CONFIRM-1',
     })
     act(() => {
       ctx0.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })

@@ -182,3 +182,45 @@ export function writeCurrentPlayerId(playerId: string | undefined): void {
     // Persistence is best-effort; ignore quota/availability errors.
   }
 }
+
+/**
+ * localStorage key for this device's join-identity map: playerId ->
+ * device join token, for every player this browser has ever created in
+ * the LOCAL-FALLBACK path (no Supabase configured). Deliberately its own
+ * key, separate from the shared envelope and from `currentPlayerId`, for
+ * the same reason both of those are separate: this answers "which of the
+ * players in `state.players` did THIS device create," which must never be
+ * synchronized/shared and must never be inferred from `displayName` (Req:
+ * duplicate-join restoration must not merge players who happen to share a
+ * name). See `joinService.ts`'s `readOrCreateDeviceJoinToken` for the
+ * token itself.
+ */
+const DEVICE_JOIN_TOKENS_STORAGE_KEY = 'cyber-tambola-v2:deviceJoinTokensByPlayerId'
+
+/** Read this device's playerId -> deviceJoinToken map. Never throws. */
+export function readDeviceJoinTokensByPlayerId(): Record<string, string> {
+  if (typeof window === 'undefined') return {}
+  try {
+    const raw = window.localStorage.getItem(DEVICE_JOIN_TOKENS_STORAGE_KEY)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw)
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return {}
+    const result: Record<string, string> = {}
+    for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
+      if (typeof value === 'string') result[key] = value
+    }
+    return result
+  } catch {
+    return {}
+  }
+}
+
+/** Best-effort write of this device's playerId -> deviceJoinToken map. */
+export function writeDeviceJoinTokensByPlayerId(map: Record<string, string>): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(DEVICE_JOIN_TOKENS_STORAGE_KEY, JSON.stringify(map))
+  } catch {
+    // Persistence is best-effort; ignore quota/availability errors.
+  }
+}

@@ -7,7 +7,7 @@ import { computeSignature, generateTicket } from '../utils/ticketGenerator'
 /**
  * The outcome of a join attempt.
  * - `new`: a brand-new player + freshly generated ticket to dispatch.
- * - `restore`: an existing player (by normalized id) to restore as current.
+ * - `restore`: an existing player (by device join token) to restore as current.
  * - `error`: a validation failure with a user-facing message.
  */
 export type JoinOutcome =
@@ -24,11 +24,49 @@ export const JOINABLE_STATUSES = [
 
 /** User-facing validation messages (exact strings per Req 3.4, 3.6, 3.8). */
 export const MESSAGES = {
-  requiredFields:
-    'Please fill in the game code, your name, and your ID to join.',
+  requiredFields: 'Please fill in the game code and your name to join.',
   gameNotFound: 'Game not found or no longer available.',
   gameCompleted: 'This game has ended and is no longer available.',
 } as const
+
+/**
+ * Dedicated localStorage key for this device's join-identity token --
+ * separate from both the shared envelope key and `currentPlayerId`'s own
+ * key (persistence.ts), for the same reason `currentPlayerId` is separate:
+ * this answers "which browser/device is this," which must never be
+ * overwritten by a remote sync/hydration and must never be shared across
+ * tabs on different devices. Unlike `currentPlayerId` it is NOT tied to any
+ * one game/session -- it is created once per browser and reused for every
+ * future join (including in a different, later game), so a returning
+ * player on the same device is recognized without asking for a name-based
+ * or ID-based match.
+ */
+const DEVICE_JOIN_TOKEN_STORAGE_KEY = 'cyber-tambola-v2:deviceJoinToken'
+
+/**
+ * Returns this browser's device join token, generating and persisting one
+ * on first use. This is an opaque, non-personal identifier -- it carries no
+ * employee/demo ID and is never displayed anywhere in the UI. It exists
+ * solely so `join_game` can recognize "this device already has a player in
+ * this game" (Req: duplicate-join restoration) without collecting an
+ * Employee ID and without matching on `displayName` (different employees
+ * can share a name).
+ */
+export function readOrCreateDeviceJoinToken(): string {
+  if (typeof window === 'undefined' || !window.localStorage) return localId()
+  try {
+    const existing = window.localStorage.getItem(DEVICE_JOIN_TOKEN_STORAGE_KEY)
+    if (existing) return existing
+    const token = localId()
+    window.localStorage.setItem(DEVICE_JOIN_TOKEN_STORAGE_KEY, token)
+    return token
+  } catch {
+    // localStorage unavailable/full/blocked (e.g. private browsing) --
+    // fail open with a fresh, non-persisted token rather than blocking the
+    // join; this device just won't be recognized as "returning" next time.
+    return localId()
+  }
+}
 
 /** The single active prototype game code, in normalized form. */
 const EXPECTED_GAME_CODE = 'cyber24'
@@ -73,15 +111,26 @@ export function shortTicketRef(ticketId: string): string {
 }
 
 /**
- * Find an existing player in the current game whose employeeDemoId normalizes
- * to the same value as the submitted id (Req 5.2).
+ * `Player` no longer carries the device join token used to recognize a
+ * returning player (it's an internal join-time signal, never a domain
+ * field shown/stored on the player record) -- restore-matching therefore
+ * cannot be done by scanning `players` for a field the type doesn't have.
+ * Callers pass the game's own locally-tracked map from device token to
+ * player id instead. In the local-fallback path (no Supabase configured)
+ * this is threaded through as `deviceJoinTokensByPlayerId` (see
+ * `PlayerJoin.tsx`), a small player-id -> token side table maintained
+ * client-side alongside `players`, exactly the same way `currentPlayerId`
+ * is kept alongside but outside of `players`.
  */
 export function findExistingPlayer(
   players: Player[],
-  employeeDemoId: string,
+  deviceJoinTokensByPlayerId: Record<string, string>,
+  deviceJoinToken: string,
 ): Player | undefined {
-  const target = normalizeId(employeeDemoId)
-  return players.find((p) => normalizeId(p.employeeDemoId) === target)
+  const target = normalizeId(deviceJoinToken)
+  return players.find(
+    (p) => normalizeId(deviceJoinTokensByPlayerId[p.id] ?? '') === target,
+  )
 }
 
 /**
@@ -92,19 +141,20 @@ export function validateJoin(
   form: JoinFormValues,
   game: Game,
   players: Player[],
+  deviceJoinTokensByPlayerId: Record<string, string>,
+  deviceJoinToken: string,
 ):
   | { kind: 'error'; message: string }
   | { kind: 'restore'; playerId: string }
   | {
       kind: 'new'
-      trimmed: { gameCode: string; displayName: string; employeeDemoId: string }
+      trimmed: { gameCode: string; displayName: string }
     } {
   const gameCode = form.gameCode.trim()
   const displayName = form.employeeName.trim()
-  const employeeDemoId = form.employeeId.trim()
 
   // Any required field empty after trim → error (Req 3.4).
-  if (!gameCode || !displayName || !employeeDemoId) {
+  if (!gameCode || !displayName) {
     return { kind: 'error', message: MESSAGES.requiredFields }
   }
 
@@ -118,13 +168,20 @@ export function validateJoin(
     return { kind: 'error', message: MESSAGES.gameCompleted }
   }
 
-  // Duplicate identity → restore existing player (Req 5.2).
-  const existing = findExistingPlayer(players, employeeDemoId)
+  // Same device already has a player in this game → restore, never a
+  // fresh join (Req 5.2). Matched by device join token, never by name:
+  // two different employees typing the same display name must never be
+  // merged into one player.
+  const existing = findExistingPlayer(
+    players,
+    deviceJoinTokensByPlayerId,
+    deviceJoinToken,
+  )
   if (existing) {
     return { kind: 'restore', playerId: existing.id }
   }
 
-  return { kind: 'new', trimmed: { gameCode, displayName, employeeDemoId } }
+  return { kind: 'new', trimmed: { gameCode, displayName } }
 }
 
 /**
@@ -139,15 +196,31 @@ export function buildJoinOutcome(args: {
   players: Player[]
   tickets: Ticket[]
   terms: CyberTerm[]
+  deviceJoinTokensByPlayerId: Record<string, string>
+  deviceJoinToken: string
 }): JoinOutcome {
-  const { form, game, players, tickets, terms } = args
+  const {
+    form,
+    game,
+    players,
+    tickets,
+    terms,
+    deviceJoinTokensByPlayerId,
+    deviceJoinToken,
+  } = args
 
-  const decision = validateJoin(form, game, players)
+  const decision = validateJoin(
+    form,
+    game,
+    players,
+    deviceJoinTokensByPlayerId,
+    deviceJoinToken,
+  )
   if (decision.kind !== 'new') {
     return decision
   }
 
-  const { displayName, employeeDemoId } = decision.trimmed
+  const { displayName } = decision.trimmed
   const playerId = localId()
   const ticketId = localId()
   const now = new Date().toISOString()
@@ -168,12 +241,10 @@ export function buildJoinOutcome(args: {
     id: playerId,
     gameId: game.id,
     displayName,
-    employeeDemoId,
     ticketId,
     joinedAt: now,
-    // UI-facing aliases retained from Module 1 (Req 4.1–4.3).
+    // UI-facing alias retained from Module 1 (Req 4.1–4.3).
     name: displayName,
-    employeeId: employeeDemoId,
     ticketRef: ticket.ref,
   }
 

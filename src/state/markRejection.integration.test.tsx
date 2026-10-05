@@ -56,6 +56,8 @@ function joinNew(ctx: GameSessionContextValue, form: JoinFormValues) {
     players: ctx.state.players,
     tickets: ctx.state.tickets,
     terms: cyberTerms,
+    deviceJoinTokensByPlayerId: {},
+    deviceJoinToken: `device-${Math.random().toString(36).slice(2)}`,
   })
   if (outcome.kind !== 'new') {
     throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -82,7 +84,6 @@ describe('mark rejection integration (module-4-term-marking-prize-engine)', () =
     const outcome = joinNew(ctx0, {
       gameCode: VALID_CODE,
       employeeName: 'Meera',
-      employeeId: 'EMP-4001',
     })
     act(() => {
       ctx0.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })
@@ -138,7 +139,6 @@ describe('mark rejection integration (module-4-term-marking-prize-engine)', () =
     const outcome = joinNew(ctx0, {
       gameCode: VALID_CODE,
       employeeName: 'Karan',
-      employeeId: 'EMP-4002',
     })
     act(() => {
       ctx0.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })

@@ -79,11 +79,9 @@ function makePlayer(overrides: Partial<Player> = {}): Player {
     id: PLAYER_ID,
     gameId: GAME_ID,
     displayName: 'Alex',
-    employeeDemoId: 'EMP-1',
     ticketId: TICKET_ID,
     joinedAt: '2024-01-01T00:00:00.000Z',
     name: 'Alex',
-    employeeId: 'EMP-1',
     ticketRef: 'Ticket #TEST',
     ...overrides,
   }

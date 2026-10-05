@@ -61,6 +61,8 @@ function joinNew(ctx: GameSessionContextValue, form: JoinFormValues) {
     players: ctx.state.players,
     tickets: ctx.state.tickets,
     terms: cyberTerms,
+    deviceJoinTokensByPlayerId: {},
+    deviceJoinToken: `device-${Math.random().toString(36).slice(2)}`,
   })
   if (outcome.kind !== 'new') {
     throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -105,7 +107,6 @@ describe.runIf(hasBroadcastChannel)(
       const outcome = joinNew(ctx1, {
         gameCode: VALID_CODE,
         employeeName: 'Asha',
-        employeeId: 'EMP-3001',
       })
       act(() => {
         tab1.sink.current!.dispatch({
@@ -226,7 +227,6 @@ describe.runIf(hasBroadcastChannel)(
       const outcome = joinNew(ctx1, {
         gameCode: VALID_CODE,
         employeeName: 'Bhavin',
-        employeeId: 'EMP-3002',
       })
       act(() => {
         tab1.sink.current!.dispatch({

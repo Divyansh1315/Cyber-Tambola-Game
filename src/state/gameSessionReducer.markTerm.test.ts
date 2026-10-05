@@ -50,11 +50,9 @@ function makePlayer(id: string, ticketId: string): Player {
     id,
     gameId: 'GAME_001',
     displayName: `Player ${id}`,
-    employeeDemoId: `EMP-${id}`,
     ticketId,
     joinedAt: '2026-01-01T00:00:00.000Z',
     name: `Player ${id}`,
-    employeeId: `EMP-${id}`,
     ticketRef: `Ticket #${id}`,
   }
 }

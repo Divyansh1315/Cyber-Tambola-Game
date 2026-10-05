@@ -57,13 +57,15 @@ function dispatchAndFlush(action: GameSessionAction): void {
   })
 }
 
-function joinFreshPlayer(game: Game, name: string, employeeId: string) {
+function joinFreshPlayer(game: Game, name: string, deviceJoinToken: string) {
   const outcome = buildJoinOutcome({
-    form: { gameCode: 'CYBER24', employeeName: name, employeeId },
+    form: { gameCode: 'CYBER24', employeeName: name },
     game,
     players: [],
     tickets: [],
     terms: cyberTerms,
+    deviceJoinTokensByPlayerId: {},
+    deviceJoinToken,
   })
   if (outcome.kind !== 'new') {
     throw new Error(`expected a new join outcome, got ${outcome.kind}`)

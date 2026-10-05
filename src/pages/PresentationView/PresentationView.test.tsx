@@ -55,16 +55,20 @@ import type { Winner } from '../../types/prize'
 
 // --- Test fixtures ----------------------------------------------------------
 
-function makePlayer(id: string, displayName: string, employeeDemoId: string): Player {
+// `_employeeDemoId` is accepted but deliberately never stored on the
+// returned Player: Player carries no such field at all now, and this
+// parameter exists only so callers can pass an EMP-/DEMO-shaped example
+// value that the "never exposes an employee/demo id" assertions below can
+// then verify is never rendered anywhere, guarding against any future
+// regression that reintroduces such a field.
+function makePlayer(id: string, displayName: string, _employeeDemoId: string): Player {
   return {
     id,
     gameId: 'GAME_001',
     displayName,
-    employeeDemoId,
     ticketId: `t-${id}`,
     joinedAt: new Date('2026-01-01T09:00:00.000Z').toISOString(),
     name: displayName,
-    employeeId: employeeDemoId,
     ticketRef: `Ticket #${id}`,
   }
 }

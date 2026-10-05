@@ -20,17 +20,14 @@ const GAME_ID = 'GAME_001'
 
 function makePlayer(overrides: Partial<Player> & { id: string }): Player {
   const displayName = overrides.displayName ?? 'Player'
-  const employeeDemoId = overrides.employeeDemoId ?? 'EMP-0000'
   return {
     gameId: GAME_ID,
     joinedAt: new Date('2026-01-01T09:00:00.000Z').toISOString(),
     name: displayName,
-    employeeId: employeeDemoId,
     ticketRef: `Ticket #${overrides.id}`,
     ticketId: `t-${overrides.id}`,
     ...overrides,
     displayName,
-    employeeDemoId,
   }
 }
 
@@ -109,9 +106,9 @@ describe('HostDashboard Claim Inbox + Winner Panel (Task 11.5)', () => {
 
   it('Pending Claims subsection lists claims PENDING-first then by submission time (Req 7.4)', () => {
     const players = [
-      makePlayer({ id: 'p1', displayName: 'Asha', employeeDemoId: 'EMP-1001' }),
-      makePlayer({ id: 'p2', displayName: 'Bhavya', employeeDemoId: 'EMP-1002' }),
-      makePlayer({ id: 'p3', displayName: 'Chetan', employeeDemoId: 'EMP-1003' }),
+      makePlayer({ id: 'p1', displayName: 'Asha' }),
+      makePlayer({ id: 'p2', displayName: 'Bhavya' }),
+      makePlayer({ id: 'p3', displayName: 'Chetan' }),
     ]
     const tickets = players.map((p) => makeTicket(p.ticketId, p.id))
 
@@ -162,9 +159,8 @@ describe('HostDashboard Claim Inbox + Winner Panel (Task 11.5)', () => {
   })
 
   it('Confirm is disabled for an INVALID claim and enabled for a VALID/PENDING claim on an open prize (Req 8.1, 10.1)', () => {
-    const players = [makePlayer({ id: 'p1', displayName: 'Asha', employeeDemoId: 'EMP-1001' })]
+    const players = [makePlayer({ id: 'p1', displayName: 'Asha' })]
     const tickets = players.map((p) => makeTicket(p.ticketId, p.id))
-
     const claims: PrizeClaim[] = [
       makeClaim({
         id: 'c-invalid',
@@ -208,7 +204,7 @@ describe('HostDashboard Claim Inbox + Winner Panel (Task 11.5)', () => {
 
   it('confirming one claim moves it to Confirmed and immediately shows the Winner Panel row without a refresh (Req 8.5, 15.3)', async () => {
     const user = userEvent.setup()
-    const players = [makePlayer({ id: 'p1', displayName: 'Asha', employeeDemoId: 'EMP-1001' })]
+    const players = [makePlayer({ id: 'p1', displayName: 'Asha' })]
     const tickets = players.map((p) => makeTicket(p.ticketId, p.id))
     const claims: PrizeClaim[] = [
       makeClaim({
@@ -253,7 +249,7 @@ describe('HostDashboard Claim Inbox + Winner Panel (Task 11.5)', () => {
     const user = userEvent.setup()
     vi.spyOn(window, 'prompt').mockReturnValue('Duplicate / already won')
 
-    const players = [makePlayer({ id: 'p1', displayName: 'Asha', employeeDemoId: 'EMP-1001' })]
+    const players = [makePlayer({ id: 'p1', displayName: 'Asha' })]
     const tickets = players.map((p) => makeTicket(p.ticketId, p.id))
     const claims: PrizeClaim[] = [
       makeClaim({
@@ -287,8 +283,8 @@ describe('HostDashboard Claim Inbox + Winner Panel (Task 11.5)', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true)
 
     const players = [
-      makePlayer({ id: 'p1', displayName: 'Asha', employeeDemoId: 'EMP-1001' }),
-      makePlayer({ id: 'p2', displayName: 'Bhavya', employeeDemoId: 'EMP-1002' }),
+      makePlayer({ id: 'p1', displayName: 'Asha' }),
+      makePlayer({ id: 'p2', displayName: 'Bhavya' }),
     ]
     const tickets = players.map((p) => makeTicket(p.ticketId, p.id))
     const claims: PrizeClaim[] = [

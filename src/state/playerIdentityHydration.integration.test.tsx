@@ -52,6 +52,8 @@ function joinNew(ctx: GameSessionContextValue, form: JoinFormValues) {
     players: ctx.state.players,
     tickets: ctx.state.tickets,
     terms: cyberTerms,
+    deviceJoinTokensByPlayerId: {},
+    deviceJoinToken: `device-${Math.random().toString(36).slice(2)}`,
   })
   if (outcome.kind !== 'new') {
     throw new Error(`expected a new join outcome, got: ${outcome.kind}`)
@@ -74,7 +76,6 @@ describe('client-local currentPlayerId hydration across a simulated refresh (bug
     const outcome = joinNew(ctx0, {
       gameCode: VALID_CODE,
       employeeName: 'Priya',
-      employeeId: 'EMP-5001',
     })
     act(() => {
       ctx0.dispatch({ type: 'JOIN_PLAYER', player: outcome.player, ticket: outcome.ticket })

@@ -15,18 +15,15 @@ import type { Ticket } from '../../types/ticket'
 
 function makePlayer(overrides: Partial<Player> & { id: string }): Player {
   const displayName = overrides.displayName ?? 'Player'
-  const employeeDemoId = overrides.employeeDemoId ?? 'EMP-0000'
   return {
     gameId: 'GAME_001',
     joinedAt: new Date('2026-01-01T09:00:00.000Z').toISOString(),
     name: displayName,
-    employeeId: employeeDemoId,
     ticketRef: `Ticket #${overrides.id}`,
     ticketId: `t-${overrides.id}`,
     ...overrides,
     // Explicit fields not present as raw override keys are set from resolved values.
     displayName,
-    employeeDemoId,
   }
 }
 
@@ -91,9 +88,9 @@ describe('HostDashboard participant count + roster', () => {
 
   it('participant count equals players.length after seeding (Req 6.1)', () => {
     const players = [
-      makePlayer({ id: 'p1', displayName: 'Asha', employeeDemoId: 'EMP-1001' }),
-      makePlayer({ id: 'p2', displayName: 'Bhavya', employeeDemoId: 'EMP-1002' }),
-      makePlayer({ id: 'p3', displayName: 'Chetan', employeeDemoId: 'EMP-1003' }),
+      makePlayer({ id: 'p1', displayName: 'Asha' }),
+      makePlayer({ id: 'p2', displayName: 'Bhavya' }),
+      makePlayer({ id: 'p3', displayName: 'Chetan' }),
     ]
     const tickets = players.map((p) => makeTicket(p.ticketId, p.id))
     seedPlayers(players, tickets)
@@ -108,8 +105,8 @@ describe('HostDashboard participant count + roster', () => {
 
   it('the participant roster lists display names but never any employeeDemoId (Req 17.2, 17.4)', () => {
     const players = [
-      makePlayer({ id: 'p1', displayName: 'Asha', employeeDemoId: 'EMP-1001' }),
-      makePlayer({ id: 'p2', displayName: 'Bhavya', employeeDemoId: 'EMP-1002' }),
+      makePlayer({ id: 'p1', displayName: 'Asha' }),
+      makePlayer({ id: 'p2', displayName: 'Bhavya' }),
     ]
     const tickets = players.map((p) => makeTicket(p.ticketId, p.id))
     seedPlayers(players, tickets)
