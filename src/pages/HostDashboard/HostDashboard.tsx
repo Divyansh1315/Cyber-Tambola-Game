@@ -411,9 +411,7 @@ export function HostDashboard() {
                 </Button>
               </div>
 
-              {/* Development/demo-only control — intentionally understated. */}
               <div className="host__dev-controls">
-                <span className="host__dev-label">Dev / Demo</span>
                 <Button variant="ghost" onClick={resetGame} icon="↺">
                   Reset Game
                 </Button>
