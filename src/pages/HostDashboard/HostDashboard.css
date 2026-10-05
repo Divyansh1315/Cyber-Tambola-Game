@@ -37,6 +37,54 @@
   flex-wrap: wrap;
 }
 
+/*
+ * Host-only branding block: a small "Cyber Awareness Month" eyebrow line
+ * above a larger, bold "CYBER TAMBOLA" title, both aligned beside the
+ * shield/check glyph. Sized with clamp() so it stays readable without
+ * wrapping or overflowing the header on common desktop/laptop widths, and
+ * kept compact (no extra vertical padding of its own) so it does not grow
+ * the header's overall height beyond what the existing stats/button row
+ * already occupies.
+ */
+.host__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0; /* allow the text column to size independently in the flex row */
+  flex-shrink: 0;
+}
+
+.host__brand-glyph {
+  display: inline-flex;
+  color: var(--color-primary);
+  font-size: clamp(1.75rem, 2.2vw, 2.25rem);
+  flex-shrink: 0;
+}
+
+.host__brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.host__brand-eyebrow {
+  font-size: clamp(0.65rem, 0.9vw, 0.78rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-faint);
+  white-space: nowrap;
+}
+
+.host__brand-title {
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--color-primary-strong);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .host__session-meta {
   display: flex;
   align-items: center;

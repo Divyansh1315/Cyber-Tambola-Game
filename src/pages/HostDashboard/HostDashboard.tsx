@@ -1,6 +1,5 @@
 import { Button } from '../../components/common/Button'
 import { useEffect, useState } from 'react'
-import { BrandMark } from '../../components/common/BrandMark'
 import { Card } from '../../components/common/Card'
 import { ClaimStatusTag } from '../../components/common/ClaimStatusTag'
 import { CyberWordCard } from '../../components/common/CyberWordCard'
@@ -270,12 +269,45 @@ export function HostDashboard() {
 
         {/* Session header */}
         <header className="host__header">
-          <BrandMark
-            size="md"
-            withSubtitle
-            title="Cyber Awareness Month"
-            subtitle="Cyber Tambola"
-          />
+          {/*
+           * Host-only branding block: a small "Cyber Awareness Month" line
+           * above a larger, bold "CYBER TAMBOLA" title, both set beside the
+           * shield/check glyph (reused from BrandMark's own markup so the
+           * icon stays visually identical to every other screen). This is
+           * a deliberately Host-specific layout -- BrandMark itself is left
+           * unchanged so PlayerJoin/other screens keep their existing
+           * title-then-subtitle hierarchy.
+           */}
+          <div className="host__brand">
+            <span className="host__brand-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="1em" height="1em" role="img">
+                <path
+                  fill="currentColor"
+                  d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"
+                  opacity="0.18"
+                />
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinejoin="round"
+                  d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"
+                />
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m8.5 12 2.4 2.4L15.5 9.5"
+                />
+              </svg>
+            </span>
+            <span className="host__brand-text">
+              <span className="host__brand-eyebrow">Cyber Awareness Month</span>
+              <span className="host__brand-title">Cyber Tambola</span>
+            </span>
+          </div>
           <div className="host__session-meta">
             <span className="host__stat">
               <span className="host__stat-label">Game Code</span>
