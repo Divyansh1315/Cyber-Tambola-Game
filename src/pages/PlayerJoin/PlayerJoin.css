@@ -1,11 +1,52 @@
+/*
+ * Player Join / Login screen -- Cyber Awareness Month event branding.
+ * Dark navy, professional corporate cyber-security identity: a soft
+ * gradient background, restrained decorative circuit traces, and a gentle
+ * blue glow behind the card. All decoration is `pointer-events: none` and
+ * purely visual -- it never affects layout or interaction.
+ */
 .join {
+  position: relative;
   display: flex;
   justify-content: center;
-  background: linear-gradient(160deg, #0b1a2b 0%, #12263a 60%, #0e2135 100%);
+  background: linear-gradient(160deg, #061325 0%, #0b1a2b 55%, #0e2135 100%);
   padding: var(--space-6) var(--space-4) var(--space-7);
+  overflow: hidden;
+}
+
+.join__circuits {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(18, 184, 134, 0.28);
+  pointer-events: none;
+  z-index: 0;
+}
+.join__circuit-nodes {
+  color: rgba(56, 224, 184, 0.5);
+}
+
+.join__glow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(90vw, 640px);
+  height: min(60vh, 480px);
+  transform: translateX(-50%);
+  background: radial-gradient(
+    circle,
+    rgba(15, 123, 184, 0.28) 0%,
+    rgba(15, 123, 184, 0.1) 45%,
+    transparent 72%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .join__inner {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 460px;
   display: flex;
@@ -14,8 +55,44 @@
   padding-top: var(--space-6);
 }
 
+/*
+ * Branding block: shield glyph + a small "Cyber Awareness Month" eyebrow
+ * line above the larger, bold, dominant "CYBER TAMBOLA" title -- the
+ * reverse of BrandMark's own title-then-subtitle order, since this screen
+ * needs CYBER TAMBOLA to read as the primary title (per design brief).
+ * The eyebrow uses a light cyan-accented colour (never near-black navy)
+ * against the dark background for WCAG-friendly contrast.
+ */
 .join__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
   text-align: center;
+}
+
+.join__shield {
+  width: clamp(40px, 10vw, 56px);
+  height: clamp(40px, 10vw, 56px);
+  color: var(--color-accent);
+  margin-bottom: 6px;
+}
+
+.join__brand-eyebrow {
+  font-size: clamp(0.85rem, 2.6vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #8ec9ff; /* light, cyan-accented blue -- clearly visible on dark navy */
+  text-transform: uppercase;
+}
+
+.join__brand-title {
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  text-transform: uppercase;
+  line-height: 1.15;
 }
 
 .join__intro {
@@ -28,12 +105,19 @@
   max-width: 34ch;
 }
 
+/*
+ * Login card: premium, clean, highly readable. A subtle blue accent
+ * border + soft shadow give it a polished, intentional feel without
+ * compromising contrast (the card itself stays opaque white, never
+ * glassy/transparent, so the two-field form stays easy to read).
+ */
 .join__form {
   width: 100%;
   background: var(--color-surface);
+  border: 1px solid rgba(15, 123, 184, 0.18);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  padding: var(--space-5);
+  box-shadow: 0 1px 2px rgba(11, 26, 43, 0.08), 0 20px 48px rgba(5, 15, 28, 0.45);
+  padding: var(--space-6) var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -59,6 +143,7 @@
   background: var(--color-surface);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
+  transition: border-color 0.15s ease;
 }
 
 .field__input:focus {
@@ -81,9 +166,15 @@
   width: 100%;
 }
 
-.join__note {
-  margin-top: var(--space-5);
-  color: var(--color-on-dark-soft);
-  font-size: 0.9rem;
-  font-weight: 500;
+/* Narrow phones (Req: 320-430px): keep the title readable without
+ * overflowing or forcing horizontal scroll, and tighten vertical rhythm
+ * slightly so the form still fits comfortably above the fold. */
+@media (max-width: 360px) {
+  .join__inner {
+    padding-top: var(--space-5);
+  }
+  .join__intro {
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
 }

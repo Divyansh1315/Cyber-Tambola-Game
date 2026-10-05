@@ -272,11 +272,11 @@ export function HostDashboard() {
           {/*
            * Host-only branding block: a small "Cyber Awareness Month" line
            * above a larger, bold "CYBER TAMBOLA" title, both set beside the
-           * shield/check glyph (reused from BrandMark's own markup so the
-           * icon stays visually identical to every other screen). This is
-           * a deliberately Host-specific layout -- BrandMark itself is left
-           * unchanged so PlayerJoin/other screens keep their existing
-           * title-then-subtitle hierarchy.
+           * shield/check glyph (reused inline so the icon stays visually
+           * identical across Host/Presentation/Player Join). Each screen
+           * builds this hierarchy with its own small dedicated block rather
+           * than through the shared BrandMark component, since every
+           * screen's exact layout/sizing needs differ slightly.
            */}
           <div className="host__brand">
             <span className="host__brand-glyph" aria-hidden="true">

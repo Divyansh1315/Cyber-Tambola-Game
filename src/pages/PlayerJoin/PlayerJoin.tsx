@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { BrandMark } from '../../components/common/BrandMark'
 import { Button } from '../../components/common/Button'
 import { cyberTerms } from '../../data/cyberTerms'
 import { SEED_GAME_CODE } from '../../state/gameSessionInitialState'
@@ -23,6 +22,96 @@ const GENERATOR_ERROR = 'Unable to create a ticket right now. Please try again.'
 
 /** Generic fallback for an RPC rejection whose code isn't specifically handled. */
 const GENERIC_JOIN_ERROR = 'Unable to join right now. Please try again.'
+
+/** Shown for a browser-level network failure (offline, DNS, CORS, etc). */
+const NETWORK_ERROR = 'Unable to connect. Please check your internet connection and try again.'
+
+/**
+ * Decorative shield-with-check outline glyph for the join screen's Cyber
+ * Awareness Month branding. Purely decorative -- aria-hidden, no
+ * interactive affordance. Matches the glyph already used on the
+ * Presentation/Host screens so the icon stays visually consistent across
+ * every Cyber Awareness Month surface in the app.
+ */
+function ShieldCheckIcon() {
+  return (
+    <svg
+      className="join__shield"
+      viewBox="0 0 24 24"
+      width="1em"
+      height="1em"
+      aria-hidden="true"
+      role="img"
+    >
+      <path
+        fill="currentColor"
+        d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"
+        opacity="0.18"
+      />
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+        d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"
+      />
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m8.5 12 2.4 2.4L15.5 9.5"
+      />
+    </svg>
+  )
+}
+
+/**
+ * Restrained decorative circuit-board traces + connection nodes for the
+ * join screen background. Pure decoration: aria-hidden, absolutely
+ * positioned behind the content stack, and `pointer-events: none` in CSS
+ * so it can never affect layout or interaction. Mirrors the same visual
+ * language used on the Presentation screen's lobby background.
+ */
+function CircuitBackground() {
+  return (
+    <svg
+      className="join__circuits"
+      viewBox="0 0 480 640"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <g className="join__circuit-lines" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M0 60 L70 60 L70 110 L140 110 L140 80" />
+        <path d="M0 180 L50 180 L50 220 L110 220" />
+        <path d="M480 60 L410 60 L410 110 L340 110 L340 80" />
+        <path d="M480 540 L420 540 L420 500 L360 500" />
+        <path d="M0 560 L60 560 L60 600" />
+      </g>
+      <g className="join__circuit-nodes" fill="currentColor">
+        <circle cx="70" cy="60" r="3.5" />
+        <circle cx="140" cy="110" r="3" />
+        <circle cx="50" cy="220" r="3" />
+        <circle cx="410" cy="60" r="3.5" />
+        <circle cx="340" cy="110" r="3" />
+        <circle cx="420" cy="500" r="3" />
+        <circle cx="60" cy="600" r="3" />
+      </g>
+    </svg>
+  )
+}
+
+/**
+ * True for a `TypeError` thrown by `fetch` itself (not a Supabase/Postgres
+ * error response) -- the shape every browser uses for "the request never
+ * reached the server at all" (offline, DNS failure, blocked by CORS, etc).
+ * Supabase's client surfaces this as a plain TypeError, not an RpcError,
+ * since it never got far enough to receive a Postgres response to wrap.
+ */
+function isNetworkError(err: unknown): boolean {
+  return err instanceof TypeError
+}
 
 /**
  * Screen A — Player Join.
@@ -147,12 +236,23 @@ export function PlayerJoin() {
       setError(null)
       navigate('/player')
     } catch (err) {
-      if (err instanceof RpcError) {
+      if (isNetworkError(err)) {
+        // The request never reached Supabase at all (offline/DNS/CORS) --
+        // distinct from a backend error response, so tell the player to
+        // check their own connection rather than "try again" blindly.
+        setError(NETWORK_ERROR)
+      } else if (err instanceof RpcError) {
         if (err.code === 'GAME_NOT_FOUND') {
           setError(MESSAGES.gameNotFound)
         } else if (err.code === 'GAME_COMPLETED') {
           setError(MESSAGES.gameCompleted)
         } else {
+          // Any other backend/RPC error (including a stale/mismatched RPC
+          // signature on the live database) -- never show Supabase's raw
+          // technical message to the player, but log it so the issue is
+          // diagnosable from the browser console without exposing it in
+          // the UI.
+          console.error('[PlayerJoin] join_game RPC failed:', err.code, err.message)
           setError(GENERIC_JOIN_ERROR)
         }
       } else {
@@ -165,18 +265,17 @@ export function PlayerJoin() {
 
   return (
     <div className="page join">
+      <CircuitBackground />
+      <div className="join__glow" aria-hidden="true" />
       <div className="join__inner">
         <header className="join__brand">
-          <BrandMark
-            size="hero"
-            withSubtitle
-            title="Cyber Awareness Month"
-            subtitle="Cyber Tambola"
-          />
+          <ShieldCheckIcon />
+          <span className="join__brand-eyebrow">Cyber Awareness Month</span>
+          <span className="join__brand-title">Cyber Tambola</span>
         </header>
 
         <p className="join__intro">
-          Match called cyber words with the terms on your ticket.
+          Spot the cyber word. Match your ticket. Stay cyber aware.
         </p>
 
         <form className="join__form" onSubmit={handleSubmit} noValidate>
@@ -223,16 +322,13 @@ export function PlayerJoin() {
             type="submit"
             size="lg"
             className="join__submit"
-            icon="→"
+            icon={isSubmitting ? undefined : '→'}
             disabled={isSubmitting}
+            aria-busy={isSubmitting}
           >
-            Join Game
+            {isSubmitting ? 'Joining…' : 'Join Game'}
           </Button>
         </form>
-
-        <p className="join__note">
-          <span aria-hidden="true">📱</span> No app installation required.
-        </p>
       </div>
     </div>
   )
