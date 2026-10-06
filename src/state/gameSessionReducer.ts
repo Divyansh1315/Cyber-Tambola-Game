@@ -112,13 +112,26 @@ export type GameSessionAction =
   // "last write wins, no authority claimed" treatment of this path.
   | { type: 'SYNC_LOCAL'; payload: SharedStatePayload }
   // A player taps an AVAILABLE cell; validated against Requirement 2's gates.
-  | { type: 'MARK_TERM'; termId: string }
+  // `optimisticId` is an OPTIONAL caller-supplied id for the new Mark row
+  // this case mints (claim-player-ticket-identity-mismatch fix): when
+  // supplied, the reducer uses it instead of calling `localId()` itself, so
+  // a caller that dispatches via `wrappedDispatch` (GameSessionContext.tsx)
+  // can know, in advance, the exact id this call will produce -- the same
+  // id it then needs for `resolveRollbackTarget`/`ROLLBACK_OPTIMISTIC` if
+  // the matching RPC rejects. Omitted entirely by every direct caller that
+  // doesn't need this (Local Fallback, and any test dispatching the raw
+  // action) -- those keep minting their own id via `localId()`, unchanged.
+  | { type: 'MARK_TERM'; termId: string; optimisticId?: string }
   // A player submits a claim for one specific prize (Req 2.3, 2.4): only
   // playerId/ticketId/prizeId are carried; there is no eligibility flag on
   // this action's shape, so there is nothing for the reducer to trust.
-  | { type: 'SUBMIT_PRIZE_CLAIM'; playerId: string; ticketId: string; prizeId: PrizeId }
-  // The host confirms a specific claim (Req 8).
-  | { type: 'CONFIRM_CLAIM'; claimId: string }
+  // `optimisticId` -- see MARK_TERM's doc comment above; same convention,
+  // for the new PrizeClaim row this case mints.
+  | { type: 'SUBMIT_PRIZE_CLAIM'; playerId: string; ticketId: string; prizeId: PrizeId; optimisticId?: string }
+  // The host confirms a specific claim (Req 8). `optimisticId` -- see
+  // MARK_TERM's doc comment above; same convention, for the new Winner row
+  // this case mints.
+  | { type: 'CONFIRM_CLAIM'; claimId: string; optimisticId?: string }
   // The host rejects a specific claim, with an optional reason (Req 9).
   | { type: 'REJECT_CLAIM'; claimId: string; rejectionReason?: string }
   // NEW (Module 6) — replaces SYNC_STATE's role for every Supabase-backed
@@ -153,6 +166,16 @@ export type GameSessionAction =
   // survives. `currentPlayerId` is deliberately left untouched -- this is
   // "no active game," not "log this device's player out" (Req 3.4, 4.3).
   | { type: 'NO_ACTIVE_GAME' }
+  // NEW (claim-player-ticket-identity-mismatch) — dispatched by the
+  // stale-identity invalidation effect once the backend is confirmed and
+  // `currentPlayerId` no longer resolves to a Player belonging to the
+  // confirmed Active Game (design.md Property 3). Mirrors `RESTORE_PLAYER`'s
+  // "ignore if absent" convention, but for the inverse case: instead of
+  // pointing at an existing player, it clears a `currentPlayerId` that no
+  // longer should be trusted, so the device falls through to the normal
+  // join/restore flow instead of continuing to render a stale resolution
+  // (Req 2.5).
+  | { type: 'CLEAR_STALE_PLAYER' }
 
 function now(): string {
   return new Date().toISOString()
@@ -443,7 +466,7 @@ export function gameSessionReducer(
 
       const player = state.players.find((p) => p.id === state.currentPlayerId)!
       const newMark: Mark = {
-        id: localId(),
+        id: action.optimisticId ?? localId(),
         gameId: state.game.id,
         playerId: player.id,
         ticketId: player.ticketId,
@@ -470,7 +493,7 @@ export function gameSessionReducer(
 
       const prizeMeta = PRIZES.find((p) => p.id === action.prizeId)!
       const newClaim: PrizeClaim = {
-        id: localId(),
+        id: action.optimisticId ?? localId(),
         gameId: state.game.id,
         playerId: action.playerId,
         ticketId: action.ticketId,
@@ -502,7 +525,7 @@ export function gameSessionReducer(
         c.id === claim.id ? { ...c, hostDecision: 'CONFIRMED' as const, decidedAt } : c,
       )
       const newWinner: Winner = {
-        id: localId(),
+        id: action.optimisticId ?? localId(),
         gameId: claim.gameId,
         prizeId: claim.prizeId,
         playerId: claim.playerId,
@@ -554,6 +577,16 @@ export function gameSessionReducer(
         game: createSeedGame(generateLocalGameCode()),
         winnerHistory: [...state.winnerHistory, ...state.winners],
       }
+    }
+
+    case 'CLEAR_STALE_PLAYER': {
+      // Clears a `currentPlayerId` that no longer resolves to a Player
+      // belonging to the confirmed Active Game, so the stale resolution is
+      // never silently rendered indefinitely (Req 2.5). Mirrors
+      // `RESTORE_PLAYER`'s "ignore if absent" convention for the inverse
+      // case: nothing to clear is a safe no-op rather than an error.
+      if (state.currentPlayerId === undefined) return state
+      return { ...state, currentPlayerId: undefined }
     }
 
     case 'NO_ACTIVE_GAME': {

@@ -13,7 +13,7 @@ import { cyberTerms, findCyberTerm } from '../data/cyberTerms'
 import type { CyberTerm } from '../types/cyberTerm'
 import type { Mark } from '../types/mark'
 import type { Player } from '../types/player'
-import type { PrizeProgress } from '../types/prize'
+import type { PrizeId, PrizeProgress } from '../types/prize'
 import type { Ticket } from '../types/ticket'
 import { getAllPrizeProgress, getPlayerTicketMarks } from '../utils/prizeEngine'
 import {
@@ -33,6 +33,7 @@ import {
   writeEnvelope,
 } from './persistence'
 import { createSyncChannel, type SyncChannel } from './syncChannel'
+import { localId } from './joinService'
 import {
   getSupabaseClient,
   getActiveGame,
@@ -97,6 +98,36 @@ function writeHostSecret(secret: string): void {
  * forever with no indication anything is wrong).
  */
 export type RemoteSyncStatus = 'not-configured' | 'syncing' | 'synced' | 'error'
+
+/**
+ * Why `getActivePlayerSession()` considered a session inconsistent (design.md
+ * Fix Implementation point 2; bugfix.md's `isBugCondition`). Each value is
+ * independently attributable to one failing check, in resolution order:
+ * backend not yet confirmed, player row missing, player belongs to a
+ * different game, ticket row missing, or ticket doesn't agree with the
+ * player. Shared by `getActivePlayerSession()`'s return shape and by
+ * `SessionGuardFailure` below so the two never drift out of sync.
+ */
+export type InconsistencyReason =
+  | 'NOT_BACKEND_CONFIRMED'
+  | 'PLAYER_NOT_FOUND'
+  | 'PLAYER_NOT_IN_GAME'
+  | 'TICKET_NOT_FOUND'
+  | 'TICKET_NOT_OWNED_BY_PLAYER'
+
+/**
+ * Ephemeral record of the most recent claim-submission attempt blocked by
+ * the pre-submission session consistency guard (design.md Fix Implementation
+ * point 4; Req 2.3). Purely local UI feedback for `PlayerGame.tsx` to render
+ * a distinct recovery message — this is NEVER written to `localStorage`,
+ * never broadcast via `syncChannel`, and never added to the shared envelope
+ * or `SharedStatePayload`. It is cleared on the next successful consistent
+ * submission or on navigation away from `PlayerGame`.
+ */
+export interface SessionGuardFailure {
+  prizeId: PrizeId
+  reason: InconsistencyReason
+}
 
 /** Values exposed to consumers of the session context. */
 export interface GameSessionContextValue {
@@ -172,6 +203,29 @@ export interface GameSessionContextValue {
    * seed game to show.
    */
   hasActiveGame: boolean
+  /**
+   * True once the live Active_Game's HYDRATE_FROM_REMOTE snapshot has been
+   * applied for the currentPlayerId currently held, or Supabase is not
+   * configured at all (Local Fallback has no "confirmation gap" to model).
+   * Distinct from `isHydrated`: `isHydrated` models "the initial local
+   * restore is synchronous" and is always `true` -- it says nothing about
+   * whether the identity it restored has ever been checked against the
+   * live backend. `isBackendConfirmed` is `false` while a reconnect/retry
+   * is in flight or immediately after `NO_ACTIVE_GAME`, and is the signal
+   * the claim-submission consistency guard reads (not a rendering gate --
+   * rendering keeps using `isHydrated`/the resolver's cached output
+   * regardless of this flag, per Req 2.4).
+   */
+  isBackendConfirmed: boolean
+  /**
+   * The most recent claim-submission attempt blocked by the pre-submission
+   * session consistency guard, or `undefined` if none/cleared (Req 2.3).
+   * Purely ephemeral provider-local UI feedback — see `SessionGuardFailure`'s
+   * doc comment. `PlayerGame.tsx` reads this to render a distinct recovery
+   * message for the matching `prizeId`, instead of the generic per-prize
+   * "could not be validated" message.
+   */
+  lastSessionGuardFailure?: SessionGuardFailure
 }
 
 const GameSessionContext = createContext<GameSessionContextValue | null>(null)
@@ -299,33 +353,126 @@ async function fetchFullGameState(
 }
 
 /**
- * Given an optimistic action just dispatched and the state that resulted
- * from it, resolve which local collection + id `ROLLBACK_OPTIMISTIC` should
- * remove if the matching RPC rejects. Only actions that add exactly one new
- * row to an addressable collection have a rollback target; lifecycle
- * actions (`START_GAME`/`CALL_NEXT_WORD`/`PAUSE_GAME`/`RESUME_GAME`/
- * `END_GAME`/`RESET_GAME`) mutate the single `games` row instead, which has
- * no per-row id to roll back — for those, a failed RPC is simply left for
- * the next `SYNC_REMOTE`/`HYDRATE_FROM_REMOTE` to reconcile.
+ * The single active-session resolver (design.md's `getActivePlayerSession()`,
+ * bugfix.md Req 2.1, 2.2, 2.6, 2.7). Both the UI's `currentPlayer`/
+ * `currentTicket`/marks/prize-progress derivation (the render-time memo in
+ * `GameSessionProvider`) and the claim-submission consistency guard inside
+ * `wrappedDispatch` call this one function, so they are structurally
+ * incapable of disagreeing about who is playing and on which ticket.
+ *
+ * Takes `state`/`isBackendConfirmed` as explicit parameters (rather than
+ * closing over provider state) so it can be called with two different
+ * snapshots: the render-time memo calls it with the latest `state`, while
+ * `wrappedDispatch`'s guard calls it with `before` — the snapshot captured
+ * at the top of that specific dispatch call — consistent with how
+ * `resolveRollbackTarget` already distinguishes `before`/`after`.
+ *
+ * Resolution order mirrors the Glossary's activeGame/activePlayer/
+ * activeTicket definitions exactly:
+ * - `activeGame` is always `state.game` (Local Fallback has no
+ *   confirmation gap; Supabase mode's `isBackendConfirmed` is folded
+ *   into `isConsistent` below instead of gating which game is "active").
+ * - `activePlayer` resolves by id only.
+ * - `activeTicket` resolves deterministically via
+ *   `playerId === activePlayer?.id && gameId === activeGame.id` — never
+ *   "first ticket in array" (Req 2.6).
+ *
+ * `isConsistent` is the exact boolean formula from bugfix.md's
+ * `isBugCondition` (negated): backend-confirmed AND player found AND
+ * ticket found AND every cross-id check agrees. `inconsistencyReason`
+ * is set to the FIRST failing check, in a fixed order, so each failure
+ * mode is independently attributable (matching the dev-diagnostic
+ * reason codes design.md calls for) rather than collapsing every
+ * failure into one undifferentiated boolean.
+ *
+ * Pure given its `state`/`isBackendConfirmed` arguments — no side effects.
+ *
+ * Exported (in addition to being used internally by the `value` memo and
+ * the claim-submission guard) so it can be unit-tested directly as a pure
+ * function — it has no dependency on React or the provider, so testing it
+ * in isolation is simpler and more precise than only exercising it
+ * indirectly through `GameSessionProvider`.
+ */
+export function getActivePlayerSession(
+  state: GameSessionState,
+  isBackendConfirmed: boolean,
+): {
+  activeGame: GameSessionState['game']
+  activePlayer?: Player
+  activeTicket?: Ticket
+  isConsistent: boolean
+  inconsistencyReason?: InconsistencyReason
+} {
+  const activeGame = state.game
+  const activePlayer = state.players.find((p) => p.id === state.currentPlayerId)
+  const activeTicket = state.tickets.find(
+    (t) => t.playerId === activePlayer?.id && t.gameId === activeGame.id,
+  )
+
+  let inconsistencyReason: InconsistencyReason | undefined
+
+  if (!isBackendConfirmed) {
+    inconsistencyReason = 'NOT_BACKEND_CONFIRMED'
+  } else if (!activePlayer) {
+    inconsistencyReason = 'PLAYER_NOT_FOUND'
+  } else if (activePlayer.gameId !== activeGame.id) {
+    inconsistencyReason = 'PLAYER_NOT_IN_GAME'
+  } else if (!activeTicket) {
+    inconsistencyReason = 'TICKET_NOT_FOUND'
+  } else if (activeTicket.playerId !== activePlayer.id || activeTicket.gameId !== activeGame.id) {
+    inconsistencyReason = 'TICKET_NOT_OWNED_BY_PLAYER'
+  }
+
+  const isConsistent =
+    isBackendConfirmed &&
+    !!activePlayer &&
+    !!activeTicket &&
+    activePlayer.gameId === activeGame.id &&
+    activeTicket.playerId === activePlayer.id &&
+    activeTicket.gameId === activeGame.id
+
+  return {
+    activeGame,
+    activePlayer,
+    activeTicket,
+    isConsistent,
+    inconsistencyReason: isConsistent ? undefined : inconsistencyReason,
+  }
+}
+
+/**
+ * Given an optimistic action just dispatched (already augmented with the
+ * `optimisticId` `wrappedDispatch` minted for it BEFORE dispatching —
+ * claim-player-ticket-identity-mismatch fix), resolve which local
+ * collection + id `ROLLBACK_OPTIMISTIC` should remove if the matching RPC
+ * rejects. Only actions that add exactly one new row to an addressable
+ * collection have a rollback target; lifecycle actions
+ * (`START_GAME`/`CALL_NEXT_WORD`/`PAUSE_GAME`/`RESUME_GAME`/`END_GAME`/
+ * `RESET_GAME`) mutate the single `games` row instead, which has no
+ * per-row id to roll back — for those, a failed RPC is simply left for the
+ * next `SYNC_REMOTE`/`HYDRATE_FROM_REMOTE` to reconcile.
+ *
+ * This no longer calls `gameSessionReducer` a second time to diff
+ * `before`/`after` and guess which row was added: `MARK_TERM`/
+ * `SUBMIT_PRIZE_CLAIM`/`CONFIRM_CLAIM` each mint a brand-new random id via
+ * `localId()` *inside* the reducer, so an independent second reducer call
+ * would mint a DIFFERENT random id than the one the real `dispatch(action)`
+ * call actually applied to React state — the rollback would then target an
+ * id that was never added. `wrappedDispatch` instead mints the id ONCE,
+ * injects it into the action as `optimisticId` before the single real
+ * `dispatch(action)` call, so the id dispatched to React state and the id
+ * returned here are guaranteed identical by construction.
  */
 function resolveRollbackTarget(
   action: GameSessionAction,
-  before: GameSessionState,
-  after: GameSessionState,
 ): { collection: RollbackCollection; id: string } | undefined {
   switch (action.type) {
-    case 'MARK_TERM': {
-      const added = after.marks.find((m) => !before.marks.some((b) => b.id === m.id))
-      return added ? { collection: 'marks', id: added.id } : undefined
-    }
-    case 'SUBMIT_PRIZE_CLAIM': {
-      const added = after.claims.find((c) => !before.claims.some((b) => b.id === c.id))
-      return added ? { collection: 'claims', id: added.id } : undefined
-    }
-    case 'CONFIRM_CLAIM': {
-      const added = after.winners.find((w) => !before.winners.some((b) => b.id === w.id))
-      return added ? { collection: 'winners', id: added.id } : undefined
-    }
+    case 'MARK_TERM':
+      return action.optimisticId ? { collection: 'marks', id: action.optimisticId } : undefined
+    case 'SUBMIT_PRIZE_CLAIM':
+      return action.optimisticId ? { collection: 'claims', id: action.optimisticId } : undefined
+    case 'CONFIRM_CLAIM':
+      return action.optimisticId ? { collection: 'winners', id: action.optimisticId } : undefined
     default:
       return undefined
   }
@@ -357,6 +504,30 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
   // it actually discovers there is no Active_Game to follow (task 7.1 wires
   // that dispatch/set up; this task only adds the flag itself).
   const [hasActiveGame, setHasActiveGame] = useState<boolean>(true)
+
+  // True once the live Active_Game's HYDRATE_FROM_REMOTE snapshot has been
+  // applied for the currentPlayerId currently held, or Supabase is not
+  // configured at all (Local Fallback has no "confirmation gap" to model).
+  // Starts `true` to match Local Fallback and the very first synchronous
+  // render; the mount effect below flips it to `false` the instant it finds
+  // Supabase configured and begins resolving the initial Active_Game, and
+  // back to `true` only once that round trip's HYDRATE_FROM_REMOTE lands.
+  // Deliberately NOT used to gate isHydrated -- isHydrated keeps its
+  // existing always-`true` value/meaning (Req 2.4, 3.3); this is a
+  // narrower-purpose signal consumed only by the (future) claim-submission
+  // guard.
+  const [isBackendConfirmed, setIsBackendConfirmed] = useState<boolean>(true)
+
+  // Ephemeral record of the most recent claim-submission attempt blocked by
+  // the pre-submission session consistency guard (design.md Fix
+  // Implementation point 4; Req 2.3) -- see SessionGuardFailure's doc
+  // comment. Deliberately a plain useState, NOT a reducer action: it must
+  // never be written to localStorage, never broadcast via syncChannel, and
+  // never added to the shared envelope or SharedStatePayload, since it is
+  // purely local UI feedback, not shared/persisted session state.
+  const [lastSessionGuardFailure, setLastSessionGuardFailure] = useState<
+    SessionGuardFailure | undefined
+  >(undefined)
 
   // This device's Host secret, once obtained. Never exposed via context
   // value.
@@ -430,6 +601,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       if (cancelled) return
       dispatch({ type: 'HYDRATE_FROM_REMOTE', snapshot })
       setHasActiveGame(true)
+      setIsBackendConfirmed(true)
 
       // Req 6.2: tear down the OLD per-game channel before/while
       // establishing the new one. Unsubscribing first (rather than after)
@@ -443,6 +615,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
     }
 
     setRemoteSyncStatus('syncing')
+    setIsBackendConfirmed(false)
 
     // Req 17.1/24.5: a phone on flaky Wi-Fi/4G should retry the initial
     // resolve+fetch a few times (with a short backoff) before surfacing
@@ -462,6 +635,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
           // state, never a fallback to any previously resolved game.
           gameIdRef.current = undefined
           setHasActiveGame(false)
+          setIsBackendConfirmed(false)
           dispatch({ type: 'NO_ACTIVE_GAME' })
         }
         setRemoteSyncStatus('synced')
@@ -491,9 +665,14 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
         gameChannel = null
         gameIdRef.current = undefined
         setHasActiveGame(false)
+        setIsBackendConfirmed(false)
         dispatch({ type: 'NO_ACTIVE_GAME' })
         return
       }
+      // A new Active_Game is being resolved for this pointer-change event --
+      // not yet confirmed until that round trip's own hydrateForGame call
+      // lands (mirrors the mount-time 'syncing' semantics above).
+      setIsBackendConfirmed(false)
       getActiveGame()
         .then((row) => {
           if (!cancelled && row) return hydrateForGame(row)
@@ -551,6 +730,37 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
     writeCurrentPlayerId(state.currentPlayerId)
   }, [state.currentPlayerId])
 
+  // Stale-identity invalidation (design.md Property 3; bugfix.md Req 1.5,
+  // 2.5). Once the backend is CONFIRMED (never while a reconnect/retry is
+  // in flight, or right after NO_ACTIVE_GAME -- isBackendConfirmed stays
+  // false for both, so this effect correctly no-ops then), check whether
+  // this device's currentPlayerId still resolves to a Player belonging to
+  // the confirmed Active Game. A Reset creates a brand-new game id (Req
+  // 5.1); a device that was holding a player from the retired game would
+  // otherwise keep rendering that stale player/ticket indefinitely (the
+  // bug this task fixes). If it no longer resolves, dispatch
+  // CLEAR_STALE_PLAYER so the device falls back to the same "no
+  // currentPlayerId at all" path PlayerGame.tsx's existing
+  // `!currentPlayer || !currentTicket` redirect guard already handles.
+  //
+  // Self-limiting by construction: clearing currentPlayerId to undefined
+  // changes this effect's own dependency, so it re-runs once more -- but by
+  // then `state.currentPlayerId` is unset, so the `isSet` check below is
+  // false and it no-ops. No extra guard is needed beyond the literal
+  // condition.
+  useEffect(() => {
+    if (!isBackendConfirmed) return
+
+    const isSet = state.currentPlayerId !== undefined
+    if (!isSet) return
+
+    const activePlayer = state.players.find((p) => p.id === state.currentPlayerId)
+    const isStale = !activePlayer || activePlayer.gameId !== state.game.id
+    if (isStale) {
+      dispatch({ type: 'CLEAR_STALE_PLAYER' })
+    }
+  }, [isBackendConfirmed, state.currentPlayerId, state.game.id, state.players])
+
   const value = useMemo<GameSessionContextValue>(() => {
     const currentTerm = state.game.currentTermId
       ? findCyberTerm(state.game.currentTermId)
@@ -565,11 +775,23 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
     const usedCount = state.game.revealedTermIds.length
     const activeCount = cyberTerms.filter((t) => t.active).length
 
-    // Derived session selectors (Req 9.1).
-    const currentPlayer = state.players.find((p) => p.id === state.currentPlayerId)
-    const currentTicket = currentPlayer
-      ? state.tickets.find((t) => t.id === currentPlayer.ticketId)
-      : undefined
+    // Derived session selectors (Req 9.1, 2.1, 2.4, 2.6, 2.7). Resolved via
+    // getActivePlayerSession() — the single source of truth also read by the
+    // claim-submission guard inside wrappedDispatch — so UI rendering and
+    // claim payload are structurally incapable of disagreeing about who is
+    // playing and on which ticket. `activePlayer`/`activeTicket` are used
+    // UNCONDITIONALLY here, even when `isConsistent` is false: this
+    // preserves today's no-flicker optimistic rendering (Req 2.4) — a
+    // not-yet-confirmed or momentarily-stale session still renders its
+    // last-known cached ticket instead of flashing to an empty state. Only
+    // claim *submission* reads `isConsistent` to decide whether to proceed.
+    // Passed `state`/`isBackendConfirmed` explicitly (rather than closing
+    // over them) so wrappedDispatch below can call the exact same resolver
+    // against `before` — the state snapshot captured at the top of a given
+    // dispatch call — instead of whatever is latest at render time.
+    const activeSession = getActivePlayerSession(state, isBackendConfirmed)
+    const currentPlayer = activeSession.activePlayer
+    const currentTicket = activeSession.activeTicket
 
     // Derived marking + prize-progress selectors (Req 7.2, 7.4, 15.1).
     const currentPlayerMarks =
@@ -618,6 +840,17 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       if (!supabase) {
         // Local-only fallback: optimistic dispatch is the whole story.
         dispatch(action)
+        // Keep stateRef.current in sync SYNCHRONOUSLY (same tick), rather
+        // than waiting for the real re-render to run `stateRef.current =
+        // state` below. Two `wrappedDispatch` calls issued back-to-back
+        // within the same `act()`/synchronous tick (e.g. JOIN_PLAYER then
+        // SUBMIT_PRIZE_CLAIM in one test) would otherwise both read a
+        // `before` from BEFORE either dispatch, since React batches both
+        // and only re-renders once. This computed value is used ONLY to
+        // seed the next call's `before` snapshot -- it is never dispatched
+        // or applied to React state itself; `dispatch(action)` above
+        // remains the one and only real state update.
+        stateRef.current = gameSessionReducer(before, action)
         return
       }
 
@@ -630,12 +863,36 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       const skipOptimisticDispatch =
         action.type === 'START_GAME' || action.type === 'CALL_NEXT_WORD'
 
+      // MARK_TERM/SUBMIT_PRIZE_CLAIM/CONFIRM_CLAIM each mint a brand-new row
+      // id inside the reducer (claim-player-ticket-identity-mismatch fix).
+      // Minting that id HERE, once, and injecting it into the action before
+      // the single real `dispatch(action)` call below guarantees the id
+      // applied to React state and the id used for rollback (if the
+      // matching RPC rejects) are the identical value -- there is no second,
+      // independent reducer call to risk minting a different random id.
+      // Every other action is dispatched unchanged; direct callers that
+      // construct these three action literals themselves (tests, Local
+      // Fallback) never need to supply `optimisticId` -- the reducer falls
+      // back to minting its own id via `localId()` when it's absent.
+      const augmentedAction: GameSessionAction =
+        action.type === 'MARK_TERM' || action.type === 'SUBMIT_PRIZE_CLAIM' || action.type === 'CONFIRM_CLAIM'
+          ? { ...action, optimisticId: action.optimisticId ?? localId() }
+          : action
+
       if (!skipOptimisticDispatch) {
-        dispatch(action)
+        dispatch(augmentedAction)
+        // Keep stateRef.current in sync SYNCHRONOUSLY (same tick) -- see
+        // the matching comment in the Local Fallback branch above for why.
+        // This computed value is used ONLY to seed the next call's
+        // `before` snapshot; it is never dispatched or applied to React
+        // state itself. `dispatch(augmentedAction)` above remains the one
+        // and only real state update (React's own re-render will also,
+        // redundantly but harmlessly, set `stateRef.current = state` again
+        // once it catches up).
+        stateRef.current = gameSessionReducer(before, augmentedAction)
       }
 
-      const after = skipOptimisticDispatch ? before : gameSessionReducer(before, action)
-      const rollbackTarget = resolveRollbackTarget(action, before, after)
+      const rollbackTarget = resolveRollbackTarget(augmentedAction)
 
       function rollback() {
         if (rollbackTarget) {
@@ -706,9 +963,50 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
           if (player) rpcSubmitMark(player.id, action.termId).catch(rollback)
           break
         }
-        case 'SUBMIT_PRIZE_CLAIM':
+        case 'SUBMIT_PRIZE_CLAIM': {
+          // Pre-submission session consistency guard (design.md Fix
+          // Implementation point 4; bugfix.md Req 2.2, 2.3, 2.7). Resolved
+          // against `before` — the state snapshot captured at the top of
+          // THIS dispatch call — exactly like resolveRollbackTarget already
+          // does, not against whatever is latest by the time this callback
+          // runs.
+          const guardSession = getActivePlayerSession(before, isBackendConfirmed)
+          if (!guardSession.isConsistent) {
+            // Do NOT call rpcSubmitClaim. Do NOT fabricate/synthesize a
+            // replacement ticket or player. Roll back the optimistic claim
+            // entry added earlier in this function so it is removed rather
+            // than left dangling as a phantom PENDING claim the backend
+            // never saw.
+            rollback()
+            setLastSessionGuardFailure({
+              prizeId: action.prizeId,
+              reason: guardSession.inconsistencyReason ?? 'NOT_BACKEND_CONFIRMED',
+            })
+            // Dev-only diagnostics (design.md "Temporary Diagnostic
+            // Logging"; bugfix.md Req 2.3). Deliberately logs ONLY these
+            // four non-sensitive fields — no display names, no device join
+            // tokens, no host secrets, no full players/tickets arrays — so
+            // it is safe to leave on for any dev session. Gated behind
+            // import.meta.env.DEV so it is inert in a production build.
+            // Task 16 decision: KEPT intentionally as a permanent dev-only
+            // diagnostic (see design.md "Temporary Diagnostic Logging" /
+            // tasks.md task 16) — cheap, DEV-gated, zero PII/secrets, and
+            // useful for diagnosing any future recurrence of this
+            // session-guard bug class without needing to re-instrument.
+            if (import.meta.env.DEV) {
+              console.warn('[session-guard]', {
+                ACTIVE_GAME_ID: before.game.id,
+                CURRENT_PLAYER_ID: before.currentPlayerId,
+                ACTIVE_TICKET_ID: guardSession.activeTicket?.id,
+                inconsistencyReason: guardSession.inconsistencyReason,
+              })
+            }
+            break
+          }
+          // Consistent session: proceed exactly as today — unchanged.
           rpcSubmitClaim(action.playerId, action.prizeId).catch(rollback)
           break
+        }
         case 'CONFIRM_CLAIM':
           if (hostSecret) rpcConfirmClaim(action.claimId, hostSecret).catch(rollback)
           break
@@ -795,8 +1093,10 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       // so this is true from the very first render.
       isHydrated: true,
       hasActiveGame,
+      isBackendConfirmed,
+      lastSessionGuardFailure,
     }
-  }, [state, remoteSyncStatus, hasActiveGame])
+  }, [state, remoteSyncStatus, hasActiveGame, isBackendConfirmed, lastSessionGuardFailure])
 
   return (
     <GameSessionContext.Provider value={value}>

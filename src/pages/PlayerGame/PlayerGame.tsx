@@ -127,6 +127,7 @@ export function PlayerGame() {
     currentPrizeProgress,
     dispatch,
     isHydrated,
+    lastSessionGuardFailure,
   } = useGameSession()
   const { game } = state
   const location = useLocation()
@@ -253,7 +254,16 @@ export function PlayerGame() {
       isOwnClaimInvalid,
     })
 
-    return { progress, status, view }
+    // Req 2.3: a claim submission for this specific prize was blocked by the
+    // pre-submission session consistency guard (stale/unconfirmed identity).
+    // This is checked ahead of — and overrides — the normal claimStatusView
+    // output for this prize block only, mirroring the isOwnClaimInvalid
+    // special-case pattern above. Worded distinctly from the generic
+    // "Claim could not be validated..." message so the two are never
+    // confused with one another.
+    const sessionGuardFailed = lastSessionGuardFailure?.prizeId === progress.id
+
+    return { progress, status, view, sessionGuardFailed }
   })
 
   return (
@@ -375,7 +385,7 @@ export function PlayerGame() {
         {/* Claim prizes — one independent block per Prize_Id (Req 2.5, 12.2, 13.2) */}
         <Card title="Claim Your Prizes">
           <ul className="player__claims" aria-label="Prize claim status">
-            {prizeBlocks.map(({ progress, status, view }) => (
+            {prizeBlocks.map(({ progress, status, view, sessionGuardFailed }) => (
               <li
                 key={progress.id}
                 className={`player__claim-block player__claim-block--${status.toLowerCase()}`}
@@ -383,29 +393,50 @@ export function PlayerGame() {
                 <div className="player__claim-block-head">
                   <span className="player__claim-block-label">{progress.label}</span>
                 </div>
-                <p
-                  className={`player__claim-message player__claim-message--${status.toLowerCase()}`}
-                  role="status"
-                >
-                  {view.message}
-                </p>
-                <Button
-                  variant={status === 'CONFIRMED' ? 'success' : 'primary'}
-                  size="md"
-                  className="player__claim-btn"
-                  disabled={view.buttonDisabled || readOnly}
-                  onClick={() =>
-                    dispatch({
-                      type: 'SUBMIT_PRIZE_CLAIM',
-                      playerId: currentPlayer.id,
-                      ticketId: currentTicket.id,
-                      prizeId: progress.id,
-                    })
-                  }
-                  icon="🏆"
-                >
-                  {view.buttonLabel}
-                </Button>
+                {sessionGuardFailed ? (
+                  <>
+                    <p
+                      className="player__claim-message player__claim-message--session-guard"
+                      role="status"
+                    >
+                      Your session is out of date. Please refresh or rejoin to continue.
+                    </p>
+                    <Button
+                      variant="secondary"
+                      size="md"
+                      className="player__claim-btn"
+                      onClick={() => window.location.reload()}
+                    >
+                      Refresh
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p
+                      className={`player__claim-message player__claim-message--${status.toLowerCase()}`}
+                      role="status"
+                    >
+                      {view.message}
+                    </p>
+                    <Button
+                      variant={status === 'CONFIRMED' ? 'success' : 'primary'}
+                      size="md"
+                      className="player__claim-btn"
+                      disabled={view.buttonDisabled || readOnly}
+                      onClick={() =>
+                        dispatch({
+                          type: 'SUBMIT_PRIZE_CLAIM',
+                          playerId: currentPlayer.id,
+                          ticketId: currentTicket.id,
+                          prizeId: progress.id,
+                        })
+                      }
+                      icon="🏆"
+                    >
+                      {view.buttonLabel}
+                    </Button>
+                  </>
+                )}
               </li>
             ))}
           </ul>

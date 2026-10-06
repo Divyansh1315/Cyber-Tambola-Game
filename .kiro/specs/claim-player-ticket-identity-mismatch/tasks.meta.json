@@ -1,0 +1,420 @@
+{
+  "pbtResults": {
+    "1. Write bug condition exploration test": {
+      "status": "passed",
+      "failingExample": "Counterexample (a)+(b): After joining Game A (player P_A1, ticket T_A1, ref '6405') and the Host triggering reset_game_to_new (new Active Game GAME_B confirmed via HYDRATE_FROM_REMOTE), state.game.id = 'GAME_B' and state.players/state.tickets for GAME_B are empty — yet when a stale P_A1/T_A1 pair (gameId: 'GAME_A') is present in state (simulating a stale localStorage-restored envelope), the unfixed GameSessionContext.tsx resolves currentPlayer = { id: 'P_A1', gameId: 'GAME_A', ... } and currentTicket = { id: 'T_A1', gameId: 'GAME_A', ... } as fully defined and renderable, with gameId 'GAME_A' != confirmed state.game.id 'GAME_B' (isBugCondition: NOT resolvedPlayer(X).gameId = X.activeGameId -> TRUE). Dispatching SUBMIT_PRIZE_CLAIM with playerId='P_A1', ticketId='T_A1', prizeId='CYBER_FIVE' from this stale state resulted in rpcSubmitClaim/submit_claim being called with { p_player_id: 'P_A1', p_prize_id: 'CYBER_FIVE' } with no client-side pre-check blocking it, matching the exact PLAYER_NOT_IN_GAME precursor from the incident report (Divyansh / Ticket #6405 vs #4292). Counterexample (c): with a cached localStorage envelope (currentPlayerId='P_A1', game='GAME_A') restored synchronously before the mock's get_active_game() RPC promise had settled (backendConfirmed=false per isBugCondition: NOT X.backendConfirmed -> TRUE), isHydrated was already true and currentPlayer/currentTicket were fully resolved; dispatching SUBMIT_PRIZE_CLAIM in that window still called submit_claim with { p_player_id: 'P_A1', p_prize_id: 'CYBER_FIVE' } immediately, unblocked. All assertions demonstrating the bug PASSED against the unfixed GameSessionContext.tsx/gameSessionReducer.ts, confirming the bug exists (2/2 tests passed, full suite 361/361 passed, no regressions).",
+      "lastRunTimestamp": 1791227580200
+    }
+  },
+  "executionHistory": {
+    "1. Write bug condition exploration test": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227286825
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227308572
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227611809
+      }
+    ],
+    "2. Write preservation property tests (BEFORE implementing fix)": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227286968
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227617588
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228161066
+      }
+    ],
+    "3.1 Add `isBackendConfirmed` state and wire its transitions": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227287099
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228167621
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228350129
+      }
+    ],
+    "3.2 Expose `isBackendConfirmed` on `GameSessionContextValue`": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227287227
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228362533
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228597520
+      }
+    ],
+    "4.1 Implement `getActivePlayerSession()` inside the `value` memo in `GameSessionContext.tsx`": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227287353
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228604836
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228744997
+      }
+    ],
+    "4.2 Rewire `currentPlayer`/`currentTicket`/`currentPlayerMarks`/`currentPrizeProgress` to derive from the resolver": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227287519
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228752796
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228988238
+      }
+    ],
+    "5.1 Add an ephemeral `lastSessionGuardFailure` provider-local state": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227287859
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228995870
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229204410
+      }
+    ],
+    "5.2 Implement the guard inside `wrappedDispatch`'s `SUBMIT_PRIZE_CLAIM` case": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227288155
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229211742
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229453081
+      }
+    ],
+    "6. Add dev-only diagnostic logging on guard failure": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227288380
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229461708
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229633686
+      }
+    ],
+    "7.1 Add the `CLEAR_STALE_PLAYER` action and reducer case": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227288553
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229643449
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229776717
+      }
+    ],
+    "7.2 Add the stale-identity invalidation effect in `GameSessionProvider`": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227288682
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229784614
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229987613
+      }
+    ],
+    "8. Add the distinct recovery message in `PlayerGame.tsx`": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227288870
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791230000179
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791230207164
+      }
+    ],
+    "9. Unit tests for `getActivePlayerSession()`": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227289058
+      },
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791230215149
+      },
+      {
+        "executionId": "a8e763a2-1874-4503-adc9-7202fccdf90c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791247017921
+      }
+    ],
+    "10. Unit tests for the pre-submission guard in `wrappedDispatch`": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227289198
+      },
+      {
+        "executionId": "a8e763a2-1874-4503-adc9-7202fccdf90c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791247024311
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791258927490
+      }
+    ],
+    "11. Unit tests for `CLEAR_STALE_PLAYER` and the stale-identity invalidation effect": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227289356
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791258935357
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791259358927
+      }
+    ],
+    "12. Unit test for the `PlayerGame.tsx` recovery message": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227289491
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791259365187
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791260144306
+      }
+    ],
+    "13. Regression tests for each required preserved/fixed scenario": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227289649
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791260151876
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791260927315
+      }
+    ],
+    "14. Checkpoint - run the full build and automated test suite": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227290010
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791260935476
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791262089295
+      }
+    ],
+    "15.1 Verify bug condition exploration test now passes": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227290394
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791262097286
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791262640448
+      }
+    ],
+    "15.2 Verify preservation tests still pass": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227290755
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791262646182
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791262769516
+      }
+    ],
+    "16. Remove or down-level the temporary diagnostic logging": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227291111
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791262775902
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791262927696
+      }
+    ],
+    "17. Final checkpoint - ensure all tests pass": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791227291486
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791262932898
+      },
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791263069361
+      }
+    ],
+    "3. Add `isBackendConfirmed` signal to `GameSessionContext.tsx`": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228597877
+      }
+    ],
+    "4. Implement `getActivePlayerSession()` resolver and wire derived selectors to use it": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791228988471
+      }
+    ],
+    "5. Add the pre-submission session consistency guard in `wrappedDispatch`": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229453391
+      }
+    ],
+    "7. Add `CLEAR_STALE_PLAYER` reducer action and stale-identity invalidation effect": [
+      {
+        "executionId": "a3962ecd-507b-42f2-b2c5-2cc969f1a798",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791229987964
+      }
+    ],
+    "15. Verify exploration and preservation tests against the fix": [
+      {
+        "executionId": "9776e6c4-428e-4876-92dd-7b046a098e1c",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791262769651
+      }
+    ]
+  }
+}
