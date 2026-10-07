@@ -98,7 +98,7 @@ describe('mark rejection integration (module-4-term-marking-prize-engine)', () =
     // "{term} has not been revealed yet." hint (see design.md, Error
     // Handling table, Req 14.1).
     const validation = validateMarkAttempt(sink.current!.state, lockedTermId)
-    expect(validation).toEqual({ valid: false, reason: 'TERM_NOT_CURRENT' })
+    expect(validation).toEqual({ valid: false, reason: 'TERM_NOT_REVEALED' })
 
     const progressBefore = sink.current!.currentPrizeProgress
     const marksBefore = sink.current!.state.marks
@@ -120,7 +120,7 @@ describe('mark rejection integration (module-4-term-marking-prize-engine)', () =
     const markedTermIds = getMarkedTermIds(sink.current!.currentPlayerMarks)
     const cellState = deriveCellState(
       lockedTermId,
-      sink.current!.state.game.currentTermId,
+      sink.current!.state.game.revealedTermIds,
       markedTermIds,
     )
     expect(cellState).toBe('LOCKED')
@@ -199,7 +199,7 @@ describe('mark rejection integration (module-4-term-marking-prize-engine)', () =
     const markedTermIds = getMarkedTermIds(sink.current!.currentPlayerMarks)
     const cellState = deriveCellState(
       revealedTermId,
-      sink.current!.state.game.currentTermId,
+      sink.current!.state.game.revealedTermIds,
       markedTermIds,
     )
     expect(cellState).toBe('MARKED')

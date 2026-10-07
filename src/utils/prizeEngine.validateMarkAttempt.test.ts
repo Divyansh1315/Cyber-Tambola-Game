@@ -100,7 +100,7 @@ type Scenario =
   | 'NO_CURRENT_PLAYER'
   | 'TICKET_NOT_FOUND'
   | 'TERM_NOT_ON_TICKET'
-  | 'TERM_NOT_CURRENT'
+  | 'TERM_NOT_REVEALED'
   | 'GAME_COMPLETED'
   | 'DUPLICATE_MARK'
   | 'VALID'
@@ -109,7 +109,7 @@ const scenarioArb = fc.constantFrom<Scenario>(
   'NO_CURRENT_PLAYER',
   'TICKET_NOT_FOUND',
   'TERM_NOT_ON_TICKET',
-  'TERM_NOT_CURRENT',
+  'TERM_NOT_REVEALED',
   'GAME_COMPLETED',
   'DUPLICATE_MARK',
   'VALID',
@@ -149,11 +149,11 @@ function buildFixture(scenario: Scenario, status: GameStatus, termId: string) {
         expectedReason: 'TERM_NOT_ON_TICKET' as const,
       }
     }
-    case 'TERM_NOT_CURRENT': {
+    case 'TERM_NOT_REVEALED': {
       return {
-        state: { ...state, game: { ...state.game, currentTermId: undefined } },
+        state: { ...state, game: { ...state.game, revealedTermIds: [] } },
         termId: baseTermId,
-        expectedReason: 'TERM_NOT_CURRENT' as const,
+        expectedReason: 'TERM_NOT_REVEALED' as const,
       }
     }
     case 'GAME_COMPLETED': {

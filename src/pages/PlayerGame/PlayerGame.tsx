@@ -164,7 +164,7 @@ export function PlayerGame() {
         row.map((cell) => ({
           ...cell,
           term: findCyberTerm(cell.termId)?.term ?? cell.term,
-          state: deriveCellState(cell.termId, game.currentTermId, markedTermIds),
+          state: deriveCellState(cell.termId, game.revealedTermIds, markedTermIds),
         })),
       ),
     }
@@ -191,16 +191,17 @@ export function PlayerGame() {
 
   /**
    * Tap a cell. Already-MARKED cells are a permanent no-op (Req 16.2). A tap
-   * on any cell whose term is not the game's single current term is a
-   * silent no-op — no dispatch, no hint, no visible change (Req 14.2, 14.3,
-   * 15.1, 15.2, 15.3). Only a tap on the Current_Term dispatches MARK_TERM,
-   * which is validated by the same canMarkTerm/validateMarkAttempt pipeline
-   * the reducer uses — no gate logic is duplicated here (Req 14.1, 17).
+   * on any cell whose term has never been called (not in
+   * `game.revealedTermIds`) is a silent no-op — no dispatch, no hint, no
+   * visible change (Req 14.2, 14.3, 15.1, 15.2, 15.3). A tap on any
+   * previously-called term, current or not, dispatches MARK_TERM, which is
+   * validated by the same canMarkTerm/validateMarkAttempt pipeline the
+   * reducer uses — no gate logic is duplicated here (Req 14.1, 17).
    */
   function handleTap(termId: string) {
     if (readOnly) return
 
-    const isCurrent = termId === game.currentTermId
+    const isRevealed = game.revealedTermIds.includes(termId)
     const isMarked = markedTermIds.has(termId)
 
     if (isMarked) {
@@ -208,8 +209,8 @@ export function PlayerGame() {
       return
     }
 
-    if (!isCurrent) {
-      // Not the current term — silent no-op, no dispatch, no hint (Req 15.1, 15.2).
+    if (!isRevealed) {
+      // Never called — silent no-op, no dispatch, no hint (Req 15.1, 15.2).
       return
     }
 

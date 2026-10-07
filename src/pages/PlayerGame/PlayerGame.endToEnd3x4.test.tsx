@@ -329,7 +329,7 @@ describe('end-to-end 3x4 acceptance scenario (ticket-3x4-dimension-refactor, Req
       const sampleMarkedTermId = ticketTermIds[0]
       const stateForMarked = deriveCellState(
         sampleMarkedTermId,
-        first.sink.current!.state.game.currentTermId,
+        first.sink.current!.state.game.revealedTermIds,
         new Set(markedTermIds),
       )
       expect(stateForMarked).toBe('MARKED')

@@ -136,7 +136,7 @@ describe('marks persistence integration (module-4-term-marking-prize-engine)', (
     const beforeMarkedTermIds = getMarkedTermIds(first.sink.current!.currentPlayerMarks)
     const beforeCellState = deriveCellState(
       revealedTermId,
-      beforeState.game.currentTermId,
+      beforeState.game.revealedTermIds,
       beforeMarkedTermIds,
     )
     expect(beforeCellState).toBe('MARKED')
@@ -170,7 +170,7 @@ describe('marks persistence integration (module-4-term-marking-prize-engine)', (
     const afterMarkedTermIds = getMarkedTermIds(ctx1.currentPlayerMarks)
     const afterCellState = deriveCellState(
       revealedTermId,
-      ctx1.state.game.currentTermId,
+      ctx1.state.game.revealedTermIds,
       afterMarkedTermIds,
     )
     expect(afterCellState).toBe('MARKED')

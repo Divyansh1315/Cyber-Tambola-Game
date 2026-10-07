@@ -179,7 +179,7 @@ describe.runIf(hasBroadcastChannel)(
       const tab2MarkedTermIds = getMarkedTermIds(tab2Marks)
       const tab2CellState = deriveCellState(
         revealedTermId,
-        tab2.sink.current!.state.game.currentTermId,
+        tab2.sink.current!.state.game.revealedTermIds,
         tab2MarkedTermIds,
       )
       expect(tab2CellState).toBe('MARKED')

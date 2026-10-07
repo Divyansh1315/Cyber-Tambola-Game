@@ -149,7 +149,7 @@ export type MarkValidationResult =
         | 'NO_CURRENT_PLAYER'
         | 'TICKET_NOT_FOUND'
         | 'TERM_NOT_ON_TICKET'
-        | 'TERM_NOT_CURRENT'
+        | 'TERM_NOT_REVEALED'
         | 'GAME_COMPLETED'
         | 'DUPLICATE_MARK'
     }
@@ -163,7 +163,7 @@ export type MarkValidationResult =
  *  1. NO_CURRENT_PLAYER   - no player has id === currentPlayerId
  *  2. TICKET_NOT_FOUND    - current player's ticketId has no matching Ticket
  *  3. TERM_NOT_ON_TICKET  - termId does not belong to any cell on that Ticket
- *  4. TERM_NOT_CURRENT    - termId does not equal game.currentTermId
+ *  4. TERM_NOT_REVEALED   - termId is not present in game.revealedTermIds
  *  5. GAME_COMPLETED      - game.status === 'COMPLETED' // not-a-ticket-dimension
  *  6. DUPLICATE_MARK      - a Valid_Mark already exists for
  *                           (currentPlayerId, ticketId, termId)
@@ -199,8 +199,8 @@ export function validateMarkAttempt(
     return { valid: false, reason: 'TERM_NOT_ON_TICKET' }
   }
 
-  if (termId !== state.game.currentTermId) {
-    return { valid: false, reason: 'TERM_NOT_CURRENT' }
+  if (!state.game.revealedTermIds.includes(termId)) {
+    return { valid: false, reason: 'TERM_NOT_REVEALED' }
   }
 
   if (state.game.status === 'COMPLETED') {
