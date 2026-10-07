@@ -85,11 +85,11 @@ export function mapRowToPlayer(row: Record<string, unknown>, ticket?: Ticket): P
 /**
  * Maps a `tickets` row onto the existing `Ticket` type.
  *
- * `cells` (jsonb) is stored server-side as a FLAT array of 15
+ * `cells` (jsonb) is stored server-side as a FLAT array of 12
  * `{termId, row, col}` objects (see assign_ticket in
- * 0003_rpc_join_and_tickets.sql - jsonb_agg over generate_series(1, 15)
+ * 0009_ticket_3x4_dimension_fix.sql - jsonb_agg over generate_series(1, 12)
  * never nests), not the `TicketCell[][]` shape `Ticket.rows` requires. This
- * mapper reshapes that flat array into 3 rows of 5 using each cell's own
+ * mapper reshapes that flat array into 3 rows of 4 using each cell's own
  * `row`/`col` fields. `term` (display label) and `state` are not stored
  * server-side either - every consumer (PlayerGame.tsx's `renderedTicket`)
  * already re-resolves both from the local cyberTerms bank / revealedTermIds
