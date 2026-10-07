@@ -22,6 +22,7 @@ import type { GameSessionState } from './gameSessionInitialState'
 import type { JoinFormValues } from '../types/player'
 import type { Player } from '../types/player'
 import type { Ticket, TicketCell } from '../types/ticket'
+import type { PrizeClaim } from '../types/claim'
 
 const GAME_ID = 'GAME_001'
 const PLAYER_ID = 'PLAYER_1'
@@ -159,7 +160,11 @@ describe('Regression 2: currentPlayerId identity preserved across host actions, 
       winners: player.winners,
     }
 
-    // Host confirms the claim from its own tab.
+    // Business rule (fix/multiplayer-reliability): the claim already
+    // auto-won CYBER_FIVE at submission time, so this CONFIRM_CLAIM
+    // dispatch is now a no-op (canConfirmClaim requires hostDecision ===
+    // 'PENDING') -- the claim was already CONFIRMED before this call.
+    expect(claim.hostDecision).toBe('CONFIRMED')
     host = gameSessionReducer(host, { type: 'CONFIRM_CLAIM', claimId: claim.id })
     const confirmedClaim = host.claims.find((c) => c.id === claim.id)!
     expect(confirmedClaim.hostDecision).toBe('CONFIRMED')
@@ -191,15 +196,28 @@ describe('Regression 2: currentPlayerId identity preserved across host actions, 
       winners: player.winners,
     }
 
-    // Submit a second claim for a different prize from the Player tab first,
-    // so the Host tab has something PENDING to reject.
-    player = gameSessionReducer(player, {
-      type: 'SUBMIT_PRIZE_CLAIM',
+    // Business rule (fix/multiplayer-reliability): a NEW valid claim is now
+    // auto-decided (CONFIRMED/REJECTED) immediately at submission time, so
+    // it never actually reaches hostDecision 'PENDING' for REJECT_CLAIM to
+    // act on. REJECT_CLAIM still exists purely for backward compatibility
+    // with a claim that was already sitting PENDING from before this fix
+    // was applied -- simulated here directly rather than via a fresh
+    // SUBMIT_PRIZE_CLAIM dispatch, since no dispatch path can produce a
+    // PENDING/VALID claim anymore.
+    const secondClaim: PrizeClaim = {
+      id: 'LEGACY_PENDING_CLAIM',
+      gameId: player.game.id,
       playerId: PLAYER_ID,
       ticketId: TICKET_ID,
       prizeId: 'FIREWALL_LINE',
-    })
-    const secondClaim = player.claims.find((c) => c.prizeId === 'FIREWALL_LINE')!
+      submittedAt: '2026-01-01T00:00:00.000Z',
+      validationStatus: 'VALID',
+      hostDecision: 'PENDING',
+      prizeLabel: 'Firewall Line',
+      playerName: 'Legacy Player',
+      ticketRef: TICKET_ID,
+    }
+    player = { ...player, claims: [...player.claims, secondClaim] }
     host2 = { ...host2, claims: player.claims }
 
     for (const action of [
@@ -350,7 +368,9 @@ describe('Regression 3: a refresh after a Mark, a claim submission, or a claim c
     const submittedClaim = before.sink.current!.state.claims.find(
       (c) => c.playerId === outcome.player.id && c.prizeId === 'CYBER_FIVE',
     )!
-    expect(submittedClaim.hostDecision).toBe('PENDING')
+    // Business rule (fix/multiplayer-reliability): a valid claim for an
+    // open prize now wins automatically at submission time.
+    expect(submittedClaim.hostDecision).toBe('CONFIRMED')
     const marksBefore = before.sink.current!.state.marks
 
     before.unmount()
@@ -360,7 +380,10 @@ describe('Regression 3: a refresh after a Mark, a claim submission, or a claim c
     expect(restored.tickets.some((t) => t.id === outcome.ticket.id)).toBe(true)
     expect(restored.marks).toEqual(marksBefore)
     expect(restored.claims.find((c) => c.id === submittedClaim.id)).toEqual(submittedClaim)
-    expect(restored.winners).toEqual([])
+    // The claim's auto-win created a Winner for CYBER_FIVE, which must also
+    // survive the refresh.
+    expect(restored.winners).toHaveLength(1)
+    expect(restored.winners[0].claimId).toBe(submittedClaim.id)
     after.unmount()
   })
 

@@ -209,8 +209,17 @@ describe('SUBMIT_PRIZE_CLAIM only ever appends a claim (property 3)', () => {
             expect(appended.playerId).toBe('P1')
             expect(appended.ticketId).toBe('TICKET_P1')
             expect(appended.prizeId).toBe(prizeId)
-            expect(appended.hostDecision).toBe('PENDING')
             expect(['VALID', 'INVALID']).toContain(appended.validationStatus)
+            // Business rule (fix/multiplayer-reliability): a VALID claim is
+            // now auto-decided immediately (CONFIRMED if it won the open
+            // prize, REJECTED/PRIZE_ALREADY_WON if the prize was already
+            // closed) rather than sitting PENDING; an INVALID claim is
+            // unchanged and still starts/stays PENDING.
+            if (appended.validationStatus === 'INVALID') {
+              expect(appended.hostDecision).toBe('PENDING')
+            } else {
+              expect(['CONFIRMED', 'REJECTED']).toContain(appended.hostDecision)
+            }
 
             // No id collision: the appended claim's id is new.
             expect(priorClaims.some((c) => c.id === appended.id)).toBe(false)
@@ -257,8 +266,20 @@ describe('SUBMIT_PRIZE_CLAIM never affects unrelated state (property 9)', () => 
             expect(next.players).toEqual(frozen.players)
             expect(next.currentPlayerId).toBe(frozen.currentPlayerId)
 
-            // Winners untouched by a mere submission.
-            expect(next.winners).toEqual(frozen.winners)
+            // Business rule (fix/multiplayer-reliability): `baseStateArb`
+            // always starts with an open prize (no winners), so a VALID
+            // claim now immediately wins it -- `winners` gains exactly one
+            // new entry for THIS prizeId; an INVALID claim still never
+            // touches winners at all.
+            const appended = next.claims[next.claims.length - 1]
+            if (appended.validationStatus === 'VALID') {
+              expect(next.winners.length).toBe(frozen.winners.length + 1)
+              const newWinner = next.winners[next.winners.length - 1]
+              expect(newWinner.prizeId).toBe(prizeId)
+              expect(newWinner.playerId).toBe('P1')
+            } else {
+              expect(next.winners).toEqual(frozen.winners)
+            }
 
             // Prize progress for every prize is unaffected by a claim
             // submission (progress is derived only from ticket + marks).

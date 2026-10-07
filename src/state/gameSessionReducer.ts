@@ -7,7 +7,7 @@ import type { Ticket } from '../types/ticket'
 import { validatePrizeClaim } from '../utils/claimEngine'
 import { selectNextTerm } from '../utils/gameEngine'
 import { PRIZES, validateMarkAttempt } from '../utils/prizeEngine'
-import { canConfirmClaim } from '../utils/winnerEngine'
+import { canConfirmClaim, isPrizeClosed } from '../utils/winnerEngine'
 import {
   createSeedGame,
   gameSessionInitialState,
@@ -552,27 +552,95 @@ export function gameSessionReducer(
       })
 
       const prizeMeta = PRIZES.find((p) => p.id === action.prizeId)!
+      const claimId = action.optimisticId ?? localId()
+      const submittedAt = now()
+      const prizeLabel = prizeMeta.label
+      const playerName = player?.displayName ?? 'Unknown player'
+      const ticketRef = ticket?.ref ?? 'Unknown ticket'
+
+      if (!result.valid) {
+        // INVALID claim: behavior unchanged from before this fix — always
+        // hostDecision 'PENDING' with the failing gate's reason, and
+        // winners/game are never touched. An INVALID claim must never be
+        // able to lock a prize.
+        const newClaim: PrizeClaim = {
+          id: claimId,
+          gameId: state.game.id,
+          playerId: action.playerId,
+          ticketId: action.ticketId,
+          prizeId: action.prizeId,
+          submittedAt,
+          validationStatus: 'INVALID',
+          hostDecision: 'PENDING',
+          rejectionReason: result.reason,
+          prizeLabel,
+          playerName,
+          ticketRef,
+        }
+        return { ...state, claims: [...state.claims, newClaim] }
+      }
+
+      // VALID claim: business rule — the first valid claim for an open
+      // prize wins automatically; the host no longer manually confirms.
+      // This reducer is single-threaded/synchronous (no real race locally),
+      // but mirrors the SAME end-state logic as submit_claim's SQL path
+      // (0010_claim_auto_win.sql) so Local Fallback and Supabase-configured
+      // behavior agree.
+      if (isPrizeClosed(state.winners, state.game.id, action.prizeId)) {
+        // The prize was already won by the time this (validly eligible)
+        // claim is being recorded — auto-reject, winners/game untouched.
+        const newClaim: PrizeClaim = {
+          id: claimId,
+          gameId: state.game.id,
+          playerId: action.playerId,
+          ticketId: action.ticketId,
+          prizeId: action.prizeId,
+          submittedAt,
+          validationStatus: 'VALID',
+          hostDecision: 'REJECTED',
+          rejectionReason: 'PRIZE_ALREADY_WON',
+          decidedAt: submittedAt,
+          prizeLabel,
+          playerName,
+          ticketRef,
+        }
+        return { ...state, claims: [...state.claims, newClaim] }
+      }
+
+      // Prize is open: this claim wins it immediately.
+      const decidedAt = submittedAt
       const newClaim: PrizeClaim = {
-        id: action.optimisticId ?? localId(),
+        id: claimId,
         gameId: state.game.id,
         playerId: action.playerId,
         ticketId: action.ticketId,
         prizeId: action.prizeId,
-        submittedAt: now(),
-        validationStatus: result.valid ? 'VALID' : 'INVALID',
-        hostDecision: 'PENDING',
-        rejectionReason: result.valid ? undefined : result.reason,
-        prizeLabel: prizeMeta.label,
-        playerName: player?.displayName ?? 'Unknown player',
-        ticketRef: ticket?.ref ?? 'Unknown ticket',
+        submittedAt,
+        validationStatus: 'VALID',
+        hostDecision: 'CONFIRMED',
+        rejectionReason: undefined,
+        decidedAt,
+        prizeLabel,
+        playerName,
+        ticketRef,
       }
-      // Every submission — VALID or INVALID — is recorded (Req 3.3, 3.4); an
-      // INVALID claim is never silently dropped, so the host's history and
-      // the player's own progress-based feedback (Req 10.3) both have a
-      // record to read.
+      const newWinner: Winner = {
+        id: localId(),
+        gameId: state.game.id,
+        prizeId: action.prizeId,
+        playerId: action.playerId,
+        ticketId: action.ticketId,
+        claimId,
+        confirmedAt: decidedAt,
+        prizeLabel,
+        playerName,
+        ticketRef,
+      }
       return {
         ...state,
         claims: [...state.claims, newClaim],
+        winners: [...state.winners, newWinner],
+        game: { ...state.game, latestWinnerAnnouncementId: newWinner.id },
       }
     }
 

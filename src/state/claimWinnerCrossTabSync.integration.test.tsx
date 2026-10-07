@@ -138,13 +138,16 @@ describe('cross-tab claim/winner sync (module-5-prize-claim-processing-winner-ma
       })
       await settle()
 
-      // The Player tab's own claim is VALID/PENDING.
+      // Business rule (fix/multiplayer-reliability): a valid claim for an
+      // open prize now wins automatically at submission time -- the Player
+      // tab's own claim is already VALID/CONFIRMED, with no separate host
+      // CONFIRM_CLAIM step to dispatch.
       const playerSideClaim = playerTab.sink.current!.state.claims.find(
         (c) => c.playerId === player.id && c.prizeId === 'CYBER_FIVE',
       )
       expect(playerSideClaim).toBeDefined()
       expect(playerSideClaim!.validationStatus).toBe('VALID')
-      expect(playerSideClaim!.hostDecision).toBe('PENDING')
+      expect(playerSideClaim!.hostDecision).toBe('CONFIRMED')
 
       // The Host tab received it via the BroadcastChannel round-trip, with
       // no manual SYNC_STATE dispatch and no refresh.
@@ -153,15 +156,6 @@ describe('cross-tab claim/winner sync (module-5-prize-claim-processing-winner-ma
       )
       expect(hostSideClaim).toBeDefined()
       expect(hostSideClaim).toEqual(playerSideClaim)
-
-      // --- Host tab confirms the claim -----------------------------------
-      act(() => {
-        hostTab.sink.current!.dispatch({
-          type: 'CONFIRM_CLAIM',
-          claimId: hostSideClaim!.id,
-        })
-      })
-      await settle()
 
       // The Host tab now has a Winner for CYBER_FIVE.
       const hostSideWinner = getWinnerForPrize(
@@ -183,8 +177,9 @@ describe('cross-tab claim/winner sync (module-5-prize-claim-processing-winner-ma
       expect(playerSideWinner).toBeDefined()
       expect(playerSideWinner).toEqual(hostSideWinner)
 
-      // The Player tab's own claim record is updated to CONFIRMED too (not
-      // just the winners array).
+      // The Player tab's own claim record is CONFIRMED too (not just the
+      // winners array), unchanged since submission -- there was never a
+      // separate confirm step to update it.
       const playerSideClaimAfterConfirm = playerTab.sink.current!.state.claims.find(
         (c) => c.id === playerSideClaim!.id,
       )

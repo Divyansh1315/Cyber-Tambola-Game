@@ -155,12 +155,10 @@ describe('Claim submit -> confirm cross-screen propagation (module-5-prize-claim
     )
     expect(submittedClaim).toBeDefined()
     expect(submittedClaim!.validationStatus).toBe('VALID')
-    expect(submittedClaim!.hostDecision).toBe('PENDING')
-
-    // Dispatch CONFIRM_CLAIM for the resulting claim.
-    act(() => {
-      sink.current!.dispatch({ type: 'CONFIRM_CLAIM', claimId: submittedClaim!.id })
-    })
+    // Business rule (fix/multiplayer-reliability): a valid claim for an
+    // open prize now wins automatically at submission time -- there is no
+    // separate host CONFIRM_CLAIM step to dispatch.
+    expect(submittedClaim!.hostDecision).toBe('CONFIRMED')
 
     // --- Player screen reflects the confirmed Winner ---
     const cyberFiveBlock = screen

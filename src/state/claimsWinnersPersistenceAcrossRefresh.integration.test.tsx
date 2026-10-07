@@ -134,12 +134,10 @@ describe('claims/winners persist across a simulated page refresh (module-5-prize
     )
     expect(submittedClaim).toBeDefined()
     expect(submittedClaim!.validationStatus).toBe('VALID')
-    expect(submittedClaim!.hostDecision).toBe('PENDING')
-
-    // Confirm the claim exactly as the Host Dashboard's Confirm button would.
-    act(() => {
-      before.sink.current!.dispatch({ type: 'CONFIRM_CLAIM', claimId: submittedClaim!.id })
-    })
+    // Business rule (fix/multiplayer-reliability): a valid claim for an
+    // open prize now wins automatically at submission time -- there is no
+    // separate host CONFIRM_CLAIM step to dispatch.
+    expect(submittedClaim!.hostDecision).toBe('CONFIRMED')
 
     const confirmedClaim = before.sink.current!.state.claims.find(
       (c) => c.id === submittedClaim!.id,

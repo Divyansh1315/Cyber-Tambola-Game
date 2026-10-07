@@ -280,7 +280,9 @@ describe('end-to-end 3x4 acceptance scenario (ticket-3x4-dimension-refactor, Req
         )
         expect(eligibleClaim).toBeDefined()
         expect(eligibleClaim!.validationStatus).toBe('VALID')
-        expect(eligibleClaim!.hostDecision).toBe('PENDING')
+        // Business rule (fix/multiplayer-reliability): a valid claim for an
+        // open prize now wins automatically at submission time.
+        expect(eligibleClaim!.hostDecision).toBe('CONFIRMED')
       }
 
       // --- Continue marking until all 12 ticket cells are marked (Req 30.6:

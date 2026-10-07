@@ -570,7 +570,7 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
       .closest('li') as HTMLElement
   }
 
-  it('tapping an ELIGIBLE prize claim button dispatches SUBMIT_PRIZE_CLAIM and re-renders that block as PENDING (Req 2.1, 2.2, 2.5, 12.5)', async () => {
+  it('tapping an ELIGIBLE prize claim button dispatches SUBMIT_PRIZE_CLAIM and re-renders that block as CONFIRMED winner (Req 2.1, 2.2, 2.5, 12.5)', async () => {
     const user = userEvent.setup()
     const game = createSeedGame()
     const { player, ticket } = buildJoined(game)
@@ -598,14 +598,15 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
 
     await user.click(claimButton)
 
-    // Re-renders in place: the Cyber Five block now shows the PENDING
-    // message and a disabled "Claim Pending" control.
+    // Business rule (fix/multiplayer-reliability): a valid claim for an
+    // open prize now wins automatically at submission time -- the Cyber
+    // Five block re-renders in place as a confirmed winner, not a PENDING
+    // "waiting for host" state.
     const cyberFiveBlock = claimBlockFor('Cyber Five')
-    expect(cyberFiveBlock).toHaveTextContent(
-      'Claim submitted. Waiting for Host confirmation.',
-    )
+    expect(cyberFiveBlock).toHaveTextContent('WINNER')
+    expect(cyberFiveBlock).toHaveTextContent('confirmed')
     expect(
-      screen.getByRole('button', { name: /claim pending/i }),
+      screen.getByRole('button', { name: /winner confirmed/i }),
     ).toBeDisabled()
   })
 

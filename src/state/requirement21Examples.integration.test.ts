@@ -161,8 +161,11 @@ function baseIneligibleState(): GameSessionState {
 // 21.1 — A valid claim submission is accepted as VALID/PENDING
 // ---------------------------------------------------------------------------
 
-describe('Requirement 21.1 — valid claim submission accepted as VALID/PENDING', () => {
-  it('an eligible player submitting a claim gets validationStatus VALID and hostDecision PENDING', () => {
+describe('Requirement 21.1 — valid claim submission accepted as VALID/CONFIRMED (auto-win)', () => {
+  it('an eligible player submitting a claim for an open prize gets validationStatus VALID and hostDecision CONFIRMED', () => {
+    // Business rule (fix/multiplayer-reliability): the first valid claim
+    // for an open prize wins automatically at submission time -- it no
+    // longer sits PENDING awaiting a manual host decision.
     const state = baseEligibleState()
 
     const next = gameSessionReducer(state, {
@@ -174,7 +177,8 @@ describe('Requirement 21.1 — valid claim submission accepted as VALID/PENDING'
 
     expect(next.claims.length).toBe(1)
     expect(next.claims[0].validationStatus).toBe('VALID')
-    expect(next.claims[0].hostDecision).toBe('PENDING')
+    expect(next.claims[0].hostDecision).toBe('CONFIRMED')
+    expect(next.winners).toHaveLength(1)
   })
 })
 
@@ -215,7 +219,9 @@ describe('Requirement 21.3 — duplicate submissions never exceed one active cla
       prizeId: 'CYBER_FIVE',
     })
     expect(afterFirst.claims.length).toBe(1)
-    expect(afterFirst.claims[0].hostDecision).toBe('PENDING')
+    // Business rule (fix/multiplayer-reliability): the first valid claim
+    // for an open prize wins automatically -- CONFIRMED, not PENDING.
+    expect(afterFirst.claims[0].hostDecision).toBe('CONFIRMED')
 
     const afterSecond = gameSessionReducer(afterFirst, {
       type: 'SUBMIT_PRIZE_CLAIM',
