@@ -1,4 +1,4 @@
-// Feature: module-5-prize-claim-processing-winner-management, Property 12: Presentation winner announcements show only the prize label and player name
+// Feature: module-5-prize-claim-processing-winner-management, Property 12: Presentation winner announcements show only the prize label, player name, and ticket reference
 import { describe, it, expect } from 'vitest'
 import fc from 'fast-check'
 
@@ -36,14 +36,15 @@ const winnerArb: fc.Arbitrary<Winner> = fc.record({
 })
 
 describe('toAnnouncementViewModel (property 12)', () => {
-  it('exposes exactly {prizeLabel, playerName} for any Winner, never any other field', () => {
+  it('exposes exactly {prizeLabel, playerName, ticketRef} for any Winner, never any other field', () => {
     fc.assert(
       fc.property(winnerArb, (winner) => {
         const viewModel = toAnnouncementViewModel(winner)
 
-        expect(Object.keys(viewModel).sort()).toEqual(['playerName', 'prizeLabel'])
+        expect(Object.keys(viewModel).sort()).toEqual(['playerName', 'prizeLabel', 'ticketRef'])
         expect(viewModel.prizeLabel).toBe(winner.prizeLabel)
         expect(viewModel.playerName).toBe(winner.playerName)
+        expect(viewModel.ticketRef).toBe(winner.ticketRef)
 
         // Never leaks technical/identifying fields.
         expect(viewModel).not.toHaveProperty('id')

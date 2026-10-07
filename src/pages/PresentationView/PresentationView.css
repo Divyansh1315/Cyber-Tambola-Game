@@ -279,6 +279,66 @@
   font-weight: 900;
   color: #fff;
 }
+.projector__winner-ticket {
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  font-weight: 600;
+  color: var(--color-on-dark-soft);
+}
+.projector__winner-congrats {
+  font-size: clamp(1.5rem, 3.2vw, 2.25rem);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+/* Final Winner Summary (FINAL_RESULTS mode) */
+.projector__final-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+}
+.projector__final-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: min(90vw, 720px);
+}
+.projector__final-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border-dark);
+}
+.projector__final-prize {
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-weight: 700;
+  color: var(--color-accent);
+  text-align: left;
+}
+.projector__final-winner {
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-weight: 800;
+  color: #fff;
+  text-align: right;
+}
+.projector__final-winner--none {
+  color: var(--color-on-dark-soft);
+  font-weight: 600;
+}
+.projector__final-ticket {
+  display: block;
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  font-weight: 500;
+  color: var(--color-on-dark-soft);
+}
 
 /* Simple centered projector messages (Paused / Completed) */
 .projector__message {

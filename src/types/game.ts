@@ -37,6 +37,14 @@ export interface Game {
   revealedTermIds: string[]
   /** The gameplay status to return to after a pause. */
   previousStatus?: GameStatus
+  /**
+   * The id of the most recently confirmed Winner that has not yet been
+   * superseded by a Next-Cyber-Word or Start-Game action
+   * (presenter-realtime-winner-sync fix). `undefined` means no active
+   * announcement. Shared/authoritative -- never Presenter-local-only state --
+   * so every Presenter instance (any tab, any refresh) renders identically.
+   */
+  latestWinnerAnnouncementId?: string
 }
 
 // Ticket types live in ./ticket; re-exported here for backwards compatibility

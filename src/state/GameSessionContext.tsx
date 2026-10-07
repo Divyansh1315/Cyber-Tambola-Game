@@ -634,6 +634,24 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       // zero subscriptions, never a window with two.
       gameChannel?.unsubscribe()
       gameChannel = subscribeToGame(gameRow.id, (change) => {
+        // presenter-realtime-winner-sync fix (Req 2.8): a real Supabase
+        // Realtime channel's unsubscribe() is an async teardown over the
+        // websocket, not a synchronous guarantee against already-in-flight
+        // server-pushed events for the just-unsubscribed old channel. Guard
+        // against applying a stale event from a torn-down old game's channel
+        // to this (newer) game's state. gameIdRef.current is compared, not
+        // state.game.id, because this callback is registered once per
+        // hydrateForGame call and must always compare against the game id
+        // THIS specific subscription was opened for, which gameIdRef.current
+        // already correctly tracks (set synchronously above, before this
+        // channel is even subscribed) -- not whatever state.game.id happens
+        // to be by the time an event is actually received.
+        const incomingGameId = (change.row as Record<string, unknown>).game_id as
+          | string
+          | undefined
+        if (incomingGameId !== undefined && incomingGameId !== gameIdRef.current) {
+          return // stale cross-game event -- drop it
+        }
         dispatch({ type: 'SYNC_REMOTE', change })
       })
     }

@@ -220,6 +220,7 @@ export function gameSessionReducer(
         currentRound: 1,
         currentTermId: first.id,
         revealedTermIds: [...game.revealedTermIds, first.id],
+        latestWinnerAnnouncementId: undefined,
       }
       return { ...state, game: started }
     }
@@ -233,7 +234,7 @@ export function gameSessionReducer(
       if (!next) {
         return {
           ...state,
-          game: { ...game, status: 'COMPLETED', endedAt: now() },
+          game: { ...game, status: 'COMPLETED', endedAt: now(), latestWinnerAnnouncementId: undefined },
         }
       }
 
@@ -246,6 +247,7 @@ export function gameSessionReducer(
           currentRound: game.currentRound + 1,
           currentTermId: next.id,
           revealedTermIds: [...game.revealedTermIds, next.id],
+          latestWinnerAnnouncementId: undefined,
         },
       }
     }
@@ -598,7 +600,8 @@ export function gameSessionReducer(
         ...state,
         claims: updatedClaims,
         winners: [...state.winners, newWinner],
-      } // Req 8.2, 8.3, 8.4, 8.6 — only claims/winners change
+        game: { ...state.game, latestWinnerAnnouncementId: newWinner.id },
+      } // Req 8.2, 8.3, 8.4, 8.6 — only claims/winners/game.latestWinnerAnnouncementId change
     }
 
     case 'REJECT_CLAIM': {

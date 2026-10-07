@@ -181,8 +181,12 @@ describe('Claim submit -> confirm cross-screen propagation (module-5-prize-claim
     // The winner's display name now appears in both the Winner Panel row
     // and the Presentation View announcement.
     expect(screen.getAllByText('Riya Sharma').length).toBeGreaterThanOrEqual(2)
+    // No manual dismiss affordance exists any more (presenter-realtime-
+    // winner-sync): the announcement is driven entirely by the shared
+    // game.latestWinnerAnnouncementId field, cleared only by the Host
+    // calling Next Cyber Word/Start Game, never a Presenter-local button.
     expect(
-      screen.getByRole('button', { name: /dismiss winner announcement/i }),
-    ).toBeInTheDocument()
+      screen.queryByRole('button', { name: /dismiss winner announcement/i }),
+    ).toBeNull()
   })
 })

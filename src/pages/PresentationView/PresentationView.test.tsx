@@ -16,7 +16,6 @@
 // Validates: Requirements 2.5, 9.4
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import {
   createMockSupabaseClient,
@@ -262,13 +261,19 @@ describe('PresentationView winner announcement (Req 14.1, 14.2, 14.3)', () => {
     ]
     const tickets = players.map((p) => makeTicket(p.ticketId, p.id))
     const winner = makeWinner({
+      id: 'winner-1',
       playerId: 'p1',
       ticketId: 'ticket-fake-id-777',
       claimId: 'claim-fake-id-999',
       prizeLabel: 'Cyber Five',
       playerName: 'Asha',
     })
-    seedGame(baseGame('WORD_ACTIVE'), players, tickets, [winner])
+    seedGame(
+      { ...baseGame('WORD_ACTIVE'), latestWinnerAnnouncementId: winner.id },
+      players,
+      tickets,
+      [winner],
+    )
 
     const { container } = renderView()
 
@@ -281,21 +286,37 @@ describe('PresentationView winner announcement (Req 14.1, 14.2, 14.3)', () => {
     expect(container.textContent).not.toContain('claim-fake-id-999')
   })
 
-  it('returns the stage to the current game.status view after dismissing the announcement', async () => {
-    const user = userEvent.setup()
+  it('returns to the current game.status view once the announcement is cleared (no manual dismiss affordance; presenter-realtime-winner-sync)', () => {
     const players = [makePlayer('p1', 'Asha', 'EMP-1001')]
     const tickets = players.map((p) => makeTicket(p.ticketId, p.id))
-    const winner = makeWinner({ playerId: 'p1' })
-    seedGame(baseGame('WORD_ACTIVE'), players, tickets, [winner])
+    const winner = makeWinner({ id: 'winner-1', playerId: 'p1' })
+    seedGame(
+      { ...baseGame('WORD_ACTIVE'), latestWinnerAnnouncementId: winner.id },
+      players,
+      tickets,
+      [winner],
+    )
 
-    renderView()
+    const { unmount } = renderView()
 
     expect(screen.getByText('Cyber Five Winner')).toBeInTheDocument()
     expect(screen.queryByText('Cyber Word')).not.toBeInTheDocument()
+    // No manual dismiss affordance exists any more -- clearing the
+    // announcement is driven entirely by shared state
+    // (game.latestWinnerAnnouncementId), never a Presenter-local button.
+    expect(screen.queryByRole('button', { name: /dismiss winner announcement/i })).toBeNull()
+    unmount()
 
-    await user.click(screen.getByRole('button', { name: 'Dismiss Winner Announcement' }))
+    // Simulate the Host calling Next Cyber Word, which clears
+    // latestWinnerAnnouncementId (gameSessionReducer.ts's CALL_NEXT_WORD
+    // case) -- re-seed storage (no latestWinnerAnnouncementId) and remount
+    // fresh to observe the resulting view without depending on the live
+    // dispatch pipeline in this isolated test.
+    window.localStorage.clear()
+    seedGame(baseGame('WORD_ACTIVE'), players, tickets, [winner])
+    const { container } = renderView()
 
-    expect(screen.queryByText('Cyber Five Winner')).not.toBeInTheDocument()
+    expect(container.textContent).not.toContain('Cyber Five Winner')
     expect(screen.getByText('Cyber Word')).toBeInTheDocument()
     expect(screen.getByText('Phishing')).toBeInTheDocument()
   })
