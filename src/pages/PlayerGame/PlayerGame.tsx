@@ -8,7 +8,6 @@ import { PrizeProgressList } from '../../components/player/PrizeProgressList'
 import { Ticket } from '../../components/player/Ticket'
 import { findCyberTerm } from '../../data/cyberTerms'
 import { useGameSession } from '../../state/GameSessionContext'
-import { shortTicketRef } from '../../state/joinService'
 import { deriveCellState } from '../../utils/deriveCellState'
 import { canMarkTerm, getMarkedTermIds } from '../../utils/prizeEngine'
 import {
@@ -286,7 +285,7 @@ export function PlayerGame() {
           <div className="player__header-meta">
             <span className="player__name">{currentPlayer.displayName}</span>
             <span className="player__ticket-ref">
-              {shortTicketRef(currentTicket.id)}
+              {currentTicket.ref}
             </span>
           </div>
         </header>

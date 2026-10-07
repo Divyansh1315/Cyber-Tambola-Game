@@ -1166,4 +1166,66 @@ describe('Regression (claim-duplicate-submission): six required scenarios + full
 
     tab.unmount()
   })
+
+  // -------------------------------------------------------------------------
+  // Ticket reference consistency across the Player screen's own rendered
+  // header, the submitted claim's ticketRef, and the Winner History ref
+  // (bugfix.md Req 2.8). Mounts the real PlayerGame component (not just the
+  // Harness sink) so the Player screen's actual rendered DOM text is
+  // compared, not a recomputed stand-in -- this is what the mechanism-check
+  // test above could not catch, since it never renders PlayerGame itself.
+  // -------------------------------------------------------------------------
+  it('Player screen rendered ref, submitted claim ticketRef, and Winner History ref are all identical for one session (Req 2.8)', async () => {
+    const client = mockClient!
+    const tab = await mountConsistentEligiblePlayerGame(client)
+
+    // The Player screen's own rendered header ref -- must equal the
+    // server-authoritative currentTicket.ref, never a recomputed value.
+    const playerScreenRenderedRef = tab.getByText(tab.sink.current!.currentTicket!.ref)
+    expect(playerScreenRenderedRef).toBeInTheDocument()
+
+    const serverRow = buildClaimRow({
+      id: 'SERVER_CLAIM_REF_CONSISTENCY',
+      player_id: 'P_1',
+      ticket_id: 'T_1',
+      ticket_ref: tab.sink.current!.currentTicket!.ref,
+    })
+    client.queueRpcResponse('submit_claim', { data: serverRow })
+
+    const claimButton = tab.getByRole('button', { name: /claim cyber five/i })
+    fireEvent.click(claimButton)
+
+    await waitFor(() => {
+      expect(client.rpcCalls.filter((c) => c.name === 'submit_claim')).toHaveLength(1)
+    })
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+    act(() => {
+      client.fireRemoteChange({ table: 'claims', eventType: 'INSERT', row: serverRow })
+    })
+
+    await waitFor(() => {
+      expect(tab.sink.current!.state.claims.filter((c) => c.prizeId === 'CYBER_FIVE')).toHaveLength(1)
+    })
+
+    const submittedClaim = tab.sink.current!.state.claims.find((c) => c.prizeId === 'CYBER_FIVE')!
+
+    act(() => {
+      tab.sink.current!.dispatch({ type: 'CONFIRM_CLAIM', claimId: submittedClaim.id })
+    })
+    await waitFor(() => {
+      expect(tab.sink.current!.state.winners).toHaveLength(1)
+    })
+    const winner = tab.sink.current!.state.winners[0]
+
+    // All three surfaces -- Player screen's own rendered ref, the submitted
+    // claim's ticketRef, and the eventual Winner History ref -- agree.
+    expect(submittedClaim.ticketRef).toBe(tab.sink.current!.currentTicket!.ref)
+    expect(winner.ticketRef).toBe(tab.sink.current!.currentTicket!.ref)
+    expect(playerScreenRenderedRef.textContent).toBe(submittedClaim.ticketRef)
+    expect(playerScreenRenderedRef.textContent).toBe(winner.ticketRef)
+
+    tab.unmount()
+  })
 })
