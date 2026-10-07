@@ -107,7 +107,7 @@ export type PlayerClaimStatus =
  *     'PENDING' -> PENDING (Req 12.5)
  *  4. The player's own latest claim for this prize has hostDecision
  *     'REJECTED' -> REJECTED (Req 12.7)
- *  5. Otherwise, eligible now -> ELIGIBLE (Req 12.4)
+ *  5. Otherwise, eligible now -> ELIGIBLE (Req 12.4) // not-a-ticket-dimension
  *  6. Otherwise -> NOT_ELIGIBLE (Req 12.3)
  */
 export function derivePlayerClaimStatus(input: {

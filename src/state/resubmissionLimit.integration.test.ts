@@ -18,13 +18,13 @@ const TICKET_ID = 'TICKET_1'
 const GAME_ID = 'GAME_001'
 const PRIZE_ID = 'CYBER_FIVE'
 
-/** A 3x5 ticket whose 15 cells have distinct termIds T0..T14. */
+/** A 3x4 ticket whose 12 cells have distinct termIds T0..T11. */
 function makeTicket(): Ticket {
   const rows: TicketCell[][] = []
   let n = 0
   for (let row = 0; row < 3; row++) {
     const cells: TicketCell[] = []
-    for (let col = 0; col < 5; col++) {
+    for (let col = 0; col < 4; col++) {
       cells.push({ termId: `T${n}`, term: `Term ${n}`, state: 'LOCKED', row, col })
       n++
     }
@@ -52,8 +52,8 @@ function makePlayer(): Player {
   }
 }
 
-// Mark 5 distinct terms so CYBER_FIVE (any 5 marked terms) reaches 5/5.
-const MARK_TERM_IDS = ['T0', 'T5', 'T10', 'T1', 'T6']
+// Mark 5 distinct terms so CYBER_FIVE (any 5 marked terms) reaches 5/5. // not-a-ticket-dimension
+const MARK_TERM_IDS = ['T0', 'T4', 'T8', 'T1', 'T5']
 
 function baseState(): GameSessionState {
   const ticket = makeTicket()
@@ -73,12 +73,18 @@ function baseState(): GameSessionState {
   }
 }
 
+/** Dispatch MARK_TERM for termId after first making it the current term. */
+function markTerm(state: GameSessionState, termId: string): GameSessionState {
+  const withCurrent = { ...state, game: { ...state.game, currentTermId: termId } }
+  return gameSessionReducer(withCurrent, { type: 'MARK_TERM', termId })
+}
+
 describe('one-retry-after-rejection-then-blocked integration (module-5, task 15.6)', () => {
   it('allows exactly one resubmission after a rejection, then blocks further submissions with RESUBMISSION_LIMIT_REACHED', () => {
     let state = baseState()
 
     for (const termId of MARK_TERM_IDS) {
-      state = gameSessionReducer(state, { type: 'MARK_TERM', termId })
+      state = markTerm(state, termId)
     }
     expect(state.marks).toHaveLength(5)
 

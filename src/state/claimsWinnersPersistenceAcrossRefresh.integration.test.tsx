@@ -88,7 +88,7 @@ describe('claims/winners persist across a simulated page refresh (module-5-prize
       before.sink.current!.dispatch({ type: 'START_GAME' })
     })
 
-    // Reveal + mark terms until Cyber Five (any 5 marked cells) is at 5/5.
+    // Reveal + mark terms until Cyber Five (any 5 marked cells) is at 5/5. // not-a-ticket-dimension
     const activeTermCount = cyberTerms.filter((t) => t.active).length
     const ticketTermIds = new Set(
       outcome.ticket.rows.flatMap((row) => row.map((cell) => cell.termId)),

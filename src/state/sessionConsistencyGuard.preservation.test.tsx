@@ -199,18 +199,18 @@ function buildCalledTermRows(termIds: readonly string[]): Record<string, unknown
 }
 
 function buildTicketCells(): TicketCell[] {
-  return Array.from({ length: 15 }, (_, i) => ({
+  return Array.from({ length: 12 }, (_, i) => ({
     termId: `TERM_${i}`,
     term: `Term ${i}`,
-    row: Math.floor(i / 5),
-    col: i % 5,
+    row: Math.floor(i / 4),
+    col: i % 4,
     state: 'AVAILABLE' as const,
   }))
 }
 
 function buildTicketRows(): TicketCell[][] {
   const cells = buildTicketCells()
-  return [cells.slice(0, 5), cells.slice(5, 10), cells.slice(10, 15)]
+  return [cells.slice(0, 4), cells.slice(4, 8), cells.slice(8, 12)]
 }
 
 /**
@@ -244,7 +244,7 @@ function buildClaimRow(overrides: Partial<Record<string, unknown>> = {}): Record
 }
 
 /**
- * 5 cells spread across all 3 rows (2 + 2 + 1), chosen so marking exactly
+ * 5 cells spread across all 3 rows (2 + 2 + 1), chosen so marking exactly // not-a-ticket-dimension
  * these 5 reaches Cyber Five eligibility (any 5, Req 8) WITHOUT also
  * completing any single Line_Prize row (which requires all 5 cells of one
  * specific row, Req 9) -- isolating the Cyber Five claim path cleanly, the
@@ -314,6 +314,19 @@ describe('Preservation: consistent session claim submission unchanged (Req 3.1, 
     // unaffected by this fix (Req 3.8); this loop only reaches a genuine
     // claim-eligible state to observe the claim-submission baseline.
     for (const cell of cyberFiveCells) {
+      act(() => {
+        tab.sink.current!.dispatch({
+          type: 'HYDRATE_FROM_REMOTE',
+          snapshot: {
+            game: { ...tab.sink.current!.state.game, currentTermId: cell.termId },
+            players: tab.sink.current!.state.players,
+            tickets: tab.sink.current!.state.tickets,
+            marks: tab.sink.current!.state.marks,
+            claims: tab.sink.current!.state.claims,
+            winners: tab.sink.current!.state.winners,
+          },
+        })
+      })
       act(() => {
         tab.sink.current!.dispatch({ type: 'MARK_TERM', termId: cell.termId })
       })
@@ -578,6 +591,19 @@ describe('Preservation: consistent session claim submission unchanged (Req 3.1, 
     })
 
     for (const cell of localCyberFiveCells) {
+      act(() => {
+        tab.sink.current!.dispatch({
+          type: 'HYDRATE_FROM_REMOTE',
+          snapshot: {
+            game: { ...tab.sink.current!.state.game, currentTermId: cell.termId },
+            players: tab.sink.current!.state.players,
+            tickets: tab.sink.current!.state.tickets,
+            marks: tab.sink.current!.state.marks,
+            claims: tab.sink.current!.state.claims,
+            winners: tab.sink.current!.state.winners,
+          },
+        })
+      })
       act(() => {
         tab.sink.current!.dispatch({ type: 'MARK_TERM', termId: cell.termId })
       })

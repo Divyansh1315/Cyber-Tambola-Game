@@ -36,6 +36,18 @@ const cellArb: fc.Arbitrary<TicketCell> = fc.record({
   col: fc.integer({ min: 0, max: 4 }),
 })
 
+/**
+ * Rows matching either the current 3x4 ticket shape or the legacy 3x5
+ * shape — the only two shapes `isValidTicketShape` (persistence.ts)
+ * allowlists (Req 5.4, 7.2).
+ */
+const ticketRowsArb: fc.Arbitrary<TicketCell[][]> = fc
+  .constantFrom(4, 5)
+  .chain((cols) => fc.array(fc.array(cellArb, { minLength: cols, maxLength: cols }), {
+    minLength: 3,
+    maxLength: 3,
+  }))
+
 /** A ticket for a given player id (so tickets reference real players). */
 function ticketArbForPlayer(playerId: string, gameId: string): fc.Arbitrary<Ticket> {
   return fc.record({
@@ -44,10 +56,7 @@ function ticketArbForPlayer(playerId: string, gameId: string): fc.Arbitrary<Tick
     gameId: fc.constant(gameId),
     createdAt: fc.date().map((d) => d.toISOString()),
     ref: fc.string({ maxLength: 16 }),
-    rows: fc.array(fc.array(cellArb, { minLength: 1, maxLength: 5 }), {
-      minLength: 1,
-      maxLength: 3,
-    }),
+    rows: ticketRowsArb,
   })
 }
 

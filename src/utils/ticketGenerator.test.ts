@@ -6,7 +6,7 @@ import {
   computeSignature,
   generateTicket,
   getActiveTerms,
-  TICKET_COLS,
+  TICKET_COLUMNS,
   TICKET_ROWS,
   TICKET_SIZE,
   type TicketGenOptions,
@@ -85,10 +85,10 @@ function ticketTermIds(ticket: Ticket): string[] {
 }
 
 describe('ticketGenerator', () => {
-  // Feature: module-3-player-joining-tickets, property 1 — Ticket has 15 distinct active terms in a 3x5 grid
-  it('property 1: 15 distinct active terms arranged in a 3x5 grid', () => {
+  // Feature: module-3-player-joining-tickets, property 1 — Ticket has 12 distinct active terms in a 3x4 grid
+  it('property 1: 12 distinct active terms arranged in a 3x4 grid', () => {
     fc.assert(
-      fc.property(termBankArb(15), fc.integer(), (terms, seed) => {
+      fc.property(termBankArb(12), fc.integer(), (terms, seed) => {
         const activeIds = new Set(getActiveTerms(terms).map((t) => t.id))
         const ticket = generateTicket(terms, [], baseOptions(makeRng(seed)))
         const ids = ticketTermIds(ticket)
@@ -97,7 +97,7 @@ describe('ticketGenerator', () => {
         expect(new Set(ids).size).toBe(TICKET_SIZE) // all distinct
         for (const id of ids) expect(activeIds.has(id)).toBe(true) // all strictly-active
         expect(ticket.rows).toHaveLength(TICKET_ROWS)
-        for (const row of ticket.rows) expect(row).toHaveLength(TICKET_COLS)
+        for (const row of ticket.rows) expect(row).toHaveLength(TICKET_COLUMNS)
       }),
       { numRuns: RUNS },
     )
@@ -106,7 +106,7 @@ describe('ticketGenerator', () => {
   // Feature: module-3-player-joining-tickets, property 2 — Cell row/column indices match grid position
   it('property 2: cell row/col match grid position with no extra term fields', () => {
     fc.assert(
-      fc.property(termBankArb(15), fc.integer(), (terms, seed) => {
+      fc.property(termBankArb(12), fc.integer(), (terms, seed) => {
         const ticket = generateTicket(terms, [], baseOptions(makeRng(seed)))
         for (let r = 0; r < ticket.rows.length; r++) {
           for (let c = 0; c < ticket.rows[r].length; c++) {
@@ -116,7 +116,7 @@ describe('ticketGenerator', () => {
             expect(cell.row).toBeGreaterThanOrEqual(0)
             expect(cell.row).toBeLessThanOrEqual(2)
             expect(cell.col).toBeGreaterThanOrEqual(0)
-            expect(cell.col).toBeLessThanOrEqual(4)
+            expect(cell.col).toBeLessThanOrEqual(3)
             // No CyberTerm-only fields leaked onto the cell.
             expect(Object.keys(cell).sort()).toEqual(
               ['col', 'row', 'state', 'term', 'termId'].sort(),
@@ -145,7 +145,7 @@ describe('ticketGenerator', () => {
               { minLength: 1, maxLength: 8 },
             )
             .map((chars) => chars.join('')),
-          { minLength: 15, maxLength: 15 },
+          { minLength: 12, maxLength: 12 },
         ),
         (termIds) => {
           const sig = computeSignature(termIds)
@@ -170,7 +170,7 @@ describe('ticketGenerator', () => {
   it('property 4: generated signature is not in the (non-saturating) existing set', () => {
     fc.assert(
       fc.property(
-        termBankArb(16),
+        termBankArb(13),
         fc.array(fc.string(), { minLength: 0, maxLength: 5 }),
         fc.integer(),
         (terms, existing, seed) => {
@@ -187,7 +187,7 @@ describe('ticketGenerator', () => {
   it('property 5: inputs are unchanged on success and on throw', () => {
     fc.assert(
       fc.property(
-        fc.integer({ min: 10, max: 25 }), // active count (may be < 15 to force throw)
+        fc.integer({ min: 8, max: 20 }), // active count (may be < 12 to force throw)
         fc.integer(),
         (activeCount, seed) => {
           const terms: CyberTerm[] = []
@@ -206,7 +206,7 @@ describe('ticketGenerator', () => {
               baseOptions(makeRng(seed)),
             )
           } catch {
-            // throw path is acceptable (e.g. < 15 active); inputs must still be intact
+            // throw path is acceptable (e.g. < 12 active); inputs must still be intact
           }
 
           expect(JSON.stringify(terms)).toBe(snapshot)
@@ -218,10 +218,10 @@ describe('ticketGenerator', () => {
   })
 
   // Feature: module-3-player-joining-tickets, property 6 — Error conditions throw without producing a ticket
-  it('property 6: throws on <15 active terms and on a saturated signature space', () => {
-    // <15 active terms → throw
+  it('property 6: throws on <12 active terms and on a saturated signature space', () => {
+    // <12 active terms → throw
     fc.assert(
-      fc.property(fc.integer({ min: 0, max: 14 }), fc.integer(), (n, seed) => {
+      fc.property(fc.integer({ min: 0, max: 11 }), fc.integer(), (n, seed) => {
         const terms: CyberTerm[] = []
         for (let i = 0; i < n; i++) terms.push(makeTerm(i, true))
         // add some non-active noise
@@ -232,12 +232,12 @@ describe('ticketGenerator', () => {
       { numRuns: RUNS },
     )
 
-    // exactly 15 active terms → only one possible signature; if it already
+    // exactly 12 active terms → only one possible signature; if it already
     // exists, every attempt collides and the generator must throw (no dup).
     fc.assert(
       fc.property(fc.integer(), (seed) => {
         const terms: CyberTerm[] = []
-        for (let i = 0; i < 15; i++) terms.push(makeTerm(i, true))
+        for (let i = 0; i < 12; i++) terms.push(makeTerm(i, true))
         const onlySignature = computeSignature(terms.map((t) => t.id))
         expect(() =>
           generateTicket(terms, [onlySignature], baseOptions(makeRng(seed))),

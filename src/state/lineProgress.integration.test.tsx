@@ -90,7 +90,7 @@ describe('full-row Line prize eligibility integration (module-4-term-marking-pri
   })
 
   it.each(ROW_PRIZES)(
-    'marking all 5 cells in row $row makes $prizeId eligible at 5/5 while the other Line prizes stay unchanged',
+    'marking all 4 cells in row $row makes $prizeId eligible at 4/4 while the other Line prizes stay unchanged', // not-a-ticket-dimension
     ({ row, prizeId }) => {
       const harness = mountProvider()
       const ctx0 = harness.sink.current!
@@ -115,55 +115,54 @@ describe('full-row Line prize eligibility integration (module-4-term-marking-pri
       for (const otherId of ALL_LINE_PRIZE_IDS) {
         if (otherId === prizeId) continue
         const p = harness.sink.current!.currentPrizeProgress.find((pr) => pr.id === otherId)
-        priorOtherProgress.set(otherId, { current: p?.current ?? 0, target: p?.target ?? 5 })
+        priorOtherProgress.set(otherId, { current: p?.current ?? 0, target: p?.target ?? 4 })
       }
 
-      // Reveal terms (via CALL_NEXT_WORD, bounded-loop pattern since
-      // selectNextTerm is random) until all 5 of this row's termIds have
-      // been revealed. cyberTerms is finite, so bound the loop by the active
-      // term count to avoid ever hanging.
+      // Reveal and mark terms one at a time (interleaved), since only the
+      // single current term is newly markable (Req 14). Whenever the
+      // current term belongs to this row, mark it immediately before
+      // calling the next word. Bound the loop by the active term count so
+      // it always terminates even if this row's 4 terms are spread thinly
+      // across many rounds.
       const rowTermIds = outcome.ticket.rows[row].map((cell) => cell.termId)
-      const revealedRowTermIds = new Set<string>()
+      const markedRowTermIds = new Set<string>()
       const activeTermCount = cyberTerms.filter((t) => t.active).length
 
-      for (const id of rowTermIds) {
-        if (harness.sink.current!.state.game.revealedTermIds.includes(id)) {
-          revealedRowTermIds.add(id)
-        }
+      const initialCurrent = harness.sink.current!.state.game.currentTermId
+      if (initialCurrent && rowTermIds.includes(initialCurrent)) {
+        act(() => {
+          harness.sink.current!.dispatch({ type: 'MARK_TERM', termId: initialCurrent })
+        })
+        markedRowTermIds.add(initialCurrent)
       }
 
       for (
         let i = 0;
-        i < activeTermCount && revealedRowTermIds.size < rowTermIds.length;
+        i < activeTermCount && markedRowTermIds.size < rowTermIds.length;
         i++
       ) {
         if (harness.sink.current!.state.game.status === 'COMPLETED') break
         act(() => {
           harness.sink.current!.dispatch({ type: 'CALL_NEXT_WORD' })
         })
-        const revealedTermIds = harness.sink.current!.state.game.revealedTermIds
-        for (const id of rowTermIds) {
-          if (revealedTermIds.includes(id)) revealedRowTermIds.add(id)
+        const justCalled = harness.sink.current!.state.game.currentTermId
+        if (justCalled && rowTermIds.includes(justCalled) && !markedRowTermIds.has(justCalled)) {
+          act(() => {
+            harness.sink.current!.dispatch({ type: 'MARK_TERM', termId: justCalled })
+          })
+          markedRowTermIds.add(justCalled)
         }
       }
 
-      expect(revealedRowTermIds.size).toBe(rowTermIds.length)
-
-      // Mark all 5 of the row's terms exactly as PlayerGame's tap handler
-      // would.
-      for (const termId of rowTermIds) {
-        act(() => {
-          harness.sink.current!.dispatch({ type: 'MARK_TERM', termId })
-        })
-      }
+      expect(markedRowTermIds.size).toBe(rowTermIds.length)
 
       const finalProgress = harness.sink.current!.currentPrizeProgress
       const linePrizeProgress = finalProgress.find((p) => p.id === prizeId)
       expect(linePrizeProgress).toEqual({
         id: prizeId,
         label: expect.any(String),
-        current: 5,
-        target: 5,
+        current: 4,
+        target: 4,
       })
 
       // The other two Line prizes remain at their prior values (no marks

@@ -25,13 +25,13 @@ const GAME_ID = 'GAME_001'
 const PLAYER_ID = 'PLAYER_1'
 const TICKET_ID = 'TICKET_1'
 
-/** A 3x5 ticket whose 15 cells have distinct termIds T0..T14. */
+/** A 3x4 ticket whose 12 cells have distinct termIds T0..T11. */
 function makeTicket(): Ticket {
   const rows: TicketCell[][] = []
   let n = 0
   for (let row = 0; row < 3; row++) {
     const cells: TicketCell[] = []
-    for (let col = 0; col < 5; col++) {
+    for (let col = 0; col < 4; col++) {
       cells.push({ termId: `T${n}`, term: `Term ${n}`, state: 'LOCKED', row, col })
       n++
     }
@@ -88,6 +88,7 @@ describe("Regression: a new word call never decreases any prize's progress (Req 
   it('leaves every prize\'s current progress unchanged (hence non-decreasing) across a SYNC_REMOTE called_terms insert', () => {
     // Build up realistic state with an existing mark on the ticket.
     let state = baseState(['T0'])
+    state = { ...state, game: { ...state.game, currentTermId: 'T0' } }
     state = gameSessionReducer(state, { type: 'MARK_TERM', termId: 'T0' })
     expect(state.marks).toHaveLength(1)
 
@@ -119,17 +120,18 @@ describe("Regression: a new word call never decreases any prize's progress (Req 
   it('property: for any ticket/marks/new-term-id combination, prize progress never decreases after a called_terms SYNC_REMOTE insert', () => {
     fc.assert(
       fc.property(
-        // Choose how many of the ticket's 15 terms are already marked, and
+        // Choose how many of the ticket's 12 terms are already marked, and
         // which additional term id gets "called" next (may already be
         // revealed/marked — SYNC_REMOTE folding is a set-union either way).
-        fc.array(fc.integer({ min: 0, max: 14 }), { maxLength: 15 }),
-        fc.integer({ min: 0, max: 14 }),
+        fc.array(fc.integer({ min: 0, max: 11 }), { maxLength: 12 }),
+        fc.integer({ min: 0, max: 11 }),
         (markedIndexes, newTermIndex) => {
           const uniqueMarkedIds = [...new Set(markedIndexes)].map((i) => `T${i}`)
           const newTermId = `T${newTermIndex}`
 
           let state = baseState(uniqueMarkedIds)
           for (const termId of uniqueMarkedIds) {
+            state = { ...state, game: { ...state.game, currentTermId: termId } }
             state = gameSessionReducer(state, { type: 'MARK_TERM', termId })
           }
 

@@ -161,23 +161,23 @@ function buildGameRow(overrides: Partial<Record<string, unknown>> = {}): Record<
 }
 
 function buildTicketCells(): Record<string, unknown>[] {
-  return Array.from({ length: 15 }, (_, i) => ({
+  return Array.from({ length: 12 }, (_, i) => ({
     termId: `TERM_${i}`,
-    row: Math.floor(i / 5),
-    col: i % 5,
+    row: Math.floor(i / 4),
+    col: i % 4,
   }))
 }
 
 /** `TicketCell[][]` builder, mirroring the sibling exploration/preservation tests' own helper. */
 function buildTicketRows(): TicketCell[][] {
-  const cells: TicketCell[] = Array.from({ length: 15 }, (_, i) => ({
+  const cells: TicketCell[] = Array.from({ length: 12 }, (_, i) => ({
     termId: `TERM_${i}`,
     term: `TERM_${i}`,
-    row: Math.floor(i / 5),
-    col: i % 5,
+    row: Math.floor(i / 4),
+    col: i % 4,
     state: 'AVAILABLE' as const,
   }))
-  return [cells.slice(0, 5), cells.slice(5, 10), cells.slice(10, 15)]
+  return [cells.slice(0, 4), cells.slice(4, 8), cells.slice(8, 12)]
 }
 
 /**
@@ -328,6 +328,19 @@ describe('Preservation: unaffected claim submissions and guards unchanged (unfix
 
     // Mark.
     for (const termId of cyberFiveTermIds) {
+      act(() => {
+        tab.sink.current!.dispatch({
+          type: 'HYDRATE_FROM_REMOTE',
+          snapshot: {
+            game: { ...tab.sink.current!.state.game, currentTermId: termId },
+            players: tab.sink.current!.state.players,
+            tickets: tab.sink.current!.state.tickets,
+            marks: tab.sink.current!.state.marks,
+            claims: tab.sink.current!.state.claims,
+            winners: tab.sink.current!.state.winners,
+          },
+        })
+      })
       act(() => {
         tab.sink.current!.dispatch({ type: 'MARK_TERM', termId })
       })

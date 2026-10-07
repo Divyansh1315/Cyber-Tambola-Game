@@ -6,13 +6,19 @@ import { getFullHouseProgress, isPrizeEligible } from './prizeEngine'
 
 const RUNS = 100
 
-/** Builds a 3x5 ticket with 15 distinct termIds `TERM_000`..`TERM_014`. */
+/**
+ * Builds a legacy-shaped 3x5 ticket with 15 distinct termIds
+ * `TERM_000`..`TERM_014`, deliberately exercising `getFullHouseProgress`'s
+ * design decision to derive its target from the ticket's own shape (so a
+ * legacy 15-cell ticket still reports a 15-cell Full House target, not the
+ * current 12-cell constant).
+ */
 function makeTicket(): Ticket {
   const rows: TicketCell[][] = []
   for (let r = 0; r < 3; r++) {
     const row: TicketCell[] = []
     for (let c = 0; c < 5; c++) {
-      const index = r * 5 + c
+      const index = r * 5 + c // not-a-ticket-dimension (deliberately legacy 3x5 shape, see below)
       row.push({
         termId: `TERM_${String(index).padStart(3, '0')}`,
         term: `Term ${index}`,
@@ -64,9 +70,9 @@ describe('prizeEngine.getFullHouseProgress', () => {
         const progress = getFullHouseProgress(ticket, marks)
 
         expect(progress.id).toBe('CYBER_FULL_HOUSE')
-        expect(progress.target).toBe(15)
+        expect(progress.target).toBe(15) // not-a-ticket-dimension (legacy 3x5 fixture's own shape, by design)
         expect(progress.current).toBe(markedTermIds.length)
-        expect(isPrizeEligible(progress)).toBe(markedTermIds.length === 15)
+        expect(isPrizeEligible(progress)).toBe(markedTermIds.length === 15) // not-a-ticket-dimension (legacy 3x5 fixture's own shape, by design)
       }),
       { numRuns: RUNS },
     )

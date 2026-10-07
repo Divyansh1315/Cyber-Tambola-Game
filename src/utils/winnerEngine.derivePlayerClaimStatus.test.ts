@@ -23,7 +23,7 @@ function makeTicket(): Ticket {
   for (let r = 0; r < 3; r++) {
     const row: TicketCell[] = []
     for (let c = 0; c < 5; c++) {
-      const index = r * 5 + c
+      const index = r * 5 + c // not-a-ticket-dimension (deliberately legacy 3x5 fixture shape)
       row.push({
         termId: `TERM_${String(index).padStart(3, '0')}`,
         term: `Term ${index}`,

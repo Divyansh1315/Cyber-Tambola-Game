@@ -96,8 +96,8 @@ describe('SYNC_REMOTE players case (participant roster live update)', () => {
     // tickets INSERT for that same player arrives moments later.
     const flatCells = Array.from({ length: 15 }, (_, i) => ({
       termId: `T${i}`,
-      row: Math.floor(i / 5),
-      col: i % 5,
+      row: Math.floor(i / 5), // not-a-ticket-dimension (deliberately legacy 3x5 fixture shape)
+      col: i % 5, // not-a-ticket-dimension (deliberately legacy 3x5 fixture shape)
     }))
     state = gameSessionReducer(state, {
       type: 'SYNC_REMOTE',

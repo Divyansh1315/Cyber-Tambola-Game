@@ -77,6 +77,21 @@ function isGameShape(value: unknown): value is Game {
 }
 
 /**
+ * Type guard: the parsed value's `rows` shape matches either the current
+ * 3x4 ticket shape or the legacy 3x5 shape (Req 5.4, 7.2). Anything else
+ * (wrong row count, ragged rows, or any other cell count) is corrupt.
+ */
+function isValidTicketShape(t: unknown): boolean {
+  if (typeof t !== 'object' || t === null) return false
+  const ticket = t as Record<string, unknown>
+  if (!Array.isArray(ticket.rows)) return false
+  const rowLengths = ticket.rows.map((r) => (Array.isArray(r) ? r.length : -1))
+  const isCurrentShape = ticket.rows.length === 3 && rowLengths.every((n) => n === 4)
+  const isLegacyShape = ticket.rows.length === 3 && rowLengths.every((n) => n === 5)
+  return isCurrentShape || isLegacyShape
+}
+
+/**
  * Parse + validate a raw string. Returns a reconciled slice or null.
  * Never throws (Req 16.4). Only describes SHARED state — `currentPlayerId`
  * reconciliation (dangling-id handling included) now lives in
@@ -104,6 +119,7 @@ export function parseEnvelope(raw: string | null): PersistedSlice | null {
   if (!isGameShape(envelope.game)) return null
   if (!Array.isArray(envelope.players)) return null
   if (!Array.isArray(envelope.tickets)) return null
+  if (!envelope.tickets.every(isValidTicketShape)) return null
 
   const game = envelope.game as Game
   const players = envelope.players as Player[]

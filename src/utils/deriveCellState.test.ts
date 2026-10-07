@@ -2,84 +2,87 @@ import { describe, it, expect } from 'vitest'
 import fc from 'fast-check'
 import { deriveCellState } from './deriveCellState'
 
-// Feature: module-4-term-marking-prize-engine, Property 4: Cell state is derived solely from reveal history and valid marks
+// Feature: ticket-3x4-dimension-refactor, Property: Cell state is derived solely from the
+// current term and valid marks
 //
-// Property 4: Cell state is derived solely from reveal history and valid marks
-// For any termId, revealedTermIds list, and set of Marked_Term_Ids:
-//   - LOCKED when termId is absent from revealedTermIds (regardless of markedTermIds)
-//   - AVAILABLE when present and absent from markedTermIds
-//   - MARKED when present and present in markedTermIds
-// Metamorphic: adding termId to revealedTermIds flips that cell from LOCKED to
-// (AVAILABLE or MARKED) and does not change unrelated termIds' results.
+// For any termId, currentTermId, and set of Marked_Term_Ids:
+//   - MARKED when termId is present in markedTermIds (checked first, regardless of currentTermId)
+//   - AVAILABLE when absent from markedTermIds and termId === currentTermId
+//   - LOCKED when absent from markedTermIds and termId !== currentTermId
+// Metamorphic: a term that was current, got marked, and is no longer current still
+// reports MARKED, never LOCKED (marks are permanent, Req 16.1).
 //
-// **Validates: Requirements 4.1, 4.2, 4.3**
+// **Validates: Requirements 13.5, 14.1, 14.3, 16.1**
 
-/** A small alphabet of term ids so overlaps between the cell and the list occur. */
+/** A small alphabet of term ids so overlaps between the cell and currentTermId occur. */
 const termIdArb = fc.constantFrom('t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8')
-const revealedArb = fc.array(termIdArb, { maxLength: 8 })
+const currentTermIdArb = fc.option(termIdArb, { nil: undefined })
 
 /** Build a markedTermIds set that either does or does not contain termId. */
 function markedSetFor(termId: string, marked: boolean): ReadonlySet<string> {
   return marked ? new Set([termId]) : new Set<string>()
 }
 
-describe('deriveCellState (property 4)', () => {
-  it('yields AVAILABLE/LOCKED/MARKED strictly from presence + marked', () => {
+describe('deriveCellState (current-term rule)', () => {
+  it('yields MARKED/AVAILABLE/LOCKED strictly from marked + current-term equality', () => {
     fc.assert(
-      fc.property(termIdArb, revealedArb, fc.boolean(), (termId, revealed, marked) => {
-        const state = deriveCellState(termId, revealed, markedSetFor(termId, marked))
-        const present = revealed.includes(termId)
+      fc.property(termIdArb, currentTermIdArb, fc.boolean(), (termId, currentTermId, marked) => {
+        const state = deriveCellState(termId, currentTermId, markedSetFor(termId, marked))
 
-        if (!present) {
-          // Absent -> LOCKED regardless of marked (Req 4.1)
-          expect(state).toBe('LOCKED')
-        } else if (marked) {
-          // Present and marked -> MARKED only (Req 4.3)
+        if (marked) {
+          // Marked -> MARKED regardless of currentTermId (Req 16.1)
           expect(state).toBe('MARKED')
-        } else {
-          // Present and not marked -> AVAILABLE (Req 4.2)
+        } else if (termId === currentTermId) {
+          // Not marked and is the current term -> AVAILABLE (Req 14.1)
           expect(state).toBe('AVAILABLE')
+        } else {
+          // Not marked and not the current term -> LOCKED (Req 14.2, 14.3)
+          expect(state).toBe('LOCKED')
         }
       }),
       { numRuns: 200 },
     )
   })
 
-  it('never returns MARKED when the term is absent, regardless of marked', () => {
+  it('never returns LOCKED when the term is marked, regardless of currentTermId', () => {
     fc.assert(
-      fc.property(termIdArb, revealedArb, fc.boolean(), (termId, revealed, marked) => {
-        const withoutTerm = revealed.filter((id) => id !== termId)
-        expect(deriveCellState(termId, withoutTerm, markedSetFor(termId, marked))).toBe('LOCKED')
+      fc.property(termIdArb, currentTermIdArb, (termId, currentTermId) => {
+        expect(deriveCellState(termId, currentTermId, new Set([termId]))).toBe('MARKED')
       }),
       { numRuns: 200 },
     )
   })
 
-  it('metamorphic: revealing a term flips that cell from LOCKED and leaves unrelated cells unchanged', () => {
+  it('metamorphic: a term that was current, got marked, then stops being current still reports MARKED', () => {
+    fc.assert(
+      fc.property(termIdArb, termIdArb, (termId, nextCurrentTermId) => {
+        const markedTermIds = new Set([termId])
+
+        // While it was current (or even if it never was), once marked it's MARKED.
+        expect(deriveCellState(termId, termId, markedTermIds)).toBe('MARKED')
+
+        // After the game moves on to a different current term, still MARKED (Req 16.1).
+        expect(deriveCellState(termId, nextCurrentTermId, markedTermIds)).toBe('MARKED')
+      }),
+      { numRuns: 200 },
+    )
+  })
+
+  it('metamorphic: changing currentTermId does not affect unrelated unmarked cells unless they become current', () => {
     fc.assert(
       fc.property(
         termIdArb,
-        revealedArb,
-        fc.boolean(),
+        currentTermIdArb,
+        currentTermIdArb,
         fc.array(termIdArb, { maxLength: 8 }),
-        (termId, revealed, marked, otherTermIds) => {
-          // Start from a history that definitely lacks termId.
-          const before = revealed.filter((id) => id !== termId)
-          const after = [...before, termId]
-          const markedTermIds = markedSetFor(termId, marked)
+        (termId, before, after, otherTermIds) => {
+          const markedTermIds = new Set<string>()
 
-          // The affected cell starts LOCKED and, once revealed, is no longer LOCKED.
-          expect(deriveCellState(termId, before, markedTermIds)).toBe('LOCKED')
-          const afterState = deriveCellState(termId, after, markedTermIds)
-          expect(afterState).not.toBe('LOCKED')
-          expect(afterState).toBe(marked ? 'MARKED' : 'AVAILABLE')
-
-          // Unrelated cells (any id other than the one we revealed) are unchanged.
           for (const other of otherTermIds) {
-            if (other === termId) continue
-            expect(deriveCellState(other, after, markedTermIds)).toBe(
-              deriveCellState(other, before, markedTermIds),
-            )
+            if (other === termId || other === before || other === after) continue
+            // An unmarked term that is neither the before nor after current term stays LOCKED.
+            expect(deriveCellState(other, before, markedTermIds)).toBe('LOCKED')
+            expect(deriveCellState(other, after, markedTermIds)).toBe('LOCKED')
           }
         },
       ),
@@ -89,12 +92,11 @@ describe('deriveCellState (property 4)', () => {
 
   it('does not mutate its inputs', () => {
     fc.assert(
-      fc.property(termIdArb, revealedArb, fc.boolean(), (termId, revealed, marked) => {
-        const snapshot = [...revealed]
-        Object.freeze(revealed)
-        // Must not throw (would throw on write to a frozen array) and must not mutate.
-        deriveCellState(termId, revealed, markedSetFor(termId, marked))
-        expect([...revealed]).toEqual(snapshot)
+      fc.property(termIdArb, currentTermIdArb, fc.boolean(), (termId, currentTermId, marked) => {
+        const markedTermIds = markedSetFor(termId, marked)
+        const snapshot = new Set(markedTermIds)
+        deriveCellState(termId, currentTermId, markedTermIds)
+        expect(markedTermIds).toEqual(snapshot)
       }),
       { numRuns: 100 },
     )

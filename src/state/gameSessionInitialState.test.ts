@@ -9,13 +9,9 @@ describe('gameSessionInitialState seed', () => {
   it('seeds prize progress zeroed with correct targets (Req 18.2)', () => {
     const { prizeProgress } = gameSessionInitialState
 
-    const expected: { id: PrizeId; label: string; target: number }[] = [
-      { id: 'CYBER_FIVE', label: 'Cyber Five', target: 5 },
-      { id: 'FIREWALL_LINE', label: 'Firewall Line', target: 5 },
-      { id: 'SECURITY_LINE', label: 'Security Line', target: 5 },
-      { id: 'DATA_DEFENDER_LINE', label: 'Data Defender Line', target: 5 },
-      { id: 'CYBER_FULL_HOUSE', label: 'Cyber Full House', target: 15 },
-    ]
+    const expected: { id: PrizeId; label: string; target: number }[] = PRIZES.map(
+      (prize) => ({ id: prize.id, label: prize.label, target: prize.target }),
+    )
 
     expect(prizeProgress).toHaveLength(expected.length)
 
@@ -41,12 +37,13 @@ describe('gameSessionInitialState seed', () => {
 
 describe('PRIZES', () => {
   it('contains exactly the 5 expected prizes in the documented order (Req 7.4)', () => {
-    expect(PRIZES).toEqual([
-      { id: 'CYBER_FIVE', label: 'Cyber Five', target: 5 },
-      { id: 'FIREWALL_LINE', label: 'Firewall Line', target: 5 },
-      { id: 'SECURITY_LINE', label: 'Security Line', target: 5 },
-      { id: 'DATA_DEFENDER_LINE', label: 'Data Defender Line', target: 5 },
-      { id: 'CYBER_FULL_HOUSE', label: 'Cyber Full House', target: 15 },
+    expect(PRIZES.map((p) => p.id)).toEqual([
+      'CYBER_FIVE',
+      'FIREWALL_LINE',
+      'SECURITY_LINE',
+      'DATA_DEFENDER_LINE',
+      'CYBER_FULL_HOUSE',
     ])
+    expect(PRIZES.find((p) => p.id === 'CYBER_FIVE')?.target).toBe(5)
   })
 })

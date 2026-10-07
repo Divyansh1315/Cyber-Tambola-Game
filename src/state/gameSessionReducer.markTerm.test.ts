@@ -57,13 +57,13 @@ function makePlayer(id: string, ticketId: string): Player {
   }
 }
 
-/** A 3x5 ticket whose 15 cells have distinct termIds `T0`..`T14`. */
+/** A 3x4 ticket whose 12 cells have distinct termIds `T0`..`T11`. */
 function makeTicket(id: string, playerId: string): Ticket {
   const rows: TicketCell[][] = []
   let n = 0
   for (let row = 0; row < 3; row++) {
     const cells: TicketCell[] = []
-    for (let col = 0; col < 5; col++) {
+    for (let col = 0; col < 4; col++) {
       cells.push({ termId: `T${n}`, term: `Term ${n}`, state: 'LOCKED', row, col })
       n++
     }
@@ -86,9 +86,10 @@ function allTermIds(ticket: Ticket): string[] {
 /**
  * Builds a valid session state fixture where MARK_TERM for `termId` will be
  * accepted: current player exists, their ticket exists, `termId` is one of
- * the ticket's 15 cells, revealed, game not completed, and not yet marked.
- * `existingMarks` lets a scenario seed prior marks (for other termIds) so the
- * fixture still exercises non-trivial `marks` arrays.
+ * the ticket's 12 cells, is the game's single current term, game not
+ * completed, and not yet marked. `existingMarks` lets a scenario seed prior
+ * marks (for other termIds) so the fixture still exercises non-trivial
+ * `marks` arrays.
  */
 function validFixtureArb(): fc.Arbitrary<{
   state: GameSessionState
@@ -99,7 +100,7 @@ function validFixtureArb(): fc.Arbitrary<{
       playerId: fc.string({ minLength: 1, maxLength: 10 }),
       ticketId: fc.string({ minLength: 1, maxLength: 10 }),
       gameId: fc.string({ minLength: 1, maxLength: 10 }),
-      cellIndex: fc.integer({ min: 0, max: 14 }),
+      cellIndex: fc.integer({ min: 0, max: 11 }),
       priorMarkCount: fc.integer({ min: 0, max: 5 }),
     })
     .map(({ playerId, ticketId, gameId, cellIndex, priorMarkCount }) => {
@@ -124,7 +125,9 @@ function validFixtureArb(): fc.Arbitrary<{
         valid: true,
       }))
 
-      const game = makeGame({ id: gameId, revealedTermIds })
+      // Only the single current term is newly markable (Req 14); the target
+      // term must be game.currentTermId, not merely in revealedTermIds.
+      const game = makeGame({ id: gameId, revealedTermIds, currentTermId: termId })
 
       const state: GameSessionState = {
         ...gameSessionInitialState,

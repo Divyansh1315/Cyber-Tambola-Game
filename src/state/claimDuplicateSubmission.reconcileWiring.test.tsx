@@ -151,11 +151,12 @@ function buildGameRow(overrides: Partial<Record<string, unknown>> = {}): Record<
   }
 }
 
+/** Deliberately legacy 3x5 ticket cell fixture (not-a-ticket-dimension). */
 function buildTicketCells(): Record<string, unknown>[] {
   return Array.from({ length: 15 }, (_, i) => ({
     termId: `TERM_${i}`,
-    row: Math.floor(i / 5),
-    col: i % 5,
+    row: Math.floor(i / 5), // not-a-ticket-dimension (deliberately legacy 3x5 fixture shape)
+    col: i % 5, // not-a-ticket-dimension (deliberately legacy 3x5 fixture shape)
   }))
 }
 

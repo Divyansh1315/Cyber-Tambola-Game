@@ -77,7 +77,7 @@ describe('PlayerGame.claimStatusView — INVALID claim progress message', () => 
     )
   })
 
-  it('example: Cyber Five progress 4/5 renders the exact documented message', () => {
+  it('example: Cyber Five progress 4/5 renders the exact documented message', () => { // not-a-ticket-dimension
     const progress: PrizeProgress = {
       id: 'CYBER_FIVE',
       label: 'Cyber Five',
@@ -97,6 +97,6 @@ describe('PlayerGame.claimStatusView — INVALID claim progress message', () => 
       isOwnClaimInvalid: true,
     })
 
-    expect(view.message).toBe('Claim could not be validated. Your current progress is 4/5.')
+    expect(view.message).toBe('Claim could not be validated. Your current progress is 4/5.') // not-a-ticket-dimension
   })
 })

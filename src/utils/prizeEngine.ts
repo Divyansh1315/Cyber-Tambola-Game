@@ -2,14 +2,15 @@ import type { Game } from '../types/game'
 import type { Mark } from '../types/mark'
 import type { Prize, PrizeProgress } from '../types/prize'
 import type { Ticket } from '../types/ticket'
+import { TICKET_COLUMNS, TICKET_SIZE } from './ticketGenerator'
 
 /** The five prizes and their fixed targets/labels (Req 7.4, 8, 9, 10). */
 export const PRIZES: readonly Prize[] = [
   { id: 'CYBER_FIVE', label: 'Cyber Five', target: 5 },
-  { id: 'FIREWALL_LINE', label: 'Firewall Line', target: 5 },
-  { id: 'SECURITY_LINE', label: 'Security Line', target: 5 },
-  { id: 'DATA_DEFENDER_LINE', label: 'Data Defender Line', target: 5 },
-  { id: 'CYBER_FULL_HOUSE', label: 'Cyber Full House', target: 15 },
+  { id: 'FIREWALL_LINE', label: 'Firewall Line', target: TICKET_COLUMNS },
+  { id: 'SECURITY_LINE', label: 'Security Line', target: TICKET_COLUMNS },
+  { id: 'DATA_DEFENDER_LINE', label: 'Data Defender Line', target: TICKET_COLUMNS },
+  { id: 'CYBER_FULL_HOUSE', label: 'Cyber Full House', target: TICKET_SIZE },
 ]
 
 /** Row index (0-2) backing each Line_Prize; used by getAllPrizeProgress. */
@@ -71,7 +72,10 @@ export function getCyberFiveProgress(
 
 /**
  * One Line_Prize's progress: only marks whose Ticket_Cell is in `row` count
- * (Req 9). `prizeId`/`label` select which of the three line prizes this is.
+ * (Req 9, 21). `prizeId`/`label` select which of the three line prizes this
+ * is. The target is derived from the row's own length (falling back to
+ * `TICKET_COLUMNS` only if the row is empty), so a legacy 3x5 ticket still
+ * reports a 5-cell target with no branching on ticket format (Req 4.3, 7.3).
  */
 export function getLineProgress(
   ticket: Ticket,
@@ -84,10 +88,17 @@ export function getLineProgress(
   const rowCells = ticket.rows[row] ?? []
   const current = rowCells.filter((cell) => markedTermIds.has(cell.termId))
     .length
-  return { id: prizeId, label, current, target: 5 }
+  const target = rowCells.length || TICKET_COLUMNS
+  return { id: prizeId, label, current, target }
 }
 
-/** Cyber Full House progress: every one of the ticket's 15 terms (Req 10). */
+/**
+ * Cyber Full House progress: every one of the ticket's terms (Req 10, 22).
+ * The target is derived from the ticket's own cell count (falling back to
+ * `TICKET_SIZE` only if the ticket has no cells), so a legacy 15-cell ticket
+ * still reports a 15-cell target with no branching on ticket format
+ * (Req 7.3).
+ */
 export function getFullHouseProgress(
   ticket: Ticket,
   validMarks: readonly Mark[],
@@ -95,11 +106,12 @@ export function getFullHouseProgress(
   const markedTermIds = getMarkedTermIds(validMarks)
   const ticketTermIds = ticket.rows.flat().map((cell) => cell.termId)
   const current = ticketTermIds.filter((id) => markedTermIds.has(id)).length
+  const target = ticketTermIds.length || TICKET_SIZE
   return {
     id: 'CYBER_FULL_HOUSE',
     label: 'Cyber Full House',
     current,
-    target: 15,
+    target,
   }
 }
 
@@ -137,7 +149,7 @@ export type MarkValidationResult =
         | 'NO_CURRENT_PLAYER'
         | 'TICKET_NOT_FOUND'
         | 'TERM_NOT_ON_TICKET'
-        | 'TERM_NOT_REVEALED'
+        | 'TERM_NOT_CURRENT'
         | 'GAME_COMPLETED'
         | 'DUPLICATE_MARK'
     }
@@ -151,8 +163,8 @@ export type MarkValidationResult =
  *  1. NO_CURRENT_PLAYER   - no player has id === currentPlayerId
  *  2. TICKET_NOT_FOUND    - current player's ticketId has no matching Ticket
  *  3. TERM_NOT_ON_TICKET  - termId does not belong to any cell on that Ticket
- *  4. TERM_NOT_REVEALED   - termId is not in game.revealedTermIds
- *  5. GAME_COMPLETED      - game.status === 'COMPLETED'
+ *  4. TERM_NOT_CURRENT    - termId does not equal game.currentTermId
+ *  5. GAME_COMPLETED      - game.status === 'COMPLETED' // not-a-ticket-dimension
  *  6. DUPLICATE_MARK      - a Valid_Mark already exists for
  *                           (currentPlayerId, ticketId, termId)
  *
@@ -187,8 +199,8 @@ export function validateMarkAttempt(
     return { valid: false, reason: 'TERM_NOT_ON_TICKET' }
   }
 
-  if (!state.game.revealedTermIds.includes(termId)) {
-    return { valid: false, reason: 'TERM_NOT_REVEALED' }
+  if (termId !== state.game.currentTermId) {
+    return { valid: false, reason: 'TERM_NOT_CURRENT' }
   }
 
   if (state.game.status === 'COMPLETED') {

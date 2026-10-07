@@ -1,0 +1,683 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Update `src/utils/ticketGenerator.ts` constants": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399573378
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399588017
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399732927
+      }
+    ],
+    "1.2 Update all importers of the old `TICKET_COLS` name": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399573560
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399739811
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399840301
+      }
+    ],
+    "2.1 Update `generateTicket`'s row/col assignment in `src/utils/ticketGenerator.ts`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399573717
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399740721
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399841097
+      }
+    ],
+    "2.2 Update `src/types/ticket.ts` documentation and range comments": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399573838
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399847275
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399917340
+      }
+    ],
+    "3. Checkpoint — ticket generation and types pass": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574009
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400192289
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400319907
+      }
+    ],
+    "4.1 Update `PRIZES` targets in `src/utils/prizeEngine.ts`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574101
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399848256
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399918246
+      }
+    ],
+    "4.2 Make `getLineProgress`/`getFullHouseProgress` derive dimensions from the ticket's own shape": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574193
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399925829
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400104784
+      }
+    ],
+    "4.3 Replace `TERM_NOT_REVEALED` with `TERM_NOT_CURRENT` in `validateMarkAttempt`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574284
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400193039
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400295664
+      }
+    ],
+    "5.1 Update `src/utils/deriveCellState.ts`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574382
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399926615
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400105852
+      }
+    ],
+    "6. Checkpoint — prize/validation engine passes": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574469
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400613811
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400635859
+      }
+    ],
+    "7.1 Update `src/components/player/TicketCell.tsx`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574579
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400643703
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400715859
+      }
+    ],
+    "7.2 Update `src/components/player/Ticket.css`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574666
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400722306
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401106114
+      }
+    ],
+    "8.1 Update `src/pages/PlayerGame/PlayerGame.tsx`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574757
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400723133
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401106914
+      }
+    ],
+    "9. Checkpoint — UI layer passes": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399574850
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401386428
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405154534
+      }
+    ],
+    "10.1 Add `isValidTicketShape` to `src/state/persistence.ts`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399575021
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401149331
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401377540
+      }
+    ],
+    "11.1 Create `src/regressionScan.dimensionLiterals.test.ts`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399575117
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401387330
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405155437
+      }
+    ],
+    "11.2 Allowlist genuinely unrelated literals found by the scan": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399575217
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405219874
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405228596
+      }
+    ],
+    "12. Checkpoint — persistence and regression scan pass": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399575321
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405277548
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405286794
+      }
+    ],
+    "15. Checkpoint — full test suite passes": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399575427
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405999266
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791406107715
+      }
+    ],
+    "16.1 Update test helper functions that build/inspect ticket dimensions": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399575550
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405156311
+      }
+    ],
+    "16.2 Update mock/demo player ticket data for in-progress and winning scenarios": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399575680
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405157679
+      }
+    ],
+    "17. Final verification pass": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399575778
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791406117589
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791406409954
+      }
+    ],
+    "1. Introduce renamed dimension constants and legacy-ticket detection": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399840461
+      }
+    ],
+    "2. Update row/col math and domain type documentation": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791399917464
+      }
+    ],
+    "5. Update `deriveCellState` to the current-term rule": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400105985
+      }
+    ],
+    "2.3 Write property tests for ticket generation shape and signature": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400138774
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400163649
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400185153
+      }
+    ],
+    "4. Update the pure prize/validation engine": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400295799
+      }
+    ],
+    "4.4 Write property tests for prize targets and mark validation": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400344035
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400354208
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400605451
+      }
+    ],
+    "4.5 Write property test for claim engine / prize engine agreement": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400345106
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400355135
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400606001
+      }
+    ],
+    "5.2 Write property test for cell-state derivation under the current-term rule": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400345766
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400353072
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791400362673
+      }
+    ],
+    "7. Update the Ticket Cell component and its styles": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401106454
+      }
+    ],
+    "8. Update the Player Game screen": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401107232
+      }
+    ],
+    "7.3 Write property tests and example tests for `TicketCell`": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401122760
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401138768
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401376468
+      }
+    ],
+    "8.2 Write example tests for legend removal and non-current-tap no-op": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401123726
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401140642
+      }
+    ],
+    "8.3 Write example test for ticket grid DOM structure": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401124443
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401139636
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401377111
+      }
+    ],
+    "10. Add persistence hydration shape validation": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791401377787
+      }
+    ],
+    "16. Update pre-existing fixtures and mocks to the 12-cell shape": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405158320
+      }
+    ],
+    "10.2 Write property tests for persistence round-trip and malformed-shape rejection": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405183135
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405252163
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405258513
+      }
+    ],
+    "13.1 Write property test for prize progress percentage rendering": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405184378
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405982549
+      }
+    ],
+    "14.1 Write dimension-constants and row-index-mapping example tests": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405185129
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405984882
+      }
+    ],
+    "14.2 Write legacy-ticket preservation example tests": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405186329
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405986015
+      }
+    ],
+    "14.3 Write Cyber Five / Line Prize / Cyber Full House eligibility example tests": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405187806
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405987037
+      }
+    ],
+    "14.4 Write non-current-tap and repeated-tap-on-marked example tests": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405188848
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405988087
+      }
+    ],
+    "14.5 Write persistence-cycle and frontend/backend-agreement example tests": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405190048
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405989344
+      }
+    ],
+    "14.6 Write the end-to-end acceptance scenario test (Requirement 30)": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405190611
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405983860
+      }
+    ],
+    "16.3 Write a failing-by-construction guard test for fixture drift": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405191612
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405990141
+      }
+    ],
+    "11. Add the Requirement 31 regression scan": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405228882
+      }
+    ],
+    "13. Write remaining property tests": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405309823
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405983030
+      }
+    ],
+    "14. Write unit/example tests for dimension constants, legacy preservation, and the end-to-end scenario": [
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405311306
+      },
+      {
+        "executionId": "dea41bbc-03b9-4d66-a303-851bbfff26f8",
+        "chatSessionId": "sess_cb8f1b6b-ab55-43df-a83c-5368b79a096a",
+        "timestamp": 1791405984080
+      }
+    ]
+  }
+}

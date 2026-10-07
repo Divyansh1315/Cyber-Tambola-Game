@@ -4,6 +4,7 @@ import type { Player } from '../types/player'
 import type { PrizeClaim } from '../types/claim'
 import type { PrizeProgress, Winner } from '../types/prize'
 import type { Ticket } from '../types/ticket'
+import { PRIZES } from '../utils/prizeEngine'
 
 /** The single prototype game code used across all screens. */
 export const SEED_GAME_CODE = 'CYBER24'
@@ -63,16 +64,15 @@ export interface GameSessionState {
 }
 
 /**
- * Zeroed prize progress used for live state (Req 18.2). Defined locally so live
- * state has no dependency on any dev-only mock fixture (Req 13).
+ * Zeroed prize progress used for live state (Req 18.2). Built from the
+ * `PRIZES` array in `prizeEngine.ts` — the single source of truth for prize
+ * ids/labels/targets — so this seed can never drift out of sync with the
+ * engine's targets (e.g. the 3x4 ticket dimension refactor).
  */
-const seedPrizeProgress: PrizeProgress[] = [
-  { id: 'CYBER_FIVE', label: 'Cyber Five', current: 0, target: 5 },
-  { id: 'FIREWALL_LINE', label: 'Firewall Line', current: 0, target: 5 },
-  { id: 'SECURITY_LINE', label: 'Security Line', current: 0, target: 5 },
-  { id: 'DATA_DEFENDER_LINE', label: 'Data Defender Line', current: 0, target: 5 },
-  { id: 'CYBER_FULL_HOUSE', label: 'Cyber Full House', current: 0, target: 15 },
-]
+const seedPrizeProgress: PrizeProgress[] = PRIZES.map((prize) => ({
+  ...prize,
+  current: 0,
+}))
 
 /** The seed session state used on first load and after a reset. */
 export const gameSessionInitialState: GameSessionState = {

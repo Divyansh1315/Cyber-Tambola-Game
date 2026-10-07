@@ -8,7 +8,7 @@
 //   2. Reset/rejoin uses new ticket only                     -- Property 3; Req 3.2
 //   3. Refresh preserves same identity                       -- Req 3.3
 //   4. Duplicate name, different devices, never merges        -- Req 3.4
-//   5. Genuinely stale player from a different game is
+//   5. Genuinely stale player from a different game is // not-a-ticket-dimension
 //      still rejected server-side (client blocks first)      -- Req 3.5
 //   6. Ticket reference consistency across surfaces           -- Req 2.8, 3.1, 3.6
 //
@@ -240,17 +240,17 @@ function firePointerChange(client: MockSupabaseClient, activeGameId: string | nu
 }
 
 function buildTicketCells(): TicketCell[] {
-  return Array.from({ length: 15 }, (_, i) => ({
+  return Array.from({ length: 12 }, (_, i) => ({
     termId: `TERM_${i}`,
     term: `Term ${i}`,
-    row: Math.floor(i / 5),
-    col: i % 5,
+    row: Math.floor(i / 4),
+    col: i % 4,
     state: 'AVAILABLE' as const,
   }))
 }
 
 /**
- * 5 cells spread across all 3 rows (2 + 2 + 1), chosen so marking exactly
+ * 5 cells spread across all 3 rows (2 + 2 + 1), chosen so marking exactly // not-a-ticket-dimension
  * these 5 reaches Cyber Five eligibility (any 5) WITHOUT also completing any
  * single Line_Prize row -- same convention as the preservation test's
  * `cyberFiveOnlyCells`.
@@ -349,6 +349,19 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
 
     // Mark to Cyber Five eligibility.
     for (const cell of cyberFiveCells) {
+      act(() => {
+        tab.sink.current!.dispatch({
+          type: 'HYDRATE_FROM_REMOTE',
+          snapshot: {
+            game: { ...tab.sink.current!.state.game, currentTermId: cell.termId },
+            players: tab.sink.current!.state.players,
+            tickets: tab.sink.current!.state.tickets,
+            marks: tab.sink.current!.state.marks,
+            claims: tab.sink.current!.state.claims,
+            winners: tab.sink.current!.state.winners,
+          },
+        })
+      })
       act(() => {
         tab.sink.current!.dispatch({ type: 'MARK_TERM', termId: cell.termId })
       })
@@ -537,7 +550,7 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
       gameId: 'GAME_A',
       createdAt: '2026-01-01T00:00:00.000Z',
       ref: 'Ticket #6405',
-      rows: [buildTicketCells().slice(0, 5), buildTicketCells().slice(5, 10), buildTicketCells().slice(10, 15)],
+      rows: [buildTicketCells().slice(0, 4), buildTicketCells().slice(4, 8), buildTicketCells().slice(8, 12)],
     }
 
     const { STORAGE_KEY, CURRENT_PLAYER_STORAGE_KEY, PERSIST_VERSION } = await import('./persistence')
@@ -745,7 +758,7 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
       gameId: 'GAME_A',
       createdAt: '2026-01-01T00:00:00.000Z',
       ref: shortTicketRef('T_D1'),
-      rows: [buildTicketCells().slice(0, 5), buildTicketCells().slice(5, 10), buildTicketCells().slice(10, 15)],
+      rows: [buildTicketCells().slice(0, 4), buildTicketCells().slice(4, 8), buildTicketCells().slice(8, 12)],
     }
     const playerTwo: Player = {
       id: 'P_D2',
@@ -762,7 +775,7 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
       gameId: 'GAME_A',
       createdAt: '2026-01-01T00:00:01.000Z',
       ref: shortTicketRef('T_D2'),
-      rows: [buildTicketCells().slice(0, 5), buildTicketCells().slice(5, 10), buildTicketCells().slice(10, 15)],
+      rows: [buildTicketCells().slice(0, 4), buildTicketCells().slice(4, 8), buildTicketCells().slice(8, 12)],
     }
 
     act(() => {
@@ -818,7 +831,7 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
   })
 
   // -------------------------------------------------------------------------
-  // 5. Genuinely stale player from a different game still rejected
+  // 5. Genuinely stale player from a different game still rejected // not-a-ticket-dimension
   //    server-side -- Req 3.5
   // -------------------------------------------------------------------------
   it('5. a playerId whose gameId belongs to a different (non-Active) game is blocked client-side BEFORE any RPC call; submit_claim remains an intact backstop', async () => {
@@ -865,7 +878,7 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
           gameId: 'GAME_RETIRED',
           createdAt: '2026-01-01T00:00:00.000Z',
           ref: 'Ticket #6405',
-          rows: [buildTicketCells().slice(0, 5), buildTicketCells().slice(5, 10), buildTicketCells().slice(10, 15)],
+          rows: [buildTicketCells().slice(0, 4), buildTicketCells().slice(4, 8), buildTicketCells().slice(8, 12)],
         },
       })
       tab.sink.current!.dispatch({
@@ -977,6 +990,19 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
     const playerScreenRef = shortTicketRef(tab.sink.current!.currentTicket!.id)
 
     for (const cell of cyberFiveCells) {
+      act(() => {
+        tab.sink.current!.dispatch({
+          type: 'HYDRATE_FROM_REMOTE',
+          snapshot: {
+            game: { ...tab.sink.current!.state.game, currentTermId: cell.termId },
+            players: tab.sink.current!.state.players,
+            tickets: tab.sink.current!.state.tickets,
+            marks: tab.sink.current!.state.marks,
+            claims: tab.sink.current!.state.claims,
+            winners: tab.sink.current!.state.winners,
+          },
+        })
+      })
       act(() => {
         tab.sink.current!.dispatch({ type: 'MARK_TERM', termId: cell.termId })
       })

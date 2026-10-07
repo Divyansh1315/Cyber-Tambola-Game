@@ -7,7 +7,7 @@
 //   2. rapid-double-click-produces-at-most-one-active-claim
 //   3. realtime-echo-does-not-duplicate (both orderings)
 //   4. wrong-ticket
-//   5. refresh-then-claim
+//   5. refresh-then-claim // not-a-ticket-dimension
 //   6. reset/rejoin-then-claim
 // ...plus one broader integration test: the full join → mark → claim
 // (RPC + realtime echo in both orderings) → confirm flow.
@@ -250,11 +250,12 @@ function firePointerChange(client: MockSupabaseClient, activeGameId: string | nu
   })
 }
 
+/** Deliberately legacy 3x5 ticket cell fixture (not-a-ticket-dimension). */
 function buildTicketCells(): Record<string, unknown>[] {
   return Array.from({ length: 15 }, (_, i) => ({
     termId: `TERM_${i}`,
-    row: Math.floor(i / 5),
-    col: i % 5,
+    row: Math.floor(i / 5), // not-a-ticket-dimension (deliberately legacy 3x5 fixture shape)
+    col: i % 5, // not-a-ticket-dimension (deliberately legacy 3x5 fixture shape)
   }))
 }
 
@@ -757,9 +758,9 @@ describe('Regression (claim-duplicate-submission): six required scenarios + full
   })
 
   // -------------------------------------------------------------------------
-  // 5. refresh-then-claim
+  // 5. refresh-then-claim // not-a-ticket-dimension
   // -------------------------------------------------------------------------
-  it('5. refresh-then-claim: localStorage seeded exactly as a refresh would leave it; after backend confirmation, one claim submission results in exactly one entry', async () => {
+  it('5. refresh-then-claim: localStorage seeded exactly as a refresh would leave it; after backend confirmation, one claim submission results in exactly one entry', async () => { // not-a-ticket-dimension
     const client = mockClient!
 
     const cachedGame = {
@@ -792,7 +793,7 @@ describe('Regression (claim-duplicate-submission): six required scenarios + full
       ref: 'Ticket #6405',
       rows: cachedTicketRows,
     }
-    // 5 marks spread across rows (same convention as the prior spec's own
+    // 5 marks spread across rows (same convention as the prior spec's own // not-a-ticket-dimension
     // cyberFiveOnlyCells, chosen so marking exactly these 5 reaches Cyber
     // Five eligibility without also completing a Line_Prize row).
     const cyberFiveTermIds = ['TERM_0', 'TERM_1', 'TERM_5', 'TERM_6', 'TERM_10']
@@ -1108,6 +1109,19 @@ describe('Regression (claim-duplicate-submission): six required scenarios + full
       })
     })
     for (const termId of fiveCellTermIds) {
+      act(() => {
+        tab.sink.current!.dispatch({
+          type: 'HYDRATE_FROM_REMOTE',
+          snapshot: {
+            game: { ...tab.sink.current!.state.game, currentTermId: termId },
+            players: tab.sink.current!.state.players,
+            tickets: tab.sink.current!.state.tickets,
+            marks: tab.sink.current!.state.marks,
+            claims: tab.sink.current!.state.claims,
+            winners: tab.sink.current!.state.winners,
+          },
+        })
+      })
       act(() => {
         tab.sink.current!.dispatch({ type: 'MARK_TERM', termId })
       })

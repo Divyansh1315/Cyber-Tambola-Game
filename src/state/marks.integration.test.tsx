@@ -136,7 +136,7 @@ describe('marks persistence integration (module-4-term-marking-prize-engine)', (
     const beforeMarkedTermIds = getMarkedTermIds(first.sink.current!.currentPlayerMarks)
     const beforeCellState = deriveCellState(
       revealedTermId,
-      beforeState.game.revealedTermIds,
+      beforeState.game.currentTermId,
       beforeMarkedTermIds,
     )
     expect(beforeCellState).toBe('MARKED')
@@ -170,7 +170,7 @@ describe('marks persistence integration (module-4-term-marking-prize-engine)', (
     const afterMarkedTermIds = getMarkedTermIds(ctx1.currentPlayerMarks)
     const afterCellState = deriveCellState(
       revealedTermId,
-      ctx1.state.game.revealedTermIds,
+      ctx1.state.game.currentTermId,
       afterMarkedTermIds,
     )
     expect(afterCellState).toBe('MARKED')
@@ -184,7 +184,7 @@ describe('marks persistence integration (module-4-term-marking-prize-engine)', (
   // -------------------------------------------------------------------------
   // Task 12.4 — Five distinct marked terms make Cyber Five eligible (Test C, Req 8.3, 18.3)
   // -------------------------------------------------------------------------
-  it('marking 5 distinct revealed terms via real dispatches makes Cyber Five 5/5 and eligible (Test C, Req 8.3, 18.3)', () => {
+  it('marking 5 distinct revealed terms via real dispatches makes Cyber Five 5/5 and eligible (Test C, Req 8.3, 18.3)', () => { // not-a-ticket-dimension
     const { sink, unmount } = mountProvider()
     const ctx0 = sink.current!
 
@@ -201,34 +201,39 @@ describe('marks persistence integration (module-4-term-marking-prize-engine)', (
       sink.current!.dispatch({ type: 'START_GAME' })
     })
 
-    // Reveal clues one at a time (real CALL_NEXT_WORD cycle) until at least 5
-    // of this ticket's own 15 termIds have been revealed. The engine picks
-    // the next word randomly from the whole active term bank, so this is
-    // bounded by the active term count exactly like the Task 12.1 test
-    // above, to guarantee it can never hang.
+    // Reveal clues one at a time (real CALL_NEXT_WORD cycle), marking each
+    // ticket term immediately while it is still game.currentTermId, until 5
+    // distinct marks exist. The engine picks the next word randomly from the
+    // whole active term bank, so this is bounded by the active term count
+    // exactly like the Task 12.1 test above, to guarantee it can never hang.
+    // Marks must be made as soon as a term becomes current — not batched
+    // afterward — since only the current term is newly markable.
     const ticketTermIds = outcome.ticket.rows.flat().map((c) => c.termId)
     const activeTermCount = cyberTerms.filter((t) => t.active).length
-    let revealedOnTicket: string[] = sink.current!.state.game.revealedTermIds.filter((id) =>
-      ticketTermIds.includes(id),
-    )
-    for (let i = 0; i < activeTermCount && revealedOnTicket.length < 5; i++) {
+    const markedOnTicket = new Set<string>()
+
+    const currentTermId = sink.current!.state.game.currentTermId
+    if (currentTermId && ticketTermIds.includes(currentTermId)) {
+      act(() => {
+        sink.current!.dispatch({ type: 'MARK_TERM', termId: currentTermId })
+      })
+      markedOnTicket.add(currentTermId)
+    }
+
+    for (let i = 0; i < activeTermCount && markedOnTicket.size < 5; i++) {
       if (sink.current!.state.game.status === 'COMPLETED') break
       act(() => {
         sink.current!.dispatch({ type: 'CALL_NEXT_WORD' })
       })
-      const revealedTermIds = sink.current!.state.game.revealedTermIds
-      revealedOnTicket = revealedTermIds.filter((id) => ticketTermIds.includes(id))
+      const justCalled = sink.current!.state.game.currentTermId
+      if (justCalled && ticketTermIds.includes(justCalled) && !markedOnTicket.has(justCalled)) {
+        act(() => {
+          sink.current!.dispatch({ type: 'MARK_TERM', termId: justCalled })
+        })
+        markedOnTicket.add(justCalled)
+      }
     }
-    expect(revealedOnTicket.length).toBeGreaterThanOrEqual(5)
-
-    // Mark exactly 5 distinct revealed termIds that are on the ticket, via
-    // real MARK_TERM dispatches (not pre-seeded marks).
-    const fiveTermIds = revealedOnTicket.slice(0, 5)
-    for (const termId of fiveTermIds) {
-      act(() => {
-        sink.current!.dispatch({ type: 'MARK_TERM', termId })
-      })
-    }
+    expect(markedOnTicket.size).toBeGreaterThanOrEqual(5)
 
     expect(sink.current!.state.marks).toHaveLength(5)
 
@@ -245,7 +250,7 @@ describe('marks persistence integration (module-4-term-marking-prize-engine)', (
   // -------------------------------------------------------------------------
   // Task 12.6 — Full-ticket Cyber Full House eligibility (Test E, Req 10.3, 18.5)
   // -------------------------------------------------------------------------
-  it('marks all 15 ticket terms and reaches Cyber Full House 15/15 eligible, while Cyber Five caps at 5/5 (Test E, Req 10.3, 18.5)', () => {
+  it('marks all 12 ticket terms and reaches Cyber Full House 12/12 eligible, while Cyber Five caps at 5/5 (Test E, Req 10.3, 18.5)', () => { // not-a-ticket-dimension
     const harness = mountProvider()
     const ctx0 = harness.sink.current!
 
@@ -280,7 +285,7 @@ describe('marks persistence integration (module-4-term-marking-prize-engine)', (
     // whenever a newly-called term belongs to this ticket, mark it
     // immediately (interleaved call + mark), exactly like the refresh test
     // above. Bound the loop by the active term count so it always
-    // terminates even if this ticket's 15 terms are spread thinly across
+    // terminates even if this ticket's 12 terms are spread thinly across
     // many rounds.
     for (let i = 0; i < activeTermCount && remaining.size > 0; i++) {
       const statusBeforeCall: string = harness.sink.current!.state.game.status
@@ -302,19 +307,19 @@ describe('marks persistence integration (module-4-term-marking-prize-engine)', (
     }
 
     expect(remaining.size).toBe(0)
-    expect(harness.sink.current!.currentPlayerMarks).toHaveLength(15)
+    expect(harness.sink.current!.currentPlayerMarks).toHaveLength(12)
 
     const progress = harness.sink.current!.currentPrizeProgress
     const fullHouse = progress.find((p) => p.id === 'CYBER_FULL_HOUSE')
     expect(fullHouse).toEqual({
       id: 'CYBER_FULL_HOUSE',
       label: 'Cyber Full House',
-      current: 15,
-      target: 15,
+      current: 12,
+      target: 12,
     })
     expect(isPrizeEligible(fullHouse!)).toBe(true)
 
-    // Sanity check: Cyber Five caps at 5/5 even though all 15 terms are
+    // Sanity check: Cyber Five caps at 5/5 even though all 12 terms are // not-a-ticket-dimension
     // marked, and is itself eligible.
     const cyberFive = progress.find((p) => p.id === 'CYBER_FIVE')
     expect(cyberFive).toEqual({

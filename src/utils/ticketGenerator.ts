@@ -2,8 +2,8 @@ import type { CyberTerm } from '../types/cyberTerm'
 import type { Ticket, TicketCell } from '../types/ticket'
 
 export const TICKET_ROWS = 3
-export const TICKET_COLS = 5
-export const TICKET_SIZE = TICKET_ROWS * TICKET_COLS // 15
+export const TICKET_COLUMNS = 4
+export const TICKET_SIZE = TICKET_ROWS * TICKET_COLUMNS // 12
 export const MAX_UNIQUE_ATTEMPTS = 50
 
 /** Metadata needed to build the Ticket record around the generated cells. */
@@ -49,9 +49,9 @@ function shuffle<T>(source: readonly T[], rng: () => number): T[] {
 }
 
 /**
- * Build a new Ticket with 15 distinct active terms arranged 3x5 whose
+ * Build a new Ticket with 12 distinct active terms arranged 3x4 whose
  * signature is not present in `existingSignatures` (Req 7).
- * Throws when fewer than 15 active terms (Req 7.10) or when 50 attempts
+ * Throws when fewer than 12 active terms (Req 7.10) or when 50 attempts
  * fail to find a unique signature (Req 7.9). Inputs are never mutated.
  */
 export function generateTicket(
@@ -76,8 +76,8 @@ export function generateTicket(
     if (!existing.has(signature)) {
       const rows: TicketCell[][] = []
       for (let i = 0; i < TICKET_SIZE; i++) {
-        const row = Math.floor(i / TICKET_COLS)
-        const col = i % TICKET_COLS
+        const row = Math.floor(i / TICKET_COLUMNS)
+        const col = i % TICKET_COLUMNS
         const term = chosen[i]
         const cell: TicketCell = {
           termId: term.id,
@@ -103,5 +103,13 @@ export function generateTicket(
 
   throw new Error(
     `ticketGenerator: could not generate a unique ticket after ${MAX_UNIQUE_ATTEMPTS} attempts.`,
+  )
+}
+
+/** True when a Ticket predates this refactor: 15 cells arranged 3x5 (Req 7). */
+export function isLegacyTicket(ticket: Ticket): boolean {
+  return (
+    ticket.rows.length !== TICKET_ROWS ||
+    ticket.rows.some((row) => row.length !== TICKET_COLUMNS)
   )
 }

@@ -13,7 +13,7 @@
 //   3. PLAYER_NOT_IN_GAME     — activePlayer.gameId !== activeGame.id
 //   4. TICKET_NOT_FOUND       — no ticket with playerId === activePlayer.id
 //                                && gameId === activeGame.id
-//   5. TICKET_NOT_OWNED_BY_PLAYER — activeTicket.playerId !== activePlayer.id
+//   5. TICKET_NOT_OWNED_BY_PLAYER — activeTicket.playerId !== activePlayer.id // not-a-ticket-dimension
 //                                    || activeTicket.gameId !== activeGame.id
 //
 // Each failure mode must be independently attributable (Req 2.2, 2.7), and

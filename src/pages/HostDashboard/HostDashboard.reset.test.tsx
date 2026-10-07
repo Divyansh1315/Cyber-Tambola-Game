@@ -123,7 +123,30 @@ describe('HostDashboard Reset Demo Game clears marks + prize progress end to end
       },
     })
 
+    dispatchAndFlush({
+      type: 'SYNC_LOCAL',
+      payload: {
+        game: { ...getSession().state.game, currentTermId: toReveal[0] },
+        players: getSession().state.players as never,
+        tickets: getSession().state.tickets as never,
+        marks: getSession().state.marks as never,
+        claims: [],
+        winners: [],
+      },
+    })
     dispatchAndFlush({ type: 'MARK_TERM', termId: toReveal[0] })
+
+    dispatchAndFlush({
+      type: 'SYNC_LOCAL',
+      payload: {
+        game: { ...getSession().state.game, currentTermId: toReveal[1] },
+        players: getSession().state.players as never,
+        tickets: getSession().state.tickets as never,
+        marks: getSession().state.marks as never,
+        claims: [],
+        winners: [],
+      },
+    })
     dispatchAndFlush({ type: 'MARK_TERM', termId: toReveal[1] })
 
     // Confirm the dirty state actually has non-zero marks before resetting.
@@ -181,6 +204,7 @@ describe('HostDashboard Reset Demo Game clears marks + prize progress end to end
         game: {
           ...getSession().state.game,
           status: 'WORD_ACTIVE',
+          currentTermId: dirtyTermIds[0],
           revealedTermIds: dirtyTermIds,
         },
         players: getSession().state.players as never,
@@ -231,15 +255,16 @@ describe('HostDashboard Reset Demo Game clears marks + prize progress end to end
     const rendered = Array.from(counts).map((el) =>
       (el.textContent ?? '').replace(/\s+/g, '').replace(/✓$/, ''),
     )
-    expect(rendered.filter((t) => t === '0/5')).toHaveLength(4)
-    expect(rendered.filter((t) => t === '0/15')).toHaveLength(1)
+    expect(rendered.filter((t) => t === '0/5')).toHaveLength(1) // not-a-ticket-dimension (Cyber Five)
+    expect(rendered.filter((t) => t === '0/4')).toHaveLength(3)
+    expect(rendered.filter((t) => t === '0/12')).toHaveLength(1)
 
     // Claim messaging matches the zero-progress hint, and Claim is disabled
     // (Module 5: per-prize claim block, driven by derivePlayerClaimStatus).
     const cyberFiveClaimBlock = screen.getByText('Cyber Five', {
       selector: '.player__claim-block-label',
     }).closest('li') as HTMLElement
-    expect(cyberFiveClaimBlock).toHaveTextContent('Progress: 0/5')
+    expect(cyberFiveClaimBlock).toHaveTextContent('Progress: 0/5') // not-a-ticket-dimension
     expect(
       screen.getByRole('button', { name: /claim cyber five/i }),
     ).toBeDisabled()

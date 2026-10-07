@@ -16,13 +16,18 @@ const NON_COMPLETED_STATUSES: GameStatus[] = [
   'PAUSED',
 ]
 
-function makeGame(status: GameStatus, revealedTermIds: string[]): Game {
+function makeGame(
+  status: GameStatus,
+  revealedTermIds: string[],
+  currentTermId?: string,
+): Game {
   return {
     id: 'GAME_001',
     code: 'CYBER24',
     status,
     createdAt: new Date().toISOString(),
     currentRound: 1,
+    currentTermId,
     revealedTermIds,
   }
 }
@@ -33,7 +38,7 @@ function makeTicket(ticketId: string): Ticket {
   for (let row = 0; row < 3; row++) {
     rows[row] = []
     for (let col = 0; col < 5; col++) {
-      const i = row * 5 + col
+      const i = row * 5 + col // not-a-ticket-dimension (deliberately legacy 3x5 fixture shape)
       rows[row][col] = {
         termId: `T${i}`,
         term: `Term ${i}`,
@@ -68,12 +73,13 @@ function makeMark(overrides: Partial<Mark> = {}): Mark {
 
 /**
  * A fully-valid baseline fixture: current player p-1 owns ticket t-1 (15
- * termIds T0..T14), the target term is revealed, the game is not COMPLETED,
- * and no prior mark exists for it. `validateMarkAttempt` must accept this.
+ * termIds T0..T14), the target term is the game's current term, the game is
+ * not COMPLETED, and no prior mark exists for it. `validateMarkAttempt` must
+ * accept this.
  */
 function validBaseline(termId = 'T0') {
   const ticket = makeTicket('t-1')
-  const game = makeGame('WORD_ACTIVE', [termId])
+  const game = makeGame('WORD_ACTIVE', [termId], termId)
   return {
     state: {
       game,
@@ -94,7 +100,7 @@ type Scenario =
   | 'NO_CURRENT_PLAYER'
   | 'TICKET_NOT_FOUND'
   | 'TERM_NOT_ON_TICKET'
-  | 'TERM_NOT_REVEALED'
+  | 'TERM_NOT_CURRENT'
   | 'GAME_COMPLETED'
   | 'DUPLICATE_MARK'
   | 'VALID'
@@ -103,7 +109,7 @@ const scenarioArb = fc.constantFrom<Scenario>(
   'NO_CURRENT_PLAYER',
   'TICKET_NOT_FOUND',
   'TERM_NOT_ON_TICKET',
-  'TERM_NOT_REVEALED',
+  'TERM_NOT_CURRENT',
   'GAME_COMPLETED',
   'DUPLICATE_MARK',
   'VALID',
@@ -143,11 +149,11 @@ function buildFixture(scenario: Scenario, status: GameStatus, termId: string) {
         expectedReason: 'TERM_NOT_ON_TICKET' as const,
       }
     }
-    case 'TERM_NOT_REVEALED': {
+    case 'TERM_NOT_CURRENT': {
       return {
-        state: { ...state, game: { ...state.game, revealedTermIds: [] } },
+        state: { ...state, game: { ...state.game, currentTermId: undefined } },
         termId: baseTermId,
-        expectedReason: 'TERM_NOT_REVEALED' as const,
+        expectedReason: 'TERM_NOT_CURRENT' as const,
       }
     }
     case 'GAME_COMPLETED': {

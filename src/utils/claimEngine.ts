@@ -41,7 +41,7 @@ export type ClaimValidationResult =
  *  2. PLAYER_NOT_FOUND          - `player` is undefined
  *  3. PLAYER_NOT_IN_GAME        - player.gameId !== game.id
  *  4. TICKET_NOT_FOUND          - `ticket` is undefined
- *  5. TICKET_NOT_OWNED_BY_PLAYER- ticket.playerId !== player.id (or
+ *  5. TICKET_NOT_OWNED_BY_PLAYER- ticket.playerId !== player.id (or // not-a-ticket-dimension
  *                                 ticket.id !== player.ticketId)
  *  6. PRIZE_NOT_FOUND           - prizeId is not among PRIZES
  *  7. DUPLICATE_ACTIVE_CLAIM    - player already has a claim for this

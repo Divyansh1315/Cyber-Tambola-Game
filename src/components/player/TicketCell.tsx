@@ -7,43 +7,38 @@ interface TicketCellProps {
 
 /** Icon + label describing each state (never color alone). */
 const STATE_META = {
-  LOCKED: { icon: '🔒', hint: 'Not revealed yet' },
-  AVAILABLE: { icon: '○', hint: 'Available — tap to mark' },
+  LOCKED: { hint: 'Tap to mark when called' },
+  AVAILABLE: { hint: 'Tap to mark when called' },
   MARKED: { icon: '✓', hint: 'Marked' },
 } as const
 
 /**
  * A single cyber-word ticket cell.
- * - LOCKED cells are disabled and announce "Not revealed yet".
- * - AVAILABLE cells can be tapped to become MARKED.
- * - MARKED cells show a checkmark and can be un-marked.
- * State is conveyed with an icon and text in addition to color for accessibility.
+ * - Unmarked cells (internally LOCKED or AVAILABLE) share one neutral
+ *   presentation and remain tappable, so tap-ability never reveals which
+ *   term is currently callable.
+ * - MARKED cells show a checkmark and take visual priority.
+ * State is conveyed with an icon and `aria-label`/`aria-pressed` in addition
+ * to color for accessibility.
  */
 export function TicketCell({ cell, onToggle }: TicketCellProps) {
   const meta = STATE_META[cell.state]
-  const isLocked = cell.state === 'LOCKED'
   const isMarked = cell.state === 'MARKED'
 
   return (
     <button
       type="button"
-      className={`ticket-cell ticket-cell--${cell.state.toLowerCase()}`}
+      className={`ticket-cell ${isMarked ? 'ticket-cell--marked' : 'ticket-cell--unmarked'}`}
       onClick={() => onToggle(cell.termId)}
-      disabled={isLocked}
       aria-pressed={isMarked}
       aria-label={`${cell.term}. ${meta.hint}`}
     >
-      <span className="ticket-cell__icon" aria-hidden="true">
-        {meta.icon}
-      </span>
+      {cell.state === 'MARKED' && (
+        <span className="ticket-cell__icon" aria-hidden="true">
+          {STATE_META.MARKED.icon}
+        </span>
+      )}
       <span className="ticket-cell__term">{cell.term}</span>
-      <span className="ticket-cell__state" aria-hidden="true">
-        {cell.state === 'LOCKED'
-          ? 'Locked'
-          : cell.state === 'MARKED'
-            ? 'Marked'
-            : 'Available'}
-      </span>
     </button>
   )
 }

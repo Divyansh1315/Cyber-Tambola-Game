@@ -192,11 +192,11 @@ function buildGameRow(overrides: Partial<Record<string, unknown>> = {}): Record<
 }
 
 function buildTicketCells(): TicketCell[] {
-  return Array.from({ length: 15 }, (_, i) => ({
+  return Array.from({ length: 12 }, (_, i) => ({
     termId: `TERM_${i}`,
     term: `Term ${i}`,
-    row: Math.floor(i / 5),
-    col: i % 5,
+    row: Math.floor(i / 4),
+    col: i % 4,
     state: 'AVAILABLE' as const,
   }))
 }
@@ -299,7 +299,7 @@ describe('Pre-submission session consistency guard in wrappedDispatch (Req 2.2, 
             gameId: tab.sink.current!.state.game.id,
             createdAt: '2026-01-01T00:00:00.000Z',
             ref: 'Ticket #6405',
-            rows: [buildTicketCells().slice(0, 5), buildTicketCells().slice(5, 10), buildTicketCells().slice(10, 15)],
+            rows: [buildTicketCells().slice(0, 4), buildTicketCells().slice(4, 8), buildTicketCells().slice(8, 12)],
           },
         })
       })
@@ -443,7 +443,7 @@ describe('Pre-submission session consistency guard in wrappedDispatch (Req 2.2, 
             gameId: 'GAME_RETIRED',
             createdAt: '2026-01-01T00:00:00.000Z',
             ref: 'Ticket #6405',
-            rows: [buildTicketCells().slice(0, 5), buildTicketCells().slice(5, 10), buildTicketCells().slice(10, 15)],
+            rows: [buildTicketCells().slice(0, 4), buildTicketCells().slice(4, 8), buildTicketCells().slice(8, 12)],
           },
         })
         tab.sink.current!.dispatch({
@@ -559,6 +559,19 @@ describe('Pre-submission session consistency guard in wrappedDispatch (Req 2.2, 
         })
       })
       for (const termId of cyberFiveTermIds) {
+        act(() => {
+          tab.sink.current!.dispatch({
+            type: 'HYDRATE_FROM_REMOTE',
+            snapshot: {
+              game: { ...tab.sink.current!.state.game, currentTermId: termId },
+              players: tab.sink.current!.state.players,
+              tickets: tab.sink.current!.state.tickets,
+              marks: tab.sink.current!.state.marks,
+              claims: tab.sink.current!.state.claims,
+              winners: tab.sink.current!.state.winners,
+            },
+          })
+        })
         act(() => {
           tab.sink.current!.dispatch({ type: 'MARK_TERM', termId })
         })

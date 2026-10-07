@@ -1,13 +1,15 @@
 import type { TicketCellState } from '../types/ticket'
 
 /**
- * Derive a ticket cell's visual state purely from the game's reveal history
- * and the player's Valid_Marks for this term (Req 4.1-4.3).
+ * Derive a ticket cell's visual state purely from the game's single current
+ * term and the player's Valid_Marks for this term (Req 13.5, 14.1, 14.3, 16.1).
  *
- * Rules:
- * - termId NOT in revealedTermIds -> LOCKED (Req 4.1)
- * - present AND no Valid_Mark for this termId -> AVAILABLE (Req 4.2)
- * - present AND a Valid_Mark exists for this termId -> MARKED (Req 4.3)
+ * Rules (MARKED is checked first so a term that was current, got marked, and
+ * is no longer current still reports MARKED, never LOCKED — marks are
+ * permanent per Requirement 16.1):
+ * - a Valid_Mark exists for this termId -> MARKED
+ * - no Valid_Mark AND termId === currentTermId -> AVAILABLE (Req 14.1)
+ * - no Valid_Mark AND termId !== currentTermId -> LOCKED (Req 14.2, 14.3)
  *
  * `markedTermIds` is the caller's precomputed Marked_Term_Ids for the
  * Current_Player + Current_Ticket (via getMarkedTermIds(getPlayerTicketMarks(...))),
@@ -15,17 +17,19 @@ import type { TicketCellState } from '../types/ticket'
  * mutates its inputs.
  *
  * @param termId The CyberTerm id this cell represents.
- * @param revealedTermIds The game's live reveal history (read-only).
+ * @param currentTermId The game's single current term (`Game.currentTermId`); only
+ *   this term is newly markable. `Game.revealedTermIds` (call history) is
+ *   intentionally not consulted here (Req 14.3).
  * @param markedTermIds The Current_Player's Marked_Term_Ids for the Current_Ticket.
  * @returns The derived cell state.
  */
 export function deriveCellState(
   termId: string,
-  revealedTermIds: readonly string[],
+  currentTermId: string | undefined,
   markedTermIds: ReadonlySet<string>,
 ): TicketCellState {
-  if (!revealedTermIds.includes(termId)) {
-    return 'LOCKED'
+  if (markedTermIds.has(termId)) {
+    return 'MARKED'
   }
-  return markedTermIds.has(termId) ? 'MARKED' : 'AVAILABLE'
+  return termId === currentTermId ? 'AVAILABLE' : 'LOCKED'
 }

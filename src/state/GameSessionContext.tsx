@@ -1025,7 +1025,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
   // false for both, so this effect correctly no-ops then), check whether
   // this device's currentPlayerId still resolves to a Player belonging to
   // the confirmed Active Game. A Reset creates a brand-new game id (Req
-  // 5.1); a device that was holding a player from the retired game would
+  // 5.1); a device that was holding a player from the retired game would // not-a-ticket-dimension
   // otherwise keep rendering that stale player/ticket indefinitely (the
   // bug this task fixes). If it no longer resolves, dispatch
   // CLEAR_STALE_PLAYER so the device falls back to the same "no

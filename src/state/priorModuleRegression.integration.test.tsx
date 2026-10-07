@@ -27,13 +27,13 @@ const GAME_ID = 'GAME_001'
 const PLAYER_ID = 'PLAYER_1'
 const TICKET_ID = 'TICKET_1'
 
-/** A 3x5 ticket whose 15 cells have distinct termIds T0..T14. */
+/** A 3x4 ticket whose 12 cells have distinct termIds T0..T11. */
 function makeTicket(): Ticket {
   const rows: TicketCell[][] = []
   let n = 0
   for (let row = 0; row < 3; row++) {
     const cells: TicketCell[] = []
-    for (let col = 0; col < 5; col++) {
+    for (let col = 0; col < 4; col++) {
       cells.push({ termId: `T${n}`, term: `Term ${n}`, state: 'LOCKED', row, col })
       n++
     }
@@ -130,11 +130,8 @@ describe('Regression 2: currentPlayerId identity preserved across host actions, 
     let player = baseState()
     const allTermIds = player.tickets[0].rows.flat().map((c) => c.termId)
     const fiveTermIds = allTermIds.slice(0, 5)
-    player = {
-      ...player,
-      game: { ...player.game, revealedTermIds: allTermIds },
-    }
     for (const termId of fiveTermIds) {
+      player = revealTerm(player, termId)
       player = gameSessionReducer(player, { type: 'MARK_TERM', termId })
     }
     expect(player.currentPlayerId).toBe(PLAYER_ID)
@@ -469,7 +466,7 @@ describe('Regression 4: Prize_Progress for any Prize_Id never decreases as a res
 
     record(state)
 
-    // Reveal + mark 5 terms (bringing CYBER_FIVE to 5/5), recording progress
+    // Reveal + mark 5 terms (bringing CYBER_FIVE to 5/5), recording progress // not-a-ticket-dimension
     // after every single dispatch (reveal and mark alike).
     for (const termId of allTermIds.slice(0, 5)) {
       state = revealTerm(state, termId)
@@ -539,7 +536,7 @@ describe('Regression 4: Prize_Progress for any Prize_Id never decreases as a res
 })
 
 // ---------------------------------------------------------------------------
-// 5. Direct-word-call gameplay model (START_GAME/CALL_NEXT_WORD) unchanged
+// 5. Direct-word-call gameplay model (START_GAME/CALL_NEXT_WORD) unchanged // not-a-ticket-dimension
 //    (Req 20.5)
 // ---------------------------------------------------------------------------
 

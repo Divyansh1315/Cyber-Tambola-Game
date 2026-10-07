@@ -113,7 +113,7 @@ function makeWinner(id: string, playerId: string, ticketId: string, prizeId: 'CY
   }
 }
 
-/** Base state: one eligible player (5/5 marks on row 0 => CYBER_FIVE
+/** Base state: one eligible player (5/5 marks on row 0 => CYBER_FIVE // not-a-ticket-dimension
  * eligible), no claims, no winners, prize open. */
 function baseEligibleState(): GameSessionState {
   const playerId = 'P1'
@@ -137,7 +137,7 @@ function baseEligibleState(): GameSessionState {
   }
 }
 
-/** Base state: one ineligible player (only 2/5 marks, CYBER_FIVE not met). */
+/** Base state: one ineligible player (only 2/5 marks, CYBER_FIVE not met). */ // not-a-ticket-dimension
 function baseIneligibleState(): GameSessionState {
   const playerId = 'P1'
   const ticketId = 'TICKET_P1'

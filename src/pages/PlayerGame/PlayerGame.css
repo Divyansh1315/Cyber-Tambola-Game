@@ -58,32 +58,6 @@
   margin-top: var(--space-3);
 }
 
-/* Ticket card extras */
-.player__locked-hint {
-  margin-top: var(--space-3);
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-warning);
-}
-
-.player__legend {
-  list-style: none;
-  margin: var(--space-4) 0 0;
-  padding: var(--space-3) 0 0;
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--color-ink-soft);
-}
-.player__legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
 /* Claim blocks — one independent, self-contained block per Prize_Id (Req 13.2) */
 .player__claims {
   list-style: none;

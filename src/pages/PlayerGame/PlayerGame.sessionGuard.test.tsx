@@ -12,7 +12,7 @@
 // persisted to localStorage), so it cannot be seeded via `seedSession` like
 // the rest of `PlayerGame.test.tsx`'s suite -- it is only ever set by the
 // pre-submission session consistency guard (GameSessionContext.tsx, task
-// 5.2) actually firing on a real `SUBMIT_PRIZE_CLAIM` dispatch. In Local
+// 5.2) actually firing on a real `SUBMIT_PRIZE_CLAIM` dispatch. In Local // not-a-ticket-dimension
 // Fallback mode `isBackendConfirmed` is always `true`, and task 7.2's
 // stale-identity invalidation effect clears any structurally-stale
 // `currentPlayerId` before a guard failure could ever be observed there.
@@ -427,7 +427,7 @@ describe('PlayerGame session guard recovery message (claim-player-ticket-identit
 
       await waitFor(() => {
         expect(
-          tab.getByText('Claim could not be validated. Your current progress is 4/5.'),
+          tab.getByText('Claim could not be validated. Your current progress is 4/5.'), // not-a-ticket-dimension
         ).toBeInTheDocument()
       })
       expect(screen.queryByText(/session is out of date/i)).not.toBeInTheDocument()

@@ -14,13 +14,13 @@ const GAME_ID = 'GAME_001'
 const PLAYER_ID = 'PLAYER_1'
 const TICKET_ID = 'TICKET_1'
 
-/** A 3x5 ticket whose 15 cells have distinct termIds T0..T14. */
+/** A 3x4 ticket whose 12 cells have distinct termIds T0..T11. */
 function makeTicket(): Ticket {
   const rows: TicketCell[][] = []
   let n = 0
   for (let row = 0; row < 3; row++) {
     const cells: TicketCell[] = []
-    for (let col = 0; col < 5; col++) {
+    for (let col = 0; col < 4; col++) {
       cells.push({ termId: `T${n}`, term: `Term ${n}`, state: 'LOCKED', row, col })
       n++
     }
@@ -59,6 +59,7 @@ function baseState(): GameSessionState {
       status: 'WORD_ACTIVE',
       currentRound: 1,
       revealedTermIds: ['T0'],
+      currentTermId: 'T0',
     },
     players: [player],
     tickets: [ticket],

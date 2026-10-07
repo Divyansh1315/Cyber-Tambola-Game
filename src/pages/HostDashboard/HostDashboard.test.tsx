@@ -27,16 +27,24 @@ function makePlayer(overrides: Partial<Player> & { id: string }): Player {
   }
 }
 
+/** A minimal, but structurally valid (3 rows of 4), ticket fixture. */
 function makeTicket(id: string, playerId: string): Ticket {
+  const rows = Array.from({ length: 3 }, (_, row) =>
+    Array.from({ length: 4 }, (_, col) => ({
+      termId: `TERM_${row * 4 + col}`,
+      term: `Term ${row * 4 + col}`,
+      state: 'LOCKED' as const,
+      row,
+      col,
+    })),
+  )
   return {
     id,
     playerId,
     gameId: 'GAME_001',
     createdAt: new Date('2026-01-01T09:00:00.000Z').toISOString(),
     ref: `Ticket #${id}`,
-    rows: [
-      [{ termId: 'TERM_001', term: 'Phishing', state: 'LOCKED', row: 0, col: 0 }],
-    ],
+    rows,
   }
 }
 

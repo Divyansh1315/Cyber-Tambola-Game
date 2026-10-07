@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { Button } from '../../components/common/Button'
 import { Card } from '../../components/common/Card'
@@ -135,8 +135,6 @@ export function PlayerGame() {
   const { game } = state
   const location = useLocation()
 
-  const [lockedHint, setLockedHint] = useState<string | null>(null)
-
   const isPaused = game.status === 'PAUSED'
   const isCompleted = game.status === 'COMPLETED'
   const inLobby = game.status === 'LOBBY'
@@ -166,7 +164,7 @@ export function PlayerGame() {
         row.map((cell) => ({
           ...cell,
           term: findCyberTerm(cell.termId)?.term ?? cell.term,
-          state: deriveCellState(cell.termId, game.revealedTermIds, markedTermIds),
+          state: deriveCellState(cell.termId, game.currentTermId, markedTermIds),
         })),
       ),
     }
@@ -192,29 +190,29 @@ export function PlayerGame() {
   }
 
   /**
-   * Tap a cell. LOCKED cells only show a hint (never dispatch). MARKED cells
-   * are a permanent no-op (Req 13). AVAILABLE cells dispatch MARK_TERM, which
-   * is validated by the same canMarkTerm/validateMarkAttempt pipeline the
-   * reducer uses — no gate logic is duplicated here (Req 12, 14).
+   * Tap a cell. Already-MARKED cells are a permanent no-op (Req 16.2). A tap
+   * on any cell whose term is not the game's single current term is a
+   * silent no-op — no dispatch, no hint, no visible change (Req 14.2, 14.3,
+   * 15.1, 15.2, 15.3). Only a tap on the Current_Term dispatches MARK_TERM,
+   * which is validated by the same canMarkTerm/validateMarkAttempt pipeline
+   * the reducer uses — no gate logic is duplicated here (Req 14.1, 17).
    */
   function handleTap(termId: string) {
     if (readOnly) return
 
-    const isRevealed = game.revealedTermIds.includes(termId)
+    const isCurrent = termId === game.currentTermId
     const isMarked = markedTermIds.has(termId)
 
-    if (!isRevealed) {
-      const label = findCyberTerm(termId)?.term ?? termId
-      setLockedHint(`${label} has not been revealed yet.`)
-      return
-    }
-
     if (isMarked) {
-      // Already marked — explicit no-op, never dispatch (Req 13.1, 13.2, 14.3).
+      // Already marked — explicit no-op, never dispatch (Req 16.2).
       return
     }
 
-    setLockedHint(null)
+    if (!isCurrent) {
+      // Not the current term — silent no-op, no dispatch, no hint (Req 15.1, 15.2).
+      return
+    }
+
     if (canMarkTerm(state, termId)) {
       dispatch({ type: 'MARK_TERM', termId })
     }
@@ -380,22 +378,6 @@ export function PlayerGame() {
         {/* Cyber word ticket */}
         <Card title="Your Cyber Word Ticket" className="player__ticket-card">
           <Ticket ticket={renderedTicket} onToggleCell={handleTap} />
-          {lockedHint && (
-            <p className="player__locked-hint" role="status">
-              <span aria-hidden="true">🔒</span> {lockedHint}
-            </p>
-          )}
-          <ul className="player__legend" aria-label="Ticket cell states">
-            <li>
-              <span aria-hidden="true">🔒</span> Locked
-            </li>
-            <li>
-              <span aria-hidden="true">○</span> Available
-            </li>
-            <li>
-              <span aria-hidden="true">✓</span> Marked
-            </li>
-          </ul>
         </Card>
 
         {/* Prize progress */}

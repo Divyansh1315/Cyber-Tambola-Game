@@ -222,7 +222,7 @@ describe('session integration (module-3-player-joining-tickets)', () => {
     // Sanity: every ticket has exactly 15 cells in a 3x5 grid.
     for (const ticket of s.tickets) {
       expect(ticket.rows).toHaveLength(3)
-      expect(ticket.rows.flat()).toHaveLength(15)
+      expect(ticket.rows.flat()).toHaveLength(12)
     }
 
     mounted.unmount()

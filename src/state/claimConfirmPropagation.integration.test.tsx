@@ -94,7 +94,7 @@ describe('Claim submit -> confirm cross-screen propagation (module-5-prize-claim
     const game = createSeedGame()
     const { player, ticket } = buildJoined(game)
     const allTermIds = ticket.rows.flat().map((c) => c.termId)
-    // Mark exactly 5 terms so Cyber Five is ELIGIBLE (5/5).
+    // Mark exactly 5 terms so Cyber Five is ELIGIBLE (5/5). // not-a-ticket-dimension
     const marks5 = allTermIds.slice(0, 5).map((id) => buildMark(player, ticket, id))
     const revealedGame: Game = {
       ...game,

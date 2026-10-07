@@ -38,6 +38,18 @@ const cellArb: fc.Arbitrary<TicketCell> = fc.record({
   col: fc.integer({ min: 0, max: 4 }),
 })
 
+/**
+ * Rows matching either the current 3x4 ticket shape or the legacy 3x5
+ * shape — the only two shapes `isValidTicketShape` (persistence.ts)
+ * allowlists (Req 5.4, 7.2).
+ */
+const ticketRowsArb: fc.Arbitrary<TicketCell[][]> = fc
+  .constantFrom(4, 5)
+  .chain((cols) => fc.array(fc.array(cellArb, { minLength: cols, maxLength: cols }), {
+    minLength: 3,
+    maxLength: 3,
+  }))
+
 /** A ticket for a given player id (so tickets reference real players). */
 function ticketArbForPlayer(playerId: string, gameId: string): fc.Arbitrary<Ticket> {
   return fc.record({
@@ -46,10 +58,7 @@ function ticketArbForPlayer(playerId: string, gameId: string): fc.Arbitrary<Tick
     gameId: fc.constant(gameId),
     createdAt: fc.date().map((d) => d.toISOString()),
     ref: fc.string({ maxLength: 16 }),
-    rows: fc.array(fc.array(cellArb, { minLength: 1, maxLength: 5 }), {
-      minLength: 1,
-      maxLength: 3,
-    }),
+    rows: ticketRowsArb,
   })
 }
 
@@ -174,6 +183,56 @@ describe('malformed persistence (property 21)', () => {
   it('returns null for empty / null input', () => {
     expect(parseEnvelope(null)).toBeNull()
     expect(parseEnvelope('')).toBeNull()
+  })
+
+  // Feature: ticket-3x4-dimension-refactor
+  // Validates: Requirements 5.4, 7.2
+  it('rejects an envelope whose ticket rows do not match the 3x4 or legacy 3x5 shape', () => {
+    fc.assert(
+      fc.property(validSliceArb, (slice) => {
+        fc.pre(slice.tickets.length > 0)
+        const envelope = toEnvelope(slice)
+        // Corrupt the first ticket's rows: 2 rows of length 3 — neither the
+        // current 3x4 shape nor the legacy 3x5 shape.
+        const malformedTickets = [
+          {
+            ...envelope.tickets[0],
+            rows: [
+              [envelope.tickets[0].rows[0]?.[0] ?? { termId: 'a', term: 'A', state: 'LOCKED', row: 0, col: 0 }, { termId: 'b', term: 'B', state: 'LOCKED', row: 0, col: 1 }, { termId: 'c', term: 'C', state: 'LOCKED', row: 0, col: 2 }],
+              [{ termId: 'd', term: 'D', state: 'LOCKED', row: 1, col: 0 }, { termId: 'e', term: 'E', state: 'LOCKED', row: 1, col: 1 }, { termId: 'f', term: 'F', state: 'LOCKED', row: 1, col: 2 }],
+            ],
+          },
+          ...envelope.tickets.slice(1),
+        ]
+        const raw = JSON.stringify({ ...envelope, tickets: malformedTickets })
+        expect(parseEnvelope(raw)).toBeNull()
+      }),
+      { numRuns: 50 },
+    )
+  })
+
+  it('rejects a ticket with the wrong row count outright', () => {
+    const game = { id: 'g1', code: 'ABC', status: 'LOBBY' as const, createdAt: new Date().toISOString(), currentRound: 0, revealedTermIds: [] }
+    const badTicket = {
+      id: 't1',
+      playerId: 'p1',
+      gameId: 'g1',
+      createdAt: new Date().toISOString(),
+      ref: 'ref1',
+      rows: [
+        [{ termId: 'a', term: 'A', state: 'LOCKED', row: 0, col: 0 }],
+      ],
+    }
+    const raw = JSON.stringify({
+      version: PERSIST_VERSION,
+      game,
+      players: [],
+      tickets: [badTicket],
+      marks: [],
+      claims: [],
+      winners: [],
+    })
+    expect(parseEnvelope(raw)).toBeNull()
   })
 
   it('rejects a version marker other than the current PERSIST_VERSION', () => {

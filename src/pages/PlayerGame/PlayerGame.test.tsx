@@ -206,8 +206,8 @@ describe('PlayerGame (module-3-player-joining-tickets)', () => {
 
     renderPlayerGame()
 
-    // The ticket grid renders one gridcell per cell — exactly 15 for a 3x5 ticket.
-    expect(screen.getAllByRole('gridcell')).toHaveLength(15)
+    // The ticket grid renders one gridcell per cell — exactly 12 for a 3x4 ticket.
+    expect(screen.getAllByRole('gridcell')).toHaveLength(12)
   })
 
   it('flips a ticket cell from LOCKED to AVAILABLE when its term is revealed (Test E, Req 12.2)', () => {
@@ -237,7 +237,7 @@ describe('PlayerGame (module-3-player-joining-tickets)', () => {
       name: new RegExp(`^${label}\\.`),
     })
     expect(cellButton).toBeEnabled()
-    expect(cellButton).toHaveAttribute('aria-label', expect.stringMatching(/Available/))
+    expect(cellButton).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('keeps the Cyber Five claim button disabled with the exact progress at initial zeroed progress (Req 2.3, 12.3, 18.3)', () => {
@@ -260,12 +260,12 @@ describe('PlayerGame (module-3-player-joining-tickets)', () => {
 
     renderPlayerGame()
 
-    // Module 5: each Prize_Id renders its own progress-based message and its
-    // own claim button, driven by derivePlayerClaimStatus (NOT_ELIGIBLE at 0/5).
+    // Module 5: each Prize_Id renders its own progress-based message and its // not-a-ticket-dimension
+    // own claim button, driven by derivePlayerClaimStatus (NOT_ELIGIBLE at 0/5). // not-a-ticket-dimension
     const cyberFiveBlock = screen.getByText('Cyber Five', {
       selector: '.player__claim-block-label',
     }).closest('li') as HTMLElement
-    expect(cyberFiveBlock).toHaveTextContent('Progress: 0/5')
+    expect(cyberFiveBlock).toHaveTextContent('Progress: 0/5') // not-a-ticket-dimension
     expect(
       screen.getByRole('button', { name: /claim cyber five/i }),
     ).toBeDisabled()
@@ -319,7 +319,7 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
     const cellButton = screen.getByRole('button', {
       name: new RegExp(`^${label}\\.`),
     })
-    expect(cellButton).toHaveAttribute('aria-label', expect.stringMatching(/Available/))
+    expect(cellButton).toHaveAttribute('aria-pressed', 'false')
 
     await user.click(cellButton)
 
@@ -330,11 +330,11 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
     expect(cellButton.textContent).toContain('✓')
   })
 
-  it('tapping a LOCKED cell does not mark it, shows the hint, and leaves progress unchanged (Req 13, 14.1, 14.2)', async () => {
+  it('tapping a non-current cell is a silent no-op: stays UNMARKED, no hint, progress unchanged (Req 14.1, 14.2, 15.1, 15.2)', async () => {
     const user = userEvent.setup()
     const game = createSeedGame()
     const { player, ticket } = buildJoined(game)
-    // Nothing revealed yet — every cell is LOCKED.
+    // Nothing called yet — no cell is the current term.
     seedSession({
       game,
       players: [player],
@@ -352,17 +352,14 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
     const cellButton = screen.getByRole('button', {
       name: new RegExp(`^${label}\\.`),
     })
-    expect(cellButton).toBeDisabled()
+    // Unmarked cells remain tappable regardless of internal LOCKED/AVAILABLE
+    // state — tap-ability must not reveal which term is callable (Req 13.2).
+    expect(cellButton).toBeEnabled()
 
-    // A disabled button cannot be clicked via user-event's pointer checks,
-    // which itself proves LOCKED cells never dispatch. Directly assert the
-    // locked state and that no lockedHint/progress change occurs regardless.
-    await user.click(cellButton).catch(() => undefined)
+    await user.click(cellButton)
 
-    expect(cellButton).toHaveAttribute(
-      'aria-label',
-      expect.stringMatching(/not revealed yet/i),
-    )
+    // Still unmarked, no visible change, no hint text, no dispatch.
+    expect(cellButton).toHaveAttribute('aria-pressed', 'false')
     expect(screen.queryByText(/has not been revealed yet\.$/)).not.toBeInTheDocument()
 
     const progressAfter = screen.getAllByRole('progressbar').map((el) =>
@@ -434,7 +431,7 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
 
     renderPlayerGame()
 
-    // Before marking: Cyber Five shows the real computed 0/5 (not any other
+    // Before marking: Cyber Five shows the real computed 0/5 (not any other // not-a-ticket-dimension
     // stale mock value baked into state.prizeProgress). Scope to the Prize
     // Progress panel's own "Cyber Five" label, since Module 5's claim block
     // also renders a "Cyber Five" label elsewhere on the page.
@@ -443,7 +440,7 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
         .getAllByText('Cyber Five')
         .map((el) => el.closest('li') as HTMLElement)
         .find((li) => li.classList.contains('prize-progress__item'))!
-    expect(cyberFiveItem()).toHaveTextContent('0/5')
+    expect(cyberFiveItem()).toHaveTextContent('0/5') // not-a-ticket-dimension
 
     const label = ticket.rows[0][0].term
     const cellButton = screen.getByRole('button', {
@@ -451,21 +448,21 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
     })
     await user.click(cellButton)
 
-    // After marking one term: Cyber Five progresses to 1/5, proving the panel
+    // After marking one term: Cyber Five progresses to 1/5, proving the panel // not-a-ticket-dimension
     // re-renders from live currentPrizeProgress, not a static snapshot.
-    expect(cyberFiveItem()).toHaveTextContent('1/5')
+    expect(cyberFiveItem()).toHaveTextContent('1/5') // not-a-ticket-dimension
     const cyberFiveClaimBlock = screen.getByText('Cyber Five', {
       selector: '.player__claim-block-label',
     }).closest('li') as HTMLElement
-    expect(cyberFiveClaimBlock).toHaveTextContent('Progress: 1/5')
+    expect(cyberFiveClaimBlock).toHaveTextContent('Progress: 1/5') // not-a-ticket-dimension
   })
 
-  it('shows the exact progress messaging at 3/5 and 4/5, and the Ready message at 5/5 (Req 12.3, 12.4)', () => {
+  it('shows the exact progress messaging at 3/5 and 4/5, and the Ready message at 5/5 (Req 12.3, 12.4)', () => { // not-a-ticket-dimension
     const game = createSeedGame()
     const { player, ticket } = buildJoined(game)
     const allTermIds = ticket.rows.flat().map((c) => c.termId)
 
-    // --- 3/5 marked ---
+    // --- 3/5 marked --- // not-a-ticket-dimension
     const marks3 = allTermIds.slice(0, 3).map((id) => buildMark(player, ticket, id))
     const revealedGame3: Game = {
       ...game,
@@ -484,11 +481,11 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
     const cyberFiveBlock3 = screen.getByText('Cyber Five', {
       selector: '.player__claim-block-label',
     }).closest('li') as HTMLElement
-    expect(cyberFiveBlock3).toHaveTextContent('Progress: 3/5')
+    expect(cyberFiveBlock3).toHaveTextContent('Progress: 3/5') // not-a-ticket-dimension
     unmount3()
     window.localStorage.clear()
 
-    // --- 4/5 marked ---
+    // --- 4/5 marked --- // not-a-ticket-dimension
     const marks4 = allTermIds.slice(0, 4).map((id) => buildMark(player, ticket, id))
     seedSession({
       game: revealedGame3,
@@ -501,11 +498,11 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
     const cyberFiveBlock4 = screen.getByText('Cyber Five', {
       selector: '.player__claim-block-label',
     }).closest('li') as HTMLElement
-    expect(cyberFiveBlock4).toHaveTextContent('Progress: 4/5')
+    expect(cyberFiveBlock4).toHaveTextContent('Progress: 4/5') // not-a-ticket-dimension
     unmount4()
     window.localStorage.clear()
 
-    // --- 5/5 marked ---
+    // --- 5/5 marked --- // not-a-ticket-dimension
     const marks5 = allTermIds.slice(0, 5).map((id) => buildMark(player, ticket, id))
     seedSession({
       game: revealedGame3,
@@ -518,12 +515,12 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
     expect(screen.getByText('🎉 Cyber Five Ready!')).toBeInTheDocument()
   })
 
-  it('Claim control is disabled below 5/5, and enabled with Cyber Five Ready wording at 5/5 (Req 12.3, 12.4)', () => {
+  it('Claim control is disabled below 5/5, and enabled with Cyber Five Ready wording at 5/5 (Req 12.3, 12.4)', () => { // not-a-ticket-dimension
     const game = createSeedGame()
     const { player, ticket } = buildJoined(game)
     const allTermIds = ticket.rows.flat().map((c) => c.termId)
 
-    // Below eligibility (4/5): Claim disabled, no ready text.
+    // Below eligibility (4/5): Claim disabled, no ready text. // not-a-ticket-dimension
     const marks4 = allTermIds.slice(0, 4).map((id) => buildMark(player, ticket, id))
     const revealedGame: Game = {
       ...game,
@@ -546,7 +543,7 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
     unmount()
     window.localStorage.clear()
 
-    // At eligibility (5/5): Claim enabled and labeled "Claim Cyber Five".
+    // At eligibility (5/5): Claim enabled and labeled "Claim Cyber Five". // not-a-ticket-dimension
     const marks5 = allTermIds.slice(0, 5).map((id) => buildMark(player, ticket, id))
     seedSession({
       game: revealedGame,
@@ -578,7 +575,7 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
     const game = createSeedGame()
     const { player, ticket } = buildJoined(game)
     const allTermIds = ticket.rows.flat().map((c) => c.termId)
-    // Cyber Five at 5/5 -> ELIGIBLE.
+    // Cyber Five at 5/5 -> ELIGIBLE. // not-a-ticket-dimension
     const marks5 = allTermIds.slice(0, 5).map((id) => buildMark(player, ticket, id))
     const revealedGame: Game = {
       ...game,
@@ -618,7 +615,7 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
     const { player, ticket } = buildJoined(game)
     const allTermIds = ticket.rows.flat().map((c) => c.termId)
     // Mark exactly one cell per row plus a couple extra spread across rows,
-    // so Cyber Five (any 5 marks) reaches 5/5 while no single Line_Prize row
+    // so Cyber Five (any 5 marks) reaches 5/5 while no single Line_Prize row // not-a-ticket-dimension
     // (which needs all 5 of its own row's cells) or Full House (needs all
     // 15) reaches its own target.
     const marks5 = [
@@ -670,8 +667,8 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
     })
 
     // Each NOT_ELIGIBLE block shows its own real progress text.
-    expect(claimBlockFor('Firewall Line')).toHaveTextContent('Progress: 2/5')
-    expect(claimBlockFor('Cyber Full House')).toHaveTextContent('Progress: 5/15')
+    expect(claimBlockFor('Firewall Line')).toHaveTextContent('Progress: 2/4')
+    expect(claimBlockFor('Cyber Full House')).toHaveTextContent('Progress: 5/12')
   })
 
   it('after a host confirms, that prize block shows the Winner Confirmed celebration without covering the ticket or other prize blocks (Req 12.6, 13.1, 13.2, 13.3)', () => {
@@ -703,7 +700,7 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
     // The ticket and the other prize blocks are still fully present, not
     // covered by any overlay.
     expect(screen.getByText('Your Cyber Word Ticket')).toBeInTheDocument()
-    expect(screen.getAllByRole('gridcell')).toHaveLength(15)
+    expect(screen.getAllByRole('gridcell')).toHaveLength(12)
     expect(claimBlockFor('Firewall Line')).toBeInTheDocument()
     expect(claimBlockFor('Security Line')).toBeInTheDocument()
     expect(claimBlockFor('Data Defender Line')).toBeInTheDocument()
@@ -714,8 +711,8 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
     const game = createSeedGame()
     const { player, ticket } = buildJoined(game)
     const allTermIds = ticket.rows.flat().map((c) => c.termId)
-    // 4/5 marked for Cyber Five — an own claim was already rejected by the
-    // system as INVALID (e.g. submitted before reaching 5/5).
+    // 4/5 marked for Cyber Five — an own claim was already rejected by the // not-a-ticket-dimension
+    // system as INVALID (e.g. submitted before reaching 5/5). // not-a-ticket-dimension
     const marks4 = allTermIds.slice(0, 4).map((id) => buildMark(player, ticket, id))
     const revealedGame: Game = {
       ...game,
@@ -739,7 +736,7 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
     renderPlayerGame()
 
     expect(
-      screen.getByText('Claim could not be validated. Your current progress is 4/5.'),
+      screen.getByText('Claim could not be validated. Your current progress is 4/5.'), // not-a-ticket-dimension
     ).toBeInTheDocument()
     expect(
       screen.queryByText(/^(error|something went wrong)/i),
@@ -799,7 +796,7 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
     await user.click(cellButton)
 
     // Firewall Line progress increased for the remaining open prize.
-    expect(claimBlockFor('Firewall Line')).toHaveTextContent(/Progress: [1-9]\/5/)
+    expect(claimBlockFor('Firewall Line')).toHaveTextContent(/Progress: [1-9]\/4/)
 
     // The confirmed prize's own status remains unaffected.
     expect(claimBlockFor('Cyber Five')).toHaveTextContent('WINNER')
@@ -913,7 +910,7 @@ describe('PlayerGame survives Host lifecycle dispatches without redirecting (bug
       const cellButton = screen.getByRole('button', {
         name: new RegExp(`^${label}\\.`),
       })
-      expect(cellButton).toHaveAttribute('aria-label', expect.stringMatching(/Available/))
+      expect(cellButton).toHaveAttribute('aria-pressed', 'false')
 
       await user.click(cellButton)
 
