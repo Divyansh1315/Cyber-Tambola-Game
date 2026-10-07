@@ -49,7 +49,9 @@ import {
   submitClaim as rpcSubmitClaim,
   confirmClaim as rpcConfirmClaim,
   rejectClaim as rpcRejectClaim,
+  type ChannelStatus,
   type GetOrCreateGameResult,
+  type RemoteChange,
 } from './realtimeClient'
 import {
   mapRowToClaim,
@@ -100,6 +102,37 @@ function writeHostSecret(secret: string): void {
 export type RemoteSyncStatus = 'not-configured' | 'syncing' | 'synced' | 'error'
 
 /**
+ * Status of the live Realtime channel(s) for the currently-active game (E6
+ * — Realtime connection recovery), distinct from `RemoteSyncStatus` (which
+ * only describes the ONE-TIME initial fetch-and-subscribe round trip).
+ * This status instead tracks the ONGOING health of the per-game and
+ * active-game-pointer channels for the lifetime of the provider:
+ *
+ * - `not-configured`: Supabase is not configured (Local Fallback). No
+ *   channel exists, so there is nothing to reconnect — this is permanent
+ *   for the life of the provider in this mode, never transitions away.
+ * - `connecting`: the initial subscribe attempt for the current game is in
+ *   flight; no channel has reported `SUBSCRIBED` yet.
+ * - `connected`: at least one channel most recently reported `SUBSCRIBED`.
+ * - `reconnecting`: a channel reported `CHANNEL_ERROR`/`TIMED_OUT` (or the
+ *   browser went offline) and a bounded-backoff reconnect attempt is
+ *   scheduled or in flight.
+ * - `offline`: the browser's own `navigator.onLine`/`offline` event fired;
+ *   distinct from `reconnecting` only for the banner's wording — the
+ *   retry/backoff behavior is identical once connectivity returns.
+ * - `failed`: every bounded retry attempt was exhausted with no successful
+ *   `SUBSCRIBED`. Requires an explicit manual Retry action (never an
+ *   infinite automatic loop) to attempt again.
+ */
+export type RealtimeConnectionStatus =
+  | 'not-configured'
+  | 'connecting'
+  | 'connected'
+  | 'reconnecting'
+  | 'offline'
+  | 'failed'
+
+/**
  * Why `getActivePlayerSession()` considered a session inconsistent (design.md
  * Fix Implementation point 2; bugfix.md's `isBugCondition`). Each value is
  * independently attributable to one failing check, in resolution order:
@@ -140,6 +173,27 @@ export interface GameSessionContextValue {
    */
   remoteSyncStatus: RemoteSyncStatus
   /**
+   * Ongoing health of the live per-game/active-game-pointer Realtime
+   * channel(s) (E6 — Realtime connection recovery). See
+   * `RealtimeConnectionStatus`'s doc comment for each value's meaning.
+   * Screens may show a small, non-blocking "Connection lost. Reconnecting…"
+   * banner while this is `'reconnecting'`/`'offline'`, and a manual Retry
+   * affordance (via `retryRealtimeConnection`) while it is `'failed'`. This
+   * NEVER clears `currentPlayerId`, never redirects a valid player, and
+   * never blocks rendering of already-known state — it is purely an
+   * additional, non-blocking signal layered on top of the existing
+   * `remoteSyncStatus`/`state` rendering path.
+   */
+  realtimeConnectionStatus: RealtimeConnectionStatus
+  /**
+   * Manually retries the Realtime connection after bounded retries have
+   * been exhausted (`realtimeConnectionStatus === 'failed'`). Re-resolves
+   * the Active_Game and re-subscribes exactly as the mount effect does,
+   * without discarding any existing player/session/game state. A no-op
+   * when Supabase is not configured.
+   */
+  retryRealtimeConnection: () => void
+  /**
    * Dispatches the given optimistic action immediately (unchanged local
    * validation/behavior), then — when Supabase is configured — calls the
    * matching RPC and, on rejection, dispatches `ROLLBACK_OPTIMISTIC` for the
@@ -149,7 +203,15 @@ export interface GameSessionContextValue {
    * host-only or player-mutating action. When Supabase is not configured,
    * this is equivalent to the raw dispatch (no RPC call attempted).
    */
-  dispatch: (action: GameSessionAction) => void
+  /**
+   * Returns a Promise that always RESOLVES once the matching RPC (if any)
+   * has settled, whether it succeeded or failed (G1/G6: lets a caller
+   * build a real promise-based in-flight lock around a dispatched action).
+   * Existing rollback-on-reject handling is unchanged and remains the sole
+   * error-handling path for a failed RPC — this promise never rejects, so
+   * every existing call site that ignores the return value is unaffected.
+   */
+  dispatch: (action: GameSessionAction) => Promise<void>
   /**
    * Join a game from any device. When Supabase is configured, resolves via
    * the `join_game` RPC (authoritative game-code-exists / duplicate-
@@ -553,6 +615,13 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
     new Set(),
   )
 
+  // Ongoing health of the live per-game/active-game-pointer Realtime
+  // channel(s) (E6) — see RealtimeConnectionStatus's doc comment. Starts
+  // 'not-configured'; the mount effect below flips it to 'connecting' the
+  // instant it finds a configured Supabase client.
+  const [realtimeConnectionStatus, setRealtimeConnectionStatus] =
+    useState<RealtimeConnectionStatus>('not-configured')
+
   // This device's Host secret, once obtained. Never exposed via context
   // value.
   const hostSecretRef = useRef<string | undefined>(readHostSecret())
@@ -603,12 +672,171 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
   // null. When Supabase is NOT configured, this effect is a no-op and the
   // app stays on the local/seed fallback (Req 17.2) established by
   // initState above.
+  // Manual retry trigger (E6): bumping this number re-runs the mount effect
+  // below from scratch, exactly as if the provider had just mounted, without
+  // discarding any existing player/session/game state (the effect's own
+  // hydrateForGame/resolveInitialGame logic already preserves state — it
+  // only replaces `game`/`players`/etc. via HYDRATE_FROM_REMOTE once a fresh
+  // snapshot actually arrives). Used only when realtimeConnectionStatus has
+  // reached 'failed' and the user clicks the banner's Retry action.
+  const [manualRetryNonce, setManualRetryNonce] = useState(0)
+
   useEffect(() => {
     const supabase = getSupabaseClient()
     if (!supabase) return // dev fallback: no Supabase configured, stay local
 
+    setRealtimeConnectionStatus('connecting')
+
     let gameChannel: RealtimeChannel | null = null
+    let pointerChannel: RealtimeChannel | null = null
     let cancelled = false
+
+    // --- E6: bounded-exponential-backoff reconnect machinery -------------
+    // One reconnect timer at a time (Req: "prevent multiple simultaneous
+    // reconnect timers"), tracked locally to this effect run so a stale
+    // timer from a torn-down effect instance can never fire after cleanup.
+    let reconnectTimer: ReturnType<typeof setTimeout> | undefined
+    let reconnectAttempt = 0
+    // Set by cleanup/game-change/reset so an async channel-status callback
+    // that fires AFTER this effect instance has already been torn down
+    // never schedules a reconnect for a channel this instance no longer
+    // owns (Req: "do not reconnect when a channel was deliberately closed
+    // because of unmount, game change or reset").
+    let intentionallyClosed = false
+
+    const MAX_RECONNECT_ATTEMPTS = 6
+    const BASE_RECONNECT_DELAY_MS = 1000
+    const MAX_RECONNECT_DELAY_MS = 30000
+
+    function clearReconnectTimer() {
+      if (reconnectTimer !== undefined) {
+        clearTimeout(reconnectTimer)
+        reconnectTimer = undefined
+      }
+    }
+
+    /**
+     * Re-resolves the Active_Game and re-subscribes exactly like the
+     * initial mount path, WITHOUT touching currentPlayerId or any already-
+     * known player/game state — HYDRATE_FROM_REMOTE below only replaces
+     * state once a fresh snapshot actually arrives, so a transient failure
+     * never clears a valid session or forces a redirect. After a successful
+     * reconnect this always re-fetches full state (not just resubscribes),
+     * so any Realtime events missed while disconnected are recovered.
+     */
+    async function reconcileAfterReconnect() {
+      try {
+        const activeGame = await getActiveGame()
+        if (cancelled || intentionallyClosed) return
+        if (activeGame) {
+          await hydrateForGame(activeGame)
+        }
+        // No Active_Game found during a reconnect reconciliation is left
+        // alone deliberately: NO_ACTIVE_GAME is only dispatched by the
+        // initial-resolve/pointer-follow paths below, never synthesized
+        // here, since a reconnect's job is to recover missed events for
+        // the game already known locally, not to re-decide "is there a
+        // game at all."
+      } catch {
+        // Swallow — the channel-status-driven scheduleReconnect loop below
+        // is what decides whether/when to try again, not this one-shot
+        // reconciliation fetch.
+      }
+    }
+
+    function scheduleReconnect(reason: 'error' | 'offline') {
+      if (cancelled || intentionallyClosed) return
+      clearReconnectTimer() // never more than one timer in flight
+      if (reconnectAttempt >= MAX_RECONNECT_ATTEMPTS) {
+        setRealtimeConnectionStatus('failed')
+        return
+      }
+      setRealtimeConnectionStatus(reason === 'offline' ? 'offline' : 'reconnecting')
+      const delay = Math.min(
+        BASE_RECONNECT_DELAY_MS * 2 ** reconnectAttempt,
+        MAX_RECONNECT_DELAY_MS,
+      )
+      reconnectAttempt += 1
+      reconnectTimer = setTimeout(() => {
+        if (cancelled || intentionallyClosed) return
+        void reconnectNow()
+      }, delay)
+    }
+
+    async function reconnectNow() {
+      if (cancelled || intentionallyClosed) return
+      // Respect browser offline state where practical: don't burn a retry
+      // attempt while the browser itself reports no connectivity at all —
+      // the 'online' listener registered below schedules an immediate
+      // attempt once connectivity actually returns instead.
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        setRealtimeConnectionStatus('offline')
+        return
+      }
+      const gameId = gameIdRef.current
+      if (gameId === undefined) {
+        // No game currently tracked (e.g. NO_ACTIVE_GAME) — nothing to
+        // resubscribe to yet; the pointer channel's own status callback
+        // governs reconnect in this case.
+        return
+      }
+      // reconcileAfterReconnect() re-resolves the Active_Game and — via
+      // hydrateForGame — performs the ENTIRE unsubscribe-old/subscribe-new
+      // sequence itself (Req 6.2/6.3's ordering, unchanged). Deliberately
+      // does NOT also resubscribe here first: doing so would create a
+      // short-lived extra channel that hydrateForGame's own
+      // intentionallyClosed-guarded unsubscribe would immediately replace
+      // again — i.e. two channel creations for one reconnect instead of
+      // one. hydrateForGame's own subscribeToGame call already passes
+      // makeStatusHandler(), so the resulting channel is fully wired for
+      // future reconnects without any separate resubscribe step here.
+      await reconcileAfterReconnect()
+    }
+
+    function makeStatusHandler() {
+      return (status: ChannelStatus) => {
+        if (cancelled || intentionallyClosed) return
+        if (status === 'SUBSCRIBED') {
+          // Reset the retry counter after any successful subscription.
+          reconnectAttempt = 0
+          clearReconnectTimer()
+          setRealtimeConnectionStatus('connected')
+          return
+        }
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          scheduleReconnect('error')
+          return
+        }
+        // CLOSED: supabase-js reports this both for a deliberate
+        // `.unsubscribe()` (which this module always performs before
+        // establishing a replacement channel — see the unsubscribe-before-
+        // subscribe calls throughout this effect) and, in principle, for an
+        // unexpected server-initiated close. `intentionallyClosed` is set
+        // synchronously by every deliberate-teardown path in this effect
+        // (cleanup, game-change, reset) BEFORE calling `.unsubscribe()`, so
+        // this branch only ever schedules a reconnect for a genuinely
+        // unexpected close, never for an intentional one.
+      }
+    }
+
+    function makeGameChangeHandler(forGameId: string) {
+      return (change: RemoteChange) => {
+        // presenter-realtime-winner-sync fix (Req 2.8), preserved exactly:
+        // compare against gameIdRef.current (the id THIS subscription was
+        // opened for), never state.game.id.
+        const incomingGameId = (change.row as Record<string, unknown>).game_id as
+          | string
+          | undefined
+        if (incomingGameId !== undefined && incomingGameId !== gameIdRef.current) {
+          return // stale cross-game event -- drop it
+        }
+        if (forGameId !== gameIdRef.current) {
+          return // event from a channel for a game id we've since moved on from
+        }
+        dispatch({ type: 'SYNC_REMOTE', change })
+      }
+    }
+    // --- end E6 reconnect machinery ---------------------------------------
 
     async function hydrateForGame(gameRow: GetOrCreateGameResult) {
       gameIdRef.current = gameRow.id
@@ -631,29 +859,20 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       // establishing the new one. Unsubscribing first (rather than after)
       // means a stale event from the old game_id can never be delivered
       // once this function returns (Req 6.3) — there is a brief window with
-      // zero subscriptions, never a window with two.
+      // zero subscriptions, never a window with two. This is a deliberate
+      // close (new game identity), so the status handler must not treat the
+      // resulting CLOSED as something to reconnect.
+      intentionallyClosed = true
       gameChannel?.unsubscribe()
-      gameChannel = subscribeToGame(gameRow.id, (change) => {
-        // presenter-realtime-winner-sync fix (Req 2.8): a real Supabase
-        // Realtime channel's unsubscribe() is an async teardown over the
-        // websocket, not a synchronous guarantee against already-in-flight
-        // server-pushed events for the just-unsubscribed old channel. Guard
-        // against applying a stale event from a torn-down old game's channel
-        // to this (newer) game's state. gameIdRef.current is compared, not
-        // state.game.id, because this callback is registered once per
-        // hydrateForGame call and must always compare against the game id
-        // THIS specific subscription was opened for, which gameIdRef.current
-        // already correctly tracks (set synchronously above, before this
-        // channel is even subscribed) -- not whatever state.game.id happens
-        // to be by the time an event is actually received.
-        const incomingGameId = (change.row as Record<string, unknown>).game_id as
-          | string
-          | undefined
-        if (incomingGameId !== undefined && incomingGameId !== gameIdRef.current) {
-          return // stale cross-game event -- drop it
-        }
-        dispatch({ type: 'SYNC_REMOTE', change })
-      })
+      intentionallyClosed = false
+      reconnectAttempt = 0
+      clearReconnectTimer()
+      setRealtimeConnectionStatus('connecting')
+      gameChannel = subscribeToGame(
+        gameRow.id,
+        makeGameChangeHandler(gameRow.id),
+        makeStatusHandler(),
+      )
     }
 
     setRemoteSyncStatus('syncing')
@@ -699,11 +918,13 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
 
     // Req 4.4, 6.1: keep listening for pointer changes for the lifetime of
     // this provider, whether or not an Active_Game is currently held.
-    const pointerChannel = subscribeToActiveGamePointer((newActiveGameId) => {
+    pointerChannel = subscribeToActiveGamePointer((newActiveGameId) => {
       if (cancelled) return
       if (newActiveGameId === gameIdRef.current) return // no-op: same game re-announced
       if (newActiveGameId === null) {
+        intentionallyClosed = true
         gameChannel?.unsubscribe()
+        intentionallyClosed = false
         gameChannel = null
         gameIdRef.current = undefined
         setHasActiveGame(false)
@@ -726,13 +947,39 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
         })
     })
 
+    // Respect browser offline/online state where practical (Req). A
+    // deliberate, bounded reaction — not a replacement for the channel
+    // status callbacks above, which remain the primary signal.
+    function handleOffline() {
+      if (cancelled) return
+      setRealtimeConnectionStatus('offline')
+    }
+    function handleOnline() {
+      if (cancelled || intentionallyClosed) return
+      // Connectivity returned — attempt an immediate reconnect rather than
+      // waiting out whatever backoff delay was already scheduled.
+      clearReconnectTimer()
+      reconnectAttempt = 0
+      void reconnectNow()
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('offline', handleOffline)
+      window.addEventListener('online', handleOnline)
+    }
+
     return () => {
       cancelled = true
+      intentionallyClosed = true
+      clearReconnectTimer()
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('offline', handleOffline)
+        window.removeEventListener('online', handleOnline)
+      }
       gameChannel?.unsubscribe()
       pointerChannel?.unsubscribe()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on mount
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs on mount + manual retry
+  }, [manualRetryNonce])
 
   // Persist the SHARED session envelope so a refresh resumes the game (Req
   // 16.1, 16.2, 17.3) AND broadcast it to other tabs for live sync. When the
@@ -875,7 +1122,27 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
      * there is no server to diverge from — so the optimistic dispatch
      * still runs for every action, including these two, exactly as before.
      */
-    function wrappedDispatch(action: GameSessionAction) {
+    /**
+     * Returns a Promise that ALWAYS RESOLVES once the matching RPC call
+     * (if any) for this action has settled, whether that RPC succeeded or
+     * failed (G1/G6: the smallest compatible addition needed to let a
+     * caller build a real promise-based in-flight lock, e.g. disabling the
+     * Host's Reveal/Confirm/Reject buttons for exactly the RPC's actual
+     * duration instead of a fixed timer — such a caller only needs to know
+     * WHEN to re-enable its button, not whether the RPC succeeded). The
+     * existing `.catch(rollback)` (and, for SUBMIT_PRIZE_CLAIM, the
+     * `.then`-based RECONCILE_CLAIM_ID wiring) attached to the underlying
+     * RPC promise below is completely unchanged and remains the sole
+     * error-handling path — this returned promise is a SEPARATE, additional
+     * consumer of that same promise, never a replacement for it. Every
+     * existing call site that ignores the return value (the overwhelming
+     * majority of this codebase's `dispatch(...)` calls) is completely
+     * unaffected — this is a widening of `void` to `Promise<void>`, not a
+     * behavior change to the optimistic-dispatch/rollback/reconcile
+     * pipeline itself. For actions with no RPC (e.g. Local Fallback, or an
+     * action type with no case below) this resolves immediately.
+     */
+    function wrappedDispatch(action: GameSessionAction): Promise<void> {
       const before = stateRef.current
       const supabase = getSupabaseClient()
 
@@ -893,7 +1160,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
         // or applied to React state itself; `dispatch(action)` above
         // remains the one and only real state update.
         stateRef.current = gameSessionReducer(before, action)
-        return
+        return Promise.resolve()
       }
 
       const gameId = gameIdRef.current
@@ -946,6 +1213,15 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
         }
       }
 
+      // Captures the in-flight RPC promise (if any) for the action below,
+      // so wrappedDispatch can return a Promise<void> that settles with it
+      // (G1/G6) — existing `.catch(rollback)` behavior on each RPC call is
+      // completely unchanged; this only ADDS a second `.then`/`.catch`
+      // observer onto the SAME promise (promises support multiple
+      // independent consumers natively), never replacing or racing the
+      // original rollback wiring.
+      let pending: Promise<unknown> | undefined
+
       switch (action.type) {
         case 'START_GAME':
           // Starting the game and calling the first word are the same
@@ -957,11 +1233,14 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
           // realtime echo of the resulting games row is what actually
           // reveals the first term for every device, Host included.
           if (gameId && hostSecret) {
-            rpcCallNextWord(
+            pending = rpcCallNextWord(
               gameId,
               hostSecret,
               cyberTerms.filter((t) => t.active).map((t) => t.id),
-            ).catch(rollback)
+            ).catch((err) => {
+              rollback()
+              throw err
+            })
           }
           break
         case 'CALL_NEXT_WORD':
@@ -971,21 +1250,39 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
           // of truth for the next term, avoiding a second, independently-
           // random local guess that would only ever be overwritten.
           if (gameId && hostSecret) {
-            rpcCallNextWord(
+            pending = rpcCallNextWord(
               gameId,
               hostSecret,
               cyberTerms.filter((t) => t.active).map((t) => t.id),
-            ).catch(rollback)
+            ).catch((err) => {
+              rollback()
+              throw err
+            })
           }
           break
         case 'PAUSE_GAME':
-          if (gameId && hostSecret) rpcPauseGame(gameId, hostSecret).catch(rollback)
+          if (gameId && hostSecret) {
+            pending = rpcPauseGame(gameId, hostSecret).catch((err) => {
+              rollback()
+              throw err
+            })
+          }
           break
         case 'RESUME_GAME':
-          if (gameId && hostSecret) rpcResumeGame(gameId, hostSecret).catch(rollback)
+          if (gameId && hostSecret) {
+            pending = rpcResumeGame(gameId, hostSecret).catch((err) => {
+              rollback()
+              throw err
+            })
+          }
           break
         case 'END_GAME':
-          if (gameId && hostSecret) rpcEndGame(gameId, hostSecret).catch(rollback)
+          if (gameId && hostSecret) {
+            pending = rpcEndGame(gameId, hostSecret).catch((err) => {
+              rollback()
+              throw err
+            })
+          }
           break
         case 'RESET_GAME':
           // Reset now creates a brand-new game and repoints the server-side
@@ -998,11 +1295,21 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
           // pointer event's HYDRATE_FROM_REMOTE is what ultimately reconciles
           // it against the real new game (Req 9.3 covers Local Fallback,
           // where no Supabase client exists and this branch is never taken).
-          if (gameId && hostSecret) rpcResetGameToNew(gameId, hostSecret).catch(rollback)
+          if (gameId && hostSecret) {
+            pending = rpcResetGameToNew(gameId, hostSecret).catch((err) => {
+              rollback()
+              throw err
+            })
+          }
           break
         case 'MARK_TERM': {
           const player = before.players.find((p) => p.id === before.currentPlayerId)
-          if (player) rpcSubmitMark(player.id, action.termId).catch(rollback)
+          if (player) {
+            pending = rpcSubmitMark(player.id, action.termId).catch((err) => {
+              rollback()
+              throw err
+            })
+          }
           break
         }
         case 'SUBMIT_PRIZE_CLAIM': {
@@ -1073,7 +1380,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
             break
           }
           // Consistent session: proceed exactly as today — unchanged.
-          rpcSubmitClaim(action.playerId, action.prizeId)
+          pending = rpcSubmitClaim(action.playerId, action.prizeId)
             .then((row) => {
               dispatch({
                 type: 'RECONCILE_CLAIM_ID',
@@ -1082,23 +1389,59 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
               })
               clearSubmitting()
             })
-            .catch(() => {
+            .catch((err) => {
               rollback()
               clearSubmitting()
+              throw err
             })
           break
         }
         case 'CONFIRM_CLAIM':
-          if (hostSecret) rpcConfirmClaim(action.claimId, hostSecret).catch(rollback)
+          if (hostSecret) {
+            pending = rpcConfirmClaim(action.claimId, hostSecret).catch((err) => {
+              rollback()
+              throw err
+            })
+          }
           break
         case 'REJECT_CLAIM':
           if (hostSecret) {
-            rpcRejectClaim(action.claimId, hostSecret, action.rejectionReason).catch(rollback)
+            pending = rpcRejectClaim(action.claimId, hostSecret, action.rejectionReason).catch(
+              (err) => {
+                rollback()
+                throw err
+              },
+            )
           }
           break
         default:
           break
       }
+
+      if (!pending) return Promise.resolve()
+      // G1/G6: expose RPC completion as a Promise<void>, WITHOUT altering
+      // `pending`'s own already-attached rollback/reconcile continuation
+      // above in any way — this is a second, independent `.then`/`.catch`
+      // consumer of the same `pending` promise (promises support
+      // arbitrarily many independent consumers natively).
+      //
+      // Deliberately always RESOLVES, never rejects, regardless of
+      // `pending`'s own outcome: a caller building an in-flight lock (G1's
+      // Reveal button, G6's Confirm/Reject buttons) only needs to know the
+      // RPC SETTLED, not whether it succeeded — the existing
+      // `.catch(rollback)` chain already attached to `pending` above
+      // remains the sole error-handling path, unchanged. Every existing
+      // call site throughout this codebase that calls `dispatch(action)`
+      // and ignores the return value (the overwhelming majority, none of
+      // which await or attach a `.catch`) must see zero behavior change —
+      // including never producing an "unhandled promise rejection" from
+      // this returned promise, which a rejecting version would risk the
+      // instant any such call site's underlying RPC failed in a test or in
+      // production.
+      return pending.then(
+        () => undefined,
+        () => undefined,
+      )
     }
 
     /**
@@ -1161,6 +1504,8 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
     return {
       state,
       remoteSyncStatus,
+      realtimeConnectionStatus,
+      retryRealtimeConnection: () => setManualRetryNonce((n) => n + 1),
       dispatch: wrappedDispatch,
       joinGame,
       currentTerm,
@@ -1181,6 +1526,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
   }, [
     state,
     remoteSyncStatus,
+    realtimeConnectionStatus,
     hasActiveGame,
     isBackendConfirmed,
     lastSessionGuardFailure,

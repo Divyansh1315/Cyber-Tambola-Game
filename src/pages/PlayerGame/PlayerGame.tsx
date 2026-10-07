@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { Button } from '../../components/common/Button'
 import { Card } from '../../components/common/Card'
+import { ConnectionStatusBanner } from '../../components/common/ConnectionStatusBanner'
 import { CyberWordCard } from '../../components/common/CyberWordCard'
 import { StatusBadge } from '../../components/common/StatusBadge'
 import { PrizeProgressList } from '../../components/player/PrizeProgressList'
@@ -119,6 +120,8 @@ export function PlayerGame() {
   const {
     state,
     remoteSyncStatus,
+    realtimeConnectionStatus,
+    retryRealtimeConnection,
     currentTerm,
     currentPlayer,
     currentTicket,
@@ -296,6 +299,17 @@ export function PlayerGame() {
             Existing game session restored.
           </p>
         )}
+
+        {/* E6: small, non-blocking ongoing-connection banner. Distinct from
+            the remoteSyncStatus error notice below (which covers only the
+            one-time initial fetch) -- this covers the live channel's health
+            for the rest of the session. Never clears currentPlayerId, never
+            redirects, and the normal connected experience below renders
+            completely unchanged while this is a no-op. */}
+        <ConnectionStatusBanner
+          status={realtimeConnectionStatus}
+          onRetry={retryRealtimeConnection}
+        />
 
         {/* Connection issue: the initial sync against the server failed
             after every retry. Rendering the game screen as-is here could

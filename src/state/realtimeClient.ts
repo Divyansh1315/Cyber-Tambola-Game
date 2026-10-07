@@ -52,9 +52,19 @@ export interface RemoteChange {
  * `games` itself is filtered by its own `id` column, not a `game_id` foreign
  * key (it *is* the game); every other table is filtered by `game_id`.
  */
+/**
+ * Channel connection status, as reported by supabase-js's `.subscribe()`
+ * callback (E6 — Realtime connection recovery). A small, explicit union
+ * rather than the full `REALTIME_SUBSCRIBE_STATES` enum, since these are
+ * the only four values `GameSessionContext.tsx`'s reconnect logic branches
+ * on.
+ */
+export type ChannelStatus = 'SUBSCRIBED' | 'CHANNEL_ERROR' | 'TIMED_OUT' | 'CLOSED'
+
 export function subscribeToGame(
   gameId: string,
   onChange: (change: RemoteChange) => void,
+  onStatusChange?: (status: ChannelStatus, err?: Error) => void,
 ): RealtimeChannel | null {
   const supabase = getSupabaseClient()
   if (!supabase) return null
@@ -85,14 +95,15 @@ export function subscribeToGame(
   }
 
   channel.subscribe((status, err) => {
-    // No callback was previously passed to .subscribe(), so a failed
-    // subscription (CHANNEL_ERROR, TIMED_OUT, or the socket simply never
-    // reaching SUBSCRIBED -- e.g. a mobile network/proxy blocking the
-    // underlying WebSocket handshake even though plain HTTPS RPC calls
-    // work fine) was completely invisible: no console output, no visible
-    // error, and the affected device would never receive ANY live update
-    // again.
+    // Always log (unchanged from before E6) -- a failed subscription
+    // (CHANNEL_ERROR, TIMED_OUT, or the socket simply never reaching
+    // SUBSCRIBED -- e.g. a mobile network/proxy blocking the underlying
+    // WebSocket handshake even though plain HTTPS RPC calls work fine) must
+    // never be silent. `onStatusChange`, when provided, additionally lets
+    // the caller (GameSessionContext.tsx) drive a bounded reconnect — see
+    // that module's `realtimeConnectionStatus` state machine.
     console.info(`[realtime] game:${gameId} channel status: ${status}`, err ?? '')
+    onStatusChange?.(status as ChannelStatus, err)
   })
   return channel
 }
@@ -356,6 +367,7 @@ export function resetGameToNew(
  */
 export function subscribeToActiveGamePointer(
   onChange: (activeGameId: string | null) => void,
+  onStatusChange?: (status: ChannelStatus, err?: Error) => void,
 ): RealtimeChannel | null {
   const supabase = getSupabaseClient()
   if (!supabase) return null
@@ -368,6 +380,7 @@ export function subscribeToActiveGamePointer(
   )
   channel.subscribe((status, err) => {
     console.info(`[realtime] active-game-pointer channel status: ${status}`, err ?? '')
+    onStatusChange?.(status as ChannelStatus, err)
   })
   return channel
 }

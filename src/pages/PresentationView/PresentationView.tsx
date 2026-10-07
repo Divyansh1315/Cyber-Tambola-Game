@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ConnectionStatusBanner } from '../../components/common/ConnectionStatusBanner'
 import { JoinQrCode } from '../../components/common/JoinQrCode'
 import { useGameSession } from '../../state/GameSessionContext'
 import type { GameSessionState } from '../../state/gameSessionInitialState'
@@ -202,7 +203,8 @@ function computeQrSize(viewportHeight: number): number {
  * Employee IDs or other sensitive information.
  */
 export function PresentationView() {
-  const { state, currentTerm } = useGameSession()
+  const { state, currentTerm, realtimeConnectionStatus, retryRealtimeConnection } =
+    useGameSession()
   const { game } = state
   const qrSize = useProjectorQrSize()
 
@@ -323,6 +325,18 @@ export function PresentationView() {
 
   return (
     <div className="page page--dark projector">
+      {/* E6: small, non-blocking overlay banner, positioned so it never
+          disturbs the existing stage layout below it. No-op while
+          connected/connecting/not-configured. The Presenter has no
+          self-dismiss affordance by design (presenter-realtime-winner-sync),
+          so the Retry button here only ever appears for the operator-facing
+          'failed' state, not as a dismiss mechanism for game content. */}
+      <div className="projector__connection-banner">
+        <ConnectionStatusBanner
+          status={realtimeConnectionStatus}
+          onRetry={retryRealtimeConnection}
+        />
+      </div>
       <div className="projector__stage">{renderStage()}</div>
     </div>
   )

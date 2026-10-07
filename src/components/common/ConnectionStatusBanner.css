@@ -1,0 +1,32 @@
+/* Small, non-blocking Realtime connection status banner (E6). Mirrors the
+   existing PlayerGame.css `.player__notice`/`.player__notice--error` sizing
+   conventions so it reads as part of the same visual language, without
+   introducing a new design pattern. */
+.connection-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.connection-banner__text {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.connection-banner--reconnecting {
+  border-color: var(--color-warning, #f0b429);
+  background: var(--color-warning-soft, #fff3cd);
+}
+
+.connection-banner--failed {
+  border-color: var(--color-danger-strong);
+  background: rgba(214, 69, 69, 0.08);
+}
+
+.connection-banner--failed .connection-banner__text {
+  color: var(--color-danger-strong);
+}

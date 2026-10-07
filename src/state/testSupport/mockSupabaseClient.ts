@@ -56,10 +56,23 @@ interface PostgresChangesFilter {
 
 type PostgresChangesCallback = (payload: MockPostgresChangesPayload) => void
 
+/**
+ * Mirrors supabase-js's `REALTIME_SUBSCRIBE_STATES` values actually used by
+ * `realtimeClient.ts`'s status callback (E6 — Realtime connection recovery).
+ */
+export type MockChannelStatus = 'SUBSCRIBED' | 'CHANNEL_ERROR' | 'TIMED_OUT' | 'CLOSED'
+
+type ChannelStatusCallback = (status: MockChannelStatus, err?: Error) => void
+
 interface RegisteredListener {
   channelName: string
   filter: PostgresChangesFilter
   callback: PostgresChangesCallback
+}
+
+interface RegisteredStatusCallback {
+  channelName: string
+  callback: ChannelStatusCallback
 }
 
 /** One recorded `.rpc(name, args)` invocation, in call order. */
@@ -74,14 +87,21 @@ export interface RpcOutcome<T = unknown> {
   error?: { message: string; code?: string } | null
 }
 
-/** Minimal fake of supabase-js's `RealtimeChannel`. */
+/**
+ * Minimal fake of supabase-js's `RealtimeChannel`. `subscribe()` optionally
+ * accepts a status callback — matching the real `RealtimeChannel.subscribe
+ * (callback?: (status, err?) => void)` signature — so E6 (Realtime
+ * connection recovery) tests can drive `CHANNEL_ERROR`/`TIMED_OUT`/
+ * `CLOSED`/`SUBSCRIBED` transitions via `fireChannelStatus` below. Existing
+ * callers that invoke `subscribe()` with no argument are unaffected.
+ */
 export interface MockRealtimeChannel {
   on(
     type: 'postgres_changes',
     filter: PostgresChangesFilter,
     callback: PostgresChangesCallback,
   ): MockRealtimeChannel
-  subscribe(): MockRealtimeChannel
+  subscribe(callback?: ChannelStatusCallback): MockRealtimeChannel
   unsubscribe(): void
 }
 
@@ -141,6 +161,15 @@ export interface MockSupabaseClient {
    */
   fireRemoteChange(change: MockRemoteChange): void
 
+  /**
+   * Manually fire a channel status event (E6) as if the realtime socket had
+   * just reported it: invokes every status callback registered via
+   * `.subscribe(callback)` for the given channel name, in registration
+   * order. A channel that has been `.unsubscribe()`d no longer has any
+   * registered status callback.
+   */
+  fireChannelStatus(channelName: string, status: MockChannelStatus, err?: Error): void
+
   /** All channels created so far via `.channel()`, in creation order. */
   readonly channels: { name: string; channel: MockRealtimeChannel }[]
 }
@@ -154,6 +183,7 @@ export function createMockSupabaseClient(): MockSupabaseClient {
   const rpcCalls: RecordedRpcCall[] = []
   const fromCalls: string[] = []
   const listeners: RegisteredListener[] = []
+  const statusCallbacks: RegisteredStatusCallback[] = []
   const channels: { name: string; channel: MockRealtimeChannel }[] = []
 
   const rpcQueues = new Map<string, RpcOutcome[]>()
@@ -194,12 +224,18 @@ export function createMockSupabaseClient(): MockSupabaseClient {
         }
         return channel
       },
-      subscribe() {
+      subscribe(callback) {
+        if (callback) {
+          statusCallbacks.push({ channelName: name, callback })
+        }
         return channel
       },
       unsubscribe() {
         for (let i = listeners.length - 1; i >= 0; i -= 1) {
           if (listeners[i].channelName === name) listeners.splice(i, 1)
+        }
+        for (let i = statusCallbacks.length - 1; i >= 0; i -= 1) {
+          if (statusCallbacks[i].channelName === name) statusCallbacks.splice(i, 1)
         }
       },
     }
@@ -252,6 +288,14 @@ export function createMockSupabaseClient(): MockSupabaseClient {
       for (const listener of listeners) {
         if (listener.filter.table === change.table) {
           listener.callback(payload)
+        }
+      }
+    },
+
+    fireChannelStatus(channelName, status, err) {
+      for (const registered of statusCallbacks) {
+        if (registered.channelName === channelName) {
+          registered.callback(status, err)
         }
       }
     },

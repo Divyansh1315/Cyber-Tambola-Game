@@ -1,7 +1,8 @@
 import { Button } from '../../components/common/Button'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Card } from '../../components/common/Card'
 import { ClaimStatusTag } from '../../components/common/ClaimStatusTag'
+import { ConnectionStatusBanner } from '../../components/common/ConnectionStatusBanner'
 import { CyberWordCard } from '../../components/common/CyberWordCard'
 import { JoinQrCode } from '../../components/common/JoinQrCode'
 import { StatusBadge } from '../../components/common/StatusBadge'
@@ -141,7 +142,14 @@ function promptForRejectionReason(): string | undefined {
  * Inbox dispatches CONFIRM_CLAIM/REJECT_CLAIM against it (Module 5).
  */
 export function HostDashboard() {
-  const { state, dispatch, currentTerm, revealHistory } = useGameSession()
+  const {
+    state,
+    dispatch,
+    currentTerm,
+    revealHistory,
+    realtimeConnectionStatus,
+    retryRealtimeConnection,
+  } = useGameSession()
   const { game } = state
   const totalRounds = cyberTerms.filter((t) => t.active).length
 
@@ -228,18 +236,41 @@ export function HostDashboard() {
   // random term pick racing the server's own) — so for those two actions
   // this flag is the ONLY thing preventing a double-click from firing a
   // second RPC call during that round trip, not just a backstop.
+  //
+  // G1: this is now a genuine promise-based in-flight lock, not a fixed
+  // 800ms timer. `dispatch` (GameSessionContext.tsx's `wrappedDispatch`)
+  // returns a Promise<void> that settles once the matching RPC call itself
+  // settles (success or failure) — set `true` immediately before
+  // dispatching, cleared in BOTH the `.then` and `.catch` continuations via
+  // `.finally()`, so the lock covers exactly the real RPC's duration, never
+  // more and never less, and can never get stuck set (a rejected RPC's
+  // existing rollback — unchanged, see GameSessionContext.tsx — still
+  // fires; `.finally()` only clears this LOCAL lock, independent of that).
   const [lifecycleActionPending, setLifecycleActionPending] = useState(false)
+  // Synchronous guard, checked AND set before any state update is even
+  // requested. `lifecycleActionPending` (React state) only drives the
+  // button's `disabled`/label rendering; it is NOT itself a reliable
+  // mutual-exclusion primitive here, because two click handlers invoked
+  // synchronously back-to-back in the same tick/batch (e.g. a double-tap
+  // registered as two events before React has re-rendered) would both
+  // read the SAME stale `lifecycleActionPending` value. A ref's value is
+  // visible to every synchronous reader immediately after being set, with
+  // no batching/re-render in between.
+  const lifecycleActionPendingRef = useRef(false)
 
   function dispatchLifecycleAction(action: Parameters<typeof dispatch>[0]) {
-    if (lifecycleActionPending) return
+    if (lifecycleActionPendingRef.current) return
+    lifecycleActionPendingRef.current = true
     setLifecycleActionPending(true)
-    dispatch(action)
-    // The wrapped dispatch's RPC call is fire-and-forget from this
-    // component's perspective (GameSessionContext handles rollback
-    // internally), so there is no promise to await here -- a short cooldown
-    // is enough to absorb an accidental double-click/tap without blocking
-    // deliberate, separate actions taken a moment apart.
-    setTimeout(() => setLifecycleActionPending(false), 800)
+    // dispatch(...) (GameSessionContext.tsx's wrappedDispatch) always
+    // RESOLVES once the matching RPC settles, whether it succeeded or
+    // failed -- GameSessionContext.tsx's own rollback-on-reject handling
+    // (unchanged) is the real error response; this component only needs
+    // to know the RPC settled, to release its local button lock below.
+    void dispatch(action).finally(() => {
+      lifecycleActionPendingRef.current = false
+      setLifecycleActionPending(false)
+    })
   }
 
   const canStart = game.status === 'LOBBY' && !lifecycleActionPending
@@ -248,9 +279,55 @@ export function HostDashboard() {
   const canResume = game.status === 'PAUSED' && !lifecycleActionPending
   const canEnd = game.status !== 'COMPLETED' && !lifecycleActionPending
 
+  // G6: per-claim promise-based lock for Confirm/Reject, independent of
+  // `lifecycleActionPending` above (a different concern — per-row claim
+  // decisions, not whole-game lifecycle actions) and independent PER CLAIM
+  // ID, so acting on one claim never blocks any other claim's buttons. Only
+  // one of Confirm/Reject can be in flight for a given claim at a time
+  // (both read/write the SAME Set entry keyed by claim id), covering the
+  // "Confirm and Reject must not run simultaneously for the same claim"
+  // requirement directly.
+  const [pendingClaimDecisionIds, setPendingClaimDecisionIds] = useState<Set<string>>(new Set())
+  // Synchronous guard mirroring lifecycleActionPendingRef's reasoning above
+  // -- a Set held in a ref, checked AND mutated synchronously before any
+  // state update is requested, so two click handlers invoked back-to-back
+  // in the same tick (Confirm then Reject on the same claim, or two rapid
+  // Confirm clicks) can never both observe "not yet pending" for the same
+  // claim id. `pendingClaimDecisionIds` (React state) only drives rendering.
+  const pendingClaimDecisionIdsRef = useRef<Set<string>>(new Set())
+
+  function isClaimDecisionPending(claimId: string): boolean {
+    return pendingClaimDecisionIds.has(claimId)
+  }
+
+  function dispatchClaimDecision(claimId: string, action: Parameters<typeof dispatch>[0]) {
+    if (pendingClaimDecisionIdsRef.current.has(claimId)) return
+    pendingClaimDecisionIdsRef.current.add(claimId)
+    setPendingClaimDecisionIds((prev) => new Set(prev).add(claimId))
+    // See dispatchLifecycleAction's identical comment above: dispatch(...)
+    // always resolves once settled; GameSessionContext.tsx's own rollback
+    // is the real error response.
+    void dispatch(action).finally(() => {
+      pendingClaimDecisionIdsRef.current.delete(claimId)
+      setPendingClaimDecisionIds((prev) => {
+        const next = new Set(prev)
+        next.delete(claimId)
+        return next
+      })
+    })
+  }
+
+  function handleConfirm(claim: PrizeClaim) {
+    dispatchClaimDecision(claim.id, { type: 'CONFIRM_CLAIM', claimId: claim.id })
+  }
+
   function handleReject(claim: PrizeClaim) {
     const rejectionReason = promptForRejectionReason()
-    dispatch({ type: 'REJECT_CLAIM', claimId: claim.id, rejectionReason })
+    dispatchClaimDecision(claim.id, {
+      type: 'REJECT_CLAIM',
+      claimId: claim.id,
+      rejectionReason,
+    })
   }
 
   function resetGame() {
@@ -283,6 +360,14 @@ export function HostDashboard() {
             cross-device sync
           </p>
         ) : null}
+
+        {/* E6: small, non-blocking Realtime connection banner. No-op while
+            connected/connecting/not-configured -- the normal Host experience
+            below renders completely unchanged in that case. */}
+        <ConnectionStatusBanner
+          status={realtimeConnectionStatus}
+          onRetry={retryRealtimeConnection}
+        />
 
         {/* Session header */}
         <header className="host__header">
@@ -400,7 +485,7 @@ export function HostDashboard() {
                   disabled={!canCallNext}
                   icon="⏭"
                 >
-                  Next Cyber Word
+                  {lifecycleActionPending ? 'Calling…' : 'Next Cyber Word'}
                 </Button>
                 <Button
                   variant="ghost"
@@ -478,22 +563,25 @@ export function HostDashboard() {
                 title="Pending Claims"
                 claims={inboxGroups.pending}
                 winners={state.winners}
-                onConfirm={(claim) => dispatch({ type: 'CONFIRM_CLAIM', claimId: claim.id })}
+                onConfirm={handleConfirm}
                 onReject={handleReject}
+                isDecisionPending={isClaimDecisionPending}
               />
               <ClaimInboxSection
                 title="Confirmed"
                 claims={inboxGroups.confirmed}
                 winners={state.winners}
-                onConfirm={(claim) => dispatch({ type: 'CONFIRM_CLAIM', claimId: claim.id })}
+                onConfirm={handleConfirm}
                 onReject={handleReject}
+                isDecisionPending={isClaimDecisionPending}
               />
               <ClaimInboxSection
                 title="Rejected/Invalid"
                 claims={inboxGroups.rejectedOrInvalid}
                 winners={state.winners}
-                onConfirm={(claim) => dispatch({ type: 'CONFIRM_CLAIM', claimId: claim.id })}
+                onConfirm={handleConfirm}
                 onReject={handleReject}
+                isDecisionPending={isClaimDecisionPending}
               />
             </Card>
 
@@ -577,6 +665,8 @@ interface ClaimInboxSectionProps {
   winners: readonly Winner[]
   onConfirm: (claim: PrizeClaim) => void
   onReject: (claim: PrizeClaim) => void
+  /** G6: true while a Confirm/Reject RPC is in flight for this claim id. */
+  isDecisionPending: (claimId: string) => boolean
 }
 
 /**
@@ -590,6 +680,7 @@ function ClaimInboxSection({
   winners,
   onConfirm,
   onReject,
+  isDecisionPending,
 }: ClaimInboxSectionProps) {
   return (
     <div className="host__claims-section">
@@ -600,6 +691,11 @@ function ClaimInboxSection({
         <ul className="host__claims">
           {claims.map((claim) => {
             const row = toClaimInboxRowViewModel(claim)
+            // G6: while either Confirm or Reject is in flight for THIS
+            // claim, both of its own buttons are disabled -- unrelated
+            // claim rows are entirely unaffected (isDecisionPending is
+            // keyed by claim.id, not a single global flag).
+            const decisionPending = isDecisionPending(claim.id)
             return (
               <li key={claim.id} className="host__claim">
                 <div className="host__claim-info">
@@ -622,16 +718,16 @@ function ClaimInboxSection({
                     <Button
                       variant="success"
                       onClick={() => onConfirm(claim)}
-                      disabled={!canConfirmClaim(claim, winners)}
+                      disabled={!canConfirmClaim(claim, winners) || decisionPending}
                     >
-                      Confirm Winner
+                      {decisionPending ? 'Processing…' : 'Confirm Winner'}
                     </Button>
                     <Button
                       variant="ghost"
                       onClick={() => onReject(claim)}
-                      disabled={claim.hostDecision !== 'PENDING'}
+                      disabled={claim.hostDecision !== 'PENDING' || decisionPending}
                     >
-                      Reject
+                      {decisionPending ? 'Processing…' : 'Reject'}
                     </Button>
                   </div>
                 </div>

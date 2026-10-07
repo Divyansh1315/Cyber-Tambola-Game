@@ -360,3 +360,21 @@
   font-weight: 800;
   letter-spacing: 0.01em;
 }
+
+/* E6: fixed, small overlay slot for ConnectionStatusBanner -- intentionally
+   outside the normal flex/grid flow of .projector/.projector__stage so it
+   never shifts or resizes the existing Lobby/Word/Winner/Final-Results
+   layouts above. Renders nothing (zero height) while the banner itself
+   renders null (connected/connecting/not-configured). */
+.projector__connection-banner {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: min(90vw, 420px);
+}
+
+.projector__connection-banner:empty {
+  display: none;
+}
