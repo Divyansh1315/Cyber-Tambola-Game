@@ -65,6 +65,16 @@ export function toClaimInboxRowViewModel(claim: PrizeClaim): ClaimInboxRowViewMo
   }
 }
 
+/** Removes any later duplicate-id entries, keeping each id's first occurrence (Req 2.5). */
+export function dedupeClaimsById(claims: readonly PrizeClaim[]): PrizeClaim[] {
+  const seen = new Set<string>()
+  return claims.filter((c) => {
+    if (seen.has(c.id)) return false
+    seen.add(c.id)
+    return true
+  })
+}
+
 /** One Winner Panel row: a fixed prize with its winner's name, or none. */
 export interface WinnerPanelRowViewModel {
   prizeId: PrizeId
@@ -198,7 +208,7 @@ export function HostDashboard() {
       )
     : toWinnerHistoryViewModel(remoteWinnerHistoryData.winners, remoteWinnerHistoryData.games)
 
-  const inboxGroups = groupClaimsForHistory(sortClaimsForInbox(state.claims))
+  const inboxGroups = groupClaimsForHistory(sortClaimsForInbox(dedupeClaimsById(state.claims)))
 
   // Control enablement derived from the current lifecycle status. There is
   // only one active-round status now — calling a word displays it fully in

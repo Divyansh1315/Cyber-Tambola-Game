@@ -260,6 +260,36 @@ function cyberFiveOnlyCells(): TicketCell[] {
   return [cells[0], cells[1], cells[5], cells[6], cells[10]]
 }
 
+/**
+ * Builds a `submit_claim`-shaped server response row, mirroring
+ * `claimDuplicateSubmission.exploration.test.tsx`'s own `buildClaimRow`
+ * helper. Needed now that `wrappedDispatch`'s `SUBMIT_PRIZE_CLAIM` case
+ * consumes `rpcSubmitClaim`'s resolved value via `.then(... mapRowToClaim
+ * ...)` (claim-duplicate-submission task 4) -- a `{ data: null }` response
+ * is no longer a safe stand-in for "the RPC succeeds" in these regression
+ * scenarios, since `mapRowToClaim(null)` would throw and be caught by the
+ * existing `.catch(rollback)`, incorrectly rolling back a claim these
+ * scenarios assert should succeed.
+ */
+function buildClaimRow(overrides: Partial<Record<string, unknown>> = {}): Record<string, unknown> {
+  return {
+    id: 'SERVER_CLAIM_1',
+    game_id: 'GAME_A',
+    player_id: 'P_1',
+    ticket_id: 'T_1',
+    prize_id: 'CYBER_FIVE',
+    submitted_at: '2026-01-01T00:05:00.000Z',
+    validation_status: 'VALID',
+    host_decision: 'PENDING',
+    rejection_reason: null,
+    decided_at: null,
+    prize_label: 'Cyber Five',
+    player_name: 'Divyansh',
+    ticket_ref: 'Ticket #6405',
+    ...overrides,
+  }
+}
+
 describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6)', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -327,7 +357,15 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
       expect(tab.sink.current!.currentPrizeProgress.find((p) => p.id === 'CYBER_FIVE')?.current).toBe(5)
     })
 
-    client.queueRpcResponse('submit_claim', { data: null, error: null })
+    // Server row id ('SERVER_CLAIM_1') deliberately distinct from the
+    // client-minted optimistic id so claim-duplicate-submission's
+    // reconciliation is genuinely exercised; ticket_ref matches
+    // playerScreenRef so this scenario's own "same ref everywhere"
+    // assertion continues to hold once the entry is reconciled.
+    // Unwrapped single row -- matches `submitClaim`'s real
+    // `Promise<ClaimRow>` contract; the mock override here resolves to
+    // `data` as-is with no array unwrapping.
+    client.queueRpcResponse('submit_claim', { data: buildClaimRow({ ticket_ref: playerScreenRef }) })
     act(() => {
       tab.sink.current!.dispatch({
         type: 'SUBMIT_PRIZE_CLAIM',
@@ -340,8 +378,11 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
       expect(client.rpcCalls.some((c) => c.name === 'submit_claim')).toBe(true)
     })
 
-    const submittedClaim = tab.sink.current!.state.claims.at(-1)!
-    expect(submittedClaim.ticketRef).toBe(playerScreenRef)
+    let submittedClaim = tab.sink.current!.state.claims.at(-1)!
+    await waitFor(() => {
+      submittedClaim = tab.sink.current!.state.claims.at(-1)!
+      expect(submittedClaim.ticketRef).toBe(playerScreenRef)
+    })
 
     // Host confirms the claim -> a Winner History entry is produced.
     act(() => {
@@ -576,8 +617,11 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
     expect(tab.sink.current!.currentPrizeProgress.find((p) => p.id === 'CYBER_FIVE')?.current).toBe(5)
 
     // Claim submission behaves exactly as pre-refresh: same RPC call shape,
-    // same resulting claim.
-    client.queueRpcResponse('submit_claim', { data: null, error: null })
+    // same resulting claim. Server row id ('SERVER_CLAIM_REFRESH')
+    // deliberately distinct from the client-minted optimistic id so
+    // reconciliation is genuinely exercised, not accidentally
+    // already-matching.
+    client.queueRpcResponse('submit_claim', { data: buildClaimRow({ id: 'SERVER_CLAIM_REFRESH' }) })
     act(() => {
       tab.sink.current!.dispatch({
         type: 'SUBMIT_PRIZE_CLAIM',
@@ -594,8 +638,11 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
     expect(submitCall.args).toEqual({ p_player_id: 'P_1', p_prize_id: 'CYBER_FIVE' })
     expect(tab.sink.current!.lastSessionGuardFailure).toBeUndefined()
 
-    const recordedClaim = tab.sink.current!.state.claims.at(-1)!
-    expect(recordedClaim.ticketRef).toBe('Ticket #6405')
+    let recordedClaim = tab.sink.current!.state.claims.at(-1)!
+    await waitFor(() => {
+      recordedClaim = tab.sink.current!.state.claims.at(-1)!
+      expect(recordedClaim.ticketRef).toBe('Ticket #6405')
+    })
     expect(recordedClaim.validationStatus).toBe('VALID')
 
     tab.unmount()
@@ -938,7 +985,11 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
       expect(tab.sink.current!.currentPrizeProgress.find((p) => p.id === 'CYBER_FIVE')?.current).toBe(5)
     })
 
-    client.queueRpcResponse('submit_claim', { data: null, error: null })
+    // Server row id ('SERVER_CLAIM_1') deliberately distinct from the
+    // client-minted optimistic id so reconciliation is genuinely exercised;
+    // ticket_ref matches playerScreenRef so this scenario's own
+    // "same ref everywhere" assertion continues to hold once reconciled.
+    client.queueRpcResponse('submit_claim', { data: buildClaimRow({ ticket_ref: playerScreenRef }) })
     act(() => {
       tab.sink.current!.dispatch({
         type: 'SUBMIT_PRIZE_CLAIM',
@@ -951,7 +1002,11 @@ describe('Regression: required preserved/fixed scenarios (Req 1.5, 2.2, 2.5, 2.8
       expect(client.rpcCalls.some((c) => c.name === 'submit_claim')).toBe(true)
     })
 
-    const submittedClaim = tab.sink.current!.state.claims.at(-1)!
+    let submittedClaim = tab.sink.current!.state.claims.at(-1)!
+    await waitFor(() => {
+      submittedClaim = tab.sink.current!.state.claims.at(-1)!
+      expect(submittedClaim.ticketRef).toBe(playerScreenRef)
+    })
 
     // Host Claim Inbox row for this claim -- via the REAL view-model
     // function the Host Dashboard renders through (toClaimInboxRowViewModel),

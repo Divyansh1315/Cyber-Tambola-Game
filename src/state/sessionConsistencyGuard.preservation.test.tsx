@@ -214,6 +214,36 @@ function buildTicketRows(): TicketCell[][] {
 }
 
 /**
+ * Builds a `submit_claim`-shaped server response row, mirroring
+ * `claimDuplicateSubmission.exploration.test.tsx`'s own `buildClaimRow`
+ * helper. Needed now that `wrappedDispatch`'s `SUBMIT_PRIZE_CLAIM` case
+ * consumes `rpcSubmitClaim`'s resolved value via `.then(... mapRowToClaim
+ * ...)` (claim-duplicate-submission task 4) -- a `{ data: null }` response
+ * is no longer a safe stand-in for "the RPC succeeds" in these preservation
+ * baselines, since `mapRowToClaim(null)` would throw and be caught by the
+ * existing `.catch(rollback)`, incorrectly rolling back a claim this test
+ * asserts should succeed.
+ */
+function buildClaimRow(overrides: Partial<Record<string, unknown>> = {}): Record<string, unknown> {
+  return {
+    id: 'SERVER_CLAIM_1',
+    game_id: 'GAME_A',
+    player_id: 'P_1',
+    ticket_id: 'T_1',
+    prize_id: 'CYBER_FIVE',
+    submitted_at: '2026-01-01T00:05:00.000Z',
+    validation_status: 'VALID',
+    host_decision: 'PENDING',
+    rejection_reason: null,
+    decided_at: null,
+    prize_label: 'Cyber Five',
+    player_name: 'Divyansh',
+    ticket_ref: 'Ticket #6405',
+    ...overrides,
+  }
+}
+
+/**
  * 5 cells spread across all 3 rows (2 + 2 + 1), chosen so marking exactly
  * these 5 reaches Cyber Five eligibility (any 5, Req 8) WITHOUT also
  * completing any single Line_Prize row (which requires all 5 cells of one
@@ -297,8 +327,14 @@ describe('Preservation: consistent session claim submission unchanged (Req 3.1, 
     // Claim submission: record the exact dispatched action, the exact
     // rpcSubmitClaim call args, and the resulting claims entry's
     // ticketRef/playerName -- this is the baseline Property 2 says must
-    // never change once the fix lands.
-    client.queueRpcResponse('submit_claim', { data: null, error: null })
+    // never change once the fix lands. The server row's id
+    // ('SERVER_CLAIM_1') is deliberately distinct from the client-minted
+    // optimistic id so claim-duplicate-submission's reconciliation is
+    // genuinely exercised here, not accidentally already-matching.
+    // Unwrapped single row -- matches `submitClaim`'s real
+    // `Promise<ClaimRow>` contract; the mock override here resolves to
+    // `data` as-is with no array unwrapping.
+    client.queueRpcResponse('submit_claim', { data: buildClaimRow() })
     const rpcCallsBefore = client.rpcCalls.length
     const claimsBefore = tab.sink.current!.state.claims.length
 
@@ -319,7 +355,12 @@ describe('Preservation: consistent session claim submission unchanged (Req 3.1, 
     expect(submitCall).toBeDefined()
     expect(submitCall!.args).toEqual({ p_player_id: 'P_1', p_prize_id: 'CYBER_FIVE' })
 
-    expect(tab.sink.current!.state.claims.length).toBe(claimsBefore + 1)
+    // Still exactly one claim entry (reconciled in place post-fix, rather
+    // than left as the optimistic entry pre-fix) -- the count assertion is
+    // unaffected either way.
+    await waitFor(() => {
+      expect(tab.sink.current!.state.claims.length).toBe(claimsBefore + 1)
+    })
     const recordedClaim = tab.sink.current!.state.claims.at(-1)!
     expect(recordedClaim.playerId).toBe('P_1')
     expect(recordedClaim.ticketId).toBe('T_1')
@@ -436,7 +477,10 @@ describe('Preservation: consistent session claim submission unchanged (Req 3.1, 
     expect(tab.sink.current!.currentTicket?.id).toBe('T_1')
     expect(tab.sink.current!.currentPrizeProgress.find((p) => p.id === 'CYBER_FIVE')?.current).toBe(5)
 
-    client.queueRpcResponse('submit_claim', { data: null, error: null })
+    // Server row id deliberately distinct from the client-minted optimistic
+    // id so reconciliation is genuinely exercised, not accidentally
+    // already-matching.
+    client.queueRpcResponse('submit_claim', { data: buildClaimRow({ id: 'SERVER_CLAIM_REFRESH' }) })
     const rpcCallsBefore = client.rpcCalls.length
 
     act(() => {
@@ -456,8 +500,11 @@ describe('Preservation: consistent session claim submission unchanged (Req 3.1, 
     expect(submitCall).toBeDefined()
     expect(submitCall!.args).toEqual({ p_player_id: 'P_1', p_prize_id: 'CYBER_FIVE' })
 
-    const recordedClaim = tab.sink.current!.state.claims.at(-1)!
-    expect(recordedClaim.ticketRef).toBe('Ticket #6405')
+    let recordedClaim = tab.sink.current!.state.claims.at(-1)!
+    await waitFor(() => {
+      recordedClaim = tab.sink.current!.state.claims.at(-1)!
+      expect(recordedClaim.ticketRef).toBe('Ticket #6405')
+    })
     expect(recordedClaim.playerName).toBe('Divyansh')
     expect(recordedClaim.validationStatus).toBe('VALID')
 

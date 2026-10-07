@@ -226,6 +226,15 @@ export interface GameSessionContextValue {
    * "could not be validated" message.
    */
   lastSessionGuardFailure?: SessionGuardFailure
+  /**
+   * True while a SUBMIT_PRIZE_CLAIM dispatch for this specific prize is
+   * in flight (design.md Fix Implementation point 4; bugfix.md Req 2.6,
+   * 2.7). One flag per prize, not a single global flag, so a different
+   * prize's Claim button stays independently clickable. Exposed as a
+   * derived boolean rather than the raw storage Set so callers don't need
+   * to know the representation.
+   */
+  isSubmittingClaim: (prizeId: PrizeId) => boolean
 }
 
 const GameSessionContext = createContext<GameSessionContextValue | null>(null)
@@ -528,6 +537,21 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
   const [lastSessionGuardFailure, setLastSessionGuardFailure] = useState<
     SessionGuardFailure | undefined
   >(undefined)
+
+  // Per-prize client-side submission lock (design.md Fix Implementation
+  // point 4; bugfix.md Req 2.6, 2.7). A Set rather than a single boolean
+  // because different prizes' claim buttons must remain independently
+  // clickable while another prize's submission is in flight. Set at the
+  // very top of the SUBMIT_PRIZE_CLAIM case (covering both the
+  // guard-blocked and guard-passed paths, per design.md's own reasoning —
+  // a blocked attempt's brief flagged state is harmless and
+  // self-correcting since it is cleared again synchronously in that same
+  // branch); cleared in the guard-blocked branch and in both the
+  // RECONCILE_CLAIM_ID-dispatching `.then` and the `.catch(rollback)`
+  // continuation of the rpcSubmitClaim call, so it never gets stuck set.
+  const [submittingClaimPrizeIds, setSubmittingClaimPrizeIds] = useState<Set<PrizeId>>(
+    new Set(),
+  )
 
   // This device's Host secret, once obtained. Never exposed via context
   // value.
@@ -964,6 +988,32 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
           break
         }
         case 'SUBMIT_PRIZE_CLAIM': {
+          // Submission lock: flag this prize as in-flight the instant the
+          // case is entered, covering both the guard-blocked and
+          // guard-passed paths below (design.md Fix Implementation point
+          // 4). Cleared again in the guard-blocked branch immediately
+          // below, and in both continuations of the rpcSubmitClaim promise
+          // chain further down.
+          const submittingPrizeId = action.prizeId
+          // Narrowed locally (rather than read back off the widened
+          // `augmentedAction: GameSessionAction`, which the compiler can no
+          // longer see is a SUBMIT_PRIZE_CLAIM) so RECONCILE_CLAIM_ID's
+          // dispatch below can reference the SAME id already injected into
+          // augmentedAction above -- never a second, independently-minted
+          // id for the same call.
+          const claimOptimisticId = augmentedAction.type === 'SUBMIT_PRIZE_CLAIM'
+            ? augmentedAction.optimisticId!
+            : action.optimisticId!
+          setSubmittingClaimPrizeIds((prev) => new Set(prev).add(submittingPrizeId))
+
+          function clearSubmitting() {
+            setSubmittingClaimPrizeIds((prev) => {
+              const next = new Set(prev)
+              next.delete(submittingPrizeId)
+              return next
+            })
+          }
+
           // Pre-submission session consistency guard (design.md Fix
           // Implementation point 4; bugfix.md Req 2.2, 2.3, 2.7). Resolved
           // against `before` — the state snapshot captured at the top of
@@ -978,6 +1028,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
             // than left dangling as a phantom PENDING claim the backend
             // never saw.
             rollback()
+            clearSubmitting()
             setLastSessionGuardFailure({
               prizeId: action.prizeId,
               reason: guardSession.inconsistencyReason ?? 'NOT_BACKEND_CONFIRMED',
@@ -1004,7 +1055,19 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
             break
           }
           // Consistent session: proceed exactly as today — unchanged.
-          rpcSubmitClaim(action.playerId, action.prizeId).catch(rollback)
+          rpcSubmitClaim(action.playerId, action.prizeId)
+            .then((row) => {
+              dispatch({
+                type: 'RECONCILE_CLAIM_ID',
+                optimisticId: claimOptimisticId,
+                confirmedClaim: mapRowToClaim(row as unknown as Record<string, unknown>),
+              })
+              clearSubmitting()
+            })
+            .catch(() => {
+              rollback()
+              clearSubmitting()
+            })
           break
         }
         case 'CONFIRM_CLAIM':
@@ -1095,8 +1158,16 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
       hasActiveGame,
       isBackendConfirmed,
       lastSessionGuardFailure,
+      isSubmittingClaim: (prizeId: PrizeId) => submittingClaimPrizeIds.has(prizeId),
     }
-  }, [state, remoteSyncStatus, hasActiveGame, isBackendConfirmed, lastSessionGuardFailure])
+  }, [
+    state,
+    remoteSyncStatus,
+    hasActiveGame,
+    isBackendConfirmed,
+    lastSessionGuardFailure,
+    submittingClaimPrizeIds,
+  ])
 
   return (
     <GameSessionContext.Provider value={value}>

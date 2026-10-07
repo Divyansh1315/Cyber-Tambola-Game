@@ -128,6 +128,7 @@ export function PlayerGame() {
     dispatch,
     isHydrated,
     lastSessionGuardFailure,
+    isSubmittingClaim,
   } = useGameSession()
   const { game } = state
   const location = useLocation()
@@ -263,7 +264,14 @@ export function PlayerGame() {
     // confused with one another.
     const sessionGuardFailed = lastSessionGuardFailure?.prizeId === progress.id
 
-    return { progress, status, view, sessionGuardFailed }
+    // Req 2.6, 2.7: a submission for this specific prize is currently in
+    // flight (optimistic dispatch issued, RPC not yet resolved/rejected).
+    // Disables the Claim button and swaps its label, mirroring the same
+    // label-swap convention claimStatusView already uses for PENDING/
+    // CONFIRMED — no new component, label/disabled change only (Req 3.9).
+    const isSubmitting = isSubmittingClaim(progress.id)
+
+    return { progress, status, view, sessionGuardFailed, isSubmitting }
   })
 
   return (
@@ -385,7 +393,7 @@ export function PlayerGame() {
         {/* Claim prizes — one independent block per Prize_Id (Req 2.5, 12.2, 13.2) */}
         <Card title="Claim Your Prizes">
           <ul className="player__claims" aria-label="Prize claim status">
-            {prizeBlocks.map(({ progress, status, view, sessionGuardFailed }) => (
+            {prizeBlocks.map(({ progress, status, view, sessionGuardFailed, isSubmitting }) => (
               <li
                 key={progress.id}
                 className={`player__claim-block player__claim-block--${status.toLowerCase()}`}
@@ -422,7 +430,7 @@ export function PlayerGame() {
                       variant={status === 'CONFIRMED' ? 'success' : 'primary'}
                       size="md"
                       className="player__claim-btn"
-                      disabled={view.buttonDisabled || readOnly}
+                      disabled={view.buttonDisabled || readOnly || isSubmitting}
                       onClick={() =>
                         dispatch({
                           type: 'SUBMIT_PRIZE_CLAIM',
@@ -433,7 +441,7 @@ export function PlayerGame() {
                       }
                       icon="🏆"
                     >
-                      {view.buttonLabel}
+                      {isSubmitting ? 'Submitting Claim...' : view.buttonLabel}
                     </Button>
                   </>
                 )}

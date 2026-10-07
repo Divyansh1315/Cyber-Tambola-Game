@@ -1,0 +1,280 @@
+{
+  "pbtResults": {
+    "1. Write bug condition exploration test": {
+      "status": "passed",
+      "failingExample": "single-click-produces-two-entries: optimisticId (client-minted, e.g. a localId() UUID) and 'SERVER_CLAIM_1' both survive in state.claims for playerId='P_A1'/prizeId='CYBER_FIVE' -> 2 distinct entries instead of 1. realtime-echo-arrives-before-rpc-resolves: same 2-entry duplication with optimisticId + 'SERVER_CLAIM_2', regardless of echo/RPC ordering. wrong-ticket-mechanism-check: both duplicate entries show ticketRef='6405' (IDENTICAL, not divergent) -- confirms the ticket-mismatch symptom shares the same duplicate-rendering mechanism, not a separate bug. rapid-double-click-race: two back-to-back SUBMIT_PRIZE_CLAIM dispatches for the same (player,prize) produced 2 submit_claim RPC calls with no client-side guard preventing the second.",
+      "lastRunTimestamp": 1791342890133
+    }
+  },
+  "executionHistory": {
+    "1. Write bug condition exploration test": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342666313
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342679810
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342933082
+      }
+    ],
+    "2. Write preservation property tests (BEFORE implementing fix)": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342666812
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342950310
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791343284086
+      }
+    ],
+    "3. Add `RECONCILE_CLAIM_ID` reducer action": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342667218
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791343290493
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791343514503
+      }
+    ],
+    "4. Wire `RECONCILE_CLAIM_ID` dispatch from `rpcSubmitClaim`'s resolution in `GameSessionContext.tsx`": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342667611
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791343521330
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791345235934
+      }
+    ],
+    "5. Add per-prize `isSubmittingClaim` submission lock in `GameSessionContext.tsx`": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342668233
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791345247920
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791345520123
+      }
+    ],
+    "6. Wire the submission lock into the Claim button in `PlayerGame.tsx`": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342668589
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791345533841
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791345732360
+      }
+    ],
+    "7. Add Host Claim Inbox dedup-by-id rendering safeguard": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342669032
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791345751857
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791346862228
+      }
+    ],
+    "8. Write and document the additive partial unique index migration (0006)": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342669375
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791346893898
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791347106541
+      }
+    ],
+    "9. Unit tests for the reconciliation mechanism, Host dedup rendering, and the submission lock": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342669867
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791347114345
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791347536884
+      }
+    ],
+    "10. Regression tests for the six required scenarios from bugfix.md": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342670215
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791347543397
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791354922578
+      }
+    ],
+    "11. Checkpoint - run the full build and automated test suite": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342670633
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791354930421
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791355303179
+      }
+    ],
+    "12.1 Verify bug condition exploration test now passes": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342670996
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791355311171
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791355896690
+      }
+    ],
+    "12.2 Verify preservation tests still pass": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342671349
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791355903623
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791356044745
+      }
+    ],
+    "13. Decide keep/remove for any temporary diagnostics added during investigation": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342671889
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791356053058
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791356190802
+      }
+    ],
+    "14. Final checkpoint - ensure all tests pass and no out-of-scope files changed": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342672254
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791356198399
+      },
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791357119682
+      }
+    ],
+    "15. Manual acceptance criteria required to consider this spec done (NOT automated tasks)": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791342672600
+      }
+    ],
+    "12. Verify exploration and preservation tests against the fix": [
+      {
+        "executionId": "df22e75b-90e5-44c7-90f4-66b41040a4b6",
+        "chatSessionId": "sess_e45f3566-f4bc-4e84-a2f0-e754bedb20ec",
+        "timestamp": 1791356045308
+      }
+    ]
+  }
+}

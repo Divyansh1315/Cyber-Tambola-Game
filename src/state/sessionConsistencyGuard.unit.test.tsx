@@ -568,7 +568,34 @@ describe('Pre-submission session consistency guard in wrappedDispatch (Req 2.2, 
         expect(tab.sink.current!.currentPrizeProgress.find((p) => p.id === 'CYBER_FIVE')?.current).toBe(5)
       })
 
-      client.queueRpcResponse('submit_claim', { data: null, error: null })
+      // Server row's id ('SERVER_CLAIM_1') deliberately distinct from the
+      // client-minted optimistic id so claim-duplicate-submission's
+      // RECONCILE_CLAIM_ID reconciliation (wired from rpcSubmitClaim's
+      // .then) is genuinely exercised here, not accidentally
+      // already-matching. A bare `{ data: null }` response is no longer
+      // safe for a successful-claim-proceeds scenario since `.then` now
+      // calls `mapRowToClaim(row)`, which would throw on `null` and be
+      // caught by the existing `.catch(rollback)`.
+      // Unwrapped single row -- matches `submitClaim`'s real
+      // `Promise<ClaimRow>` contract; the mock override here resolves to
+      // `data` as-is with no array unwrapping.
+      client.queueRpcResponse('submit_claim', {
+        data: {
+          id: 'SERVER_CLAIM_1',
+          game_id: 'GAME_A',
+          player_id: 'P_1',
+          ticket_id: 'T_1',
+          prize_id: 'CYBER_FIVE',
+          submitted_at: '2026-01-01T00:05:00.000Z',
+          validation_status: 'VALID',
+          host_decision: 'PENDING',
+          rejection_reason: null,
+          decided_at: null,
+          prize_label: 'Cyber Five',
+          player_name: 'Divyansh',
+          ticket_ref: 'Ticket #6405',
+        },
+      })
       const rpcCallsBefore = client.rpcCalls.length
       const claimsBefore = tab.sink.current!.state.claims.length
 
@@ -595,9 +622,14 @@ describe('Pre-submission session consistency guard in wrappedDispatch (Req 2.2, 
       expect(submitCall).toBeDefined()
       expect(submitCall!.args).toEqual({ p_player_id: 'P_1', p_prize_id: 'CYBER_FIVE' })
 
-      // Optimistic claim entry retained (never rolled back) once the RPC
-      // resolves successfully, same payload as the pre-fix baseline.
-      expect(tab.sink.current!.state.claims.length).toBe(claimsBefore + 1)
+      // Claim entry retained (never rolled back) once the RPC resolves
+      // successfully -- same count as the pre-fix baseline (still exactly
+      // one entry); post-task-4 the entry now carries the server's
+      // authoritative id/fields via RECONCILE_CLAIM_ID rather than the
+      // optimistic ones, which this assertion does not depend on.
+      await waitFor(() => {
+        expect(tab.sink.current!.state.claims.length).toBe(claimsBefore + 1)
+      })
       const recordedClaim = tab.sink.current!.state.claims.at(-1)!
       expect(recordedClaim.playerId).toBe('P_1')
       expect(recordedClaim.ticketId).toBe('T_1')

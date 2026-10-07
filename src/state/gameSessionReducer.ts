@@ -157,6 +157,21 @@ export type GameSessionAction =
   // CALL_NEXT_WORD whose call_next_word RPC lost a race). `currentPlayerId`
   // is left untouched (Req 16.1, 16.3).
   | { type: 'ROLLBACK_OPTIMISTIC'; collection: RollbackCollection; id: string }
+  // NEW (claim-duplicate-submission) — dispatched once `rpcSubmitClaim`'s
+  // promise resolves, reconciling a SUBMIT_PRIZE_CLAIM's optimistic entry
+  // (matched by its locally-minted `optimisticId`) with the server's
+  // authoritative `ClaimRow` (already mapped to a `PrizeClaim` via
+  // `mapRowToClaim` by the caller, so the reducer stays a pure,
+  // mapper-agnostic function exactly like every other case). Once this
+  // reconciliation has run, the entry's `id` IS the server's `id`, so a
+  // later realtime echo for the same row is found by SYNC_REMOTE's existing
+  // id-only `upsertById` on the first lookup instead of being appended as a
+  // second, differently-id'd entry. Also closes the inverse ordering, where
+  // the realtime echo for this same row arrives and is folded in by
+  // `upsertById` BEFORE this action is dispatched: see the reducer case
+  // itself for how that race is detected and resolved without ever leaving
+  // two entries sharing the same id.
+  | { type: 'RECONCILE_CLAIM_ID'; optimisticId: string; confirmedClaim: PrizeClaim }
   // NEW (winner-history-and-game-reset) — dispatched by the context's
   // pointer-follow effect when get_active_game() resolves no row (Req 3.4)
   // or a pointer-change event announces active_game_id = null: resets the
@@ -458,6 +473,49 @@ export function gameSessionReducer(
         default:
           return state
       }
+    }
+
+    case 'RECONCILE_CLAIM_ID': {
+      // Replace the optimistic entry (matched by optimisticId) with the
+      // server-confirmed claim in place -- same array position, new id and
+      // every other field now authoritative. If the optimistic entry is no
+      // longer present (e.g. already rolled back by a rejected RPC racing
+      // this -- cannot happen in practice since .then and .catch are
+      // mutually exclusive outcomes of the same promise, but defensive
+      // nonetheless), this is a safe no-op, mirroring every other
+      // additive action's "ignore if absent" convention (RESTORE_PLAYER,
+      // CLEAR_STALE_PLAYER).
+      //
+      // Closes the echo-arrives-before-RPC-resolves race: a realtime
+      // echo for this same submission's server row can be folded in by
+      // SYNC_REMOTE's upsertById BEFORE this .then ever runs (upsertById
+      // matches by id only, and the echo's row id doesn't match the
+      // still-optimistic entry's id yet, so upsertById appends it as a
+      // new entry rather than finding anything to overwrite). If that has
+      // already happened by the time this action is dispatched, an entry
+      // with `action.confirmedClaim.id` already exists elsewhere in
+      // `state.claims` -- that entry is already the fully authoritative
+      // server row, so the optimistic entry is simply dropped rather than
+      // overwritten with a second copy of the same id. If no such entry
+      // exists yet (the normal, RPC-resolves-first ordering), behavior is
+      // unchanged from before: the optimistic entry is overwritten in
+      // place with the confirmed claim.
+      const index = state.claims.findIndex((c) => c.id === action.optimisticId)
+      if (index === -1) return state
+
+      const alreadyEchoedIndex = state.claims.findIndex(
+        (c, i) => i !== index && c.id === action.confirmedClaim.id,
+      )
+      if (alreadyEchoedIndex !== -1) {
+        // The echo got there first and is already authoritative -- drop
+        // the now-redundant optimistic entry rather than insert a second
+        // copy of the same id.
+        return { ...state, claims: state.claims.filter((_, i) => i !== index) }
+      }
+
+      const claims = [...state.claims]
+      claims[index] = action.confirmedClaim
+      return { ...state, claims }
     }
 
     case 'MARK_TERM': {
