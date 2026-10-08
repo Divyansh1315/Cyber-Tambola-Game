@@ -1,9 +1,11 @@
 import type { CyberTerm } from '../types/cyberTerm'
 
 /**
- * The prototype cyber term bank — 30 data-driven terms across six categories.
- * This is the single source of cyber content for the prototype. Each term's
- * word, definition, and awareness tip are shown together the moment the host
+ * The prototype cyber term bank — 50 data-driven terms across six categories
+ * (expanded from the original 30-term bank; TERM_031-TERM_050 were added so
+ * a game session can support more than 30 Cyber Word calls). This is the
+ * single source of cyber content for the prototype. Each term's word,
+ * definition, and awareness tip are shown together the moment the host
  * officially calls it — there is no hidden-answer phase (Module 5). Content
  * is kept short so it reads comfortably on a phone, the host dashboard, and a
  * projector. In a later module this content moves to a backend-provided
@@ -346,6 +348,244 @@ export const cyberTerms: CyberTerm[] = [
     awarenessTip:
       'Connect only to known networks and confirm the exact name before joining.',
     difficulty: 'hard',
+    active: true,
+  },
+
+  // --- Additional terms (TERM_031-TERM_050): expands the bank from 30 to
+  // 50 terms so a game session can support more than 30 Cyber Word calls.
+  // Same shape/conventions as the original 30 (id, term, category,
+  // definition, awarenessTip, difficulty, active) — no new category or
+  // difficulty values were introduced. ---
+
+  // --- Threats ---
+  {
+    id: 'TERM_031',
+    term: 'Smishing',
+    category: 'Threats',
+    definition:
+      'A phishing scam delivered by text message instead of email.',
+    awarenessTip:
+      'Do not tap links in unexpected texts; verify through an official app or site.',
+    difficulty: 'medium',
+    active: true,
+  },
+  {
+    id: 'TERM_032',
+    term: 'Vishing',
+    category: 'Threats',
+    definition:
+      'A phone call scam where someone pretends to be legitimate to get your information.',
+    awarenessTip:
+      'Hang up and call back using an official number if a caller asks for sensitive details.',
+    difficulty: 'medium',
+    active: true,
+  },
+  {
+    id: 'TERM_033',
+    term: 'Spyware',
+    category: 'Threats',
+    definition:
+      'Hidden software that secretly monitors your activity and steals information.',
+    awarenessTip:
+      'Only install apps from trusted sources and watch for unusual device behaviour.',
+    difficulty: 'medium',
+    active: true,
+  },
+  {
+    id: 'TERM_034',
+    term: 'Trojan',
+    category: 'Threats',
+    definition:
+      'Malware disguised as legitimate software that harms your system once installed.',
+    awarenessTip:
+      'Avoid downloading software from untrusted or unofficial sources.',
+    difficulty: 'medium',
+    active: true,
+  },
+  {
+    id: 'TERM_035',
+    term: 'Virus',
+    category: 'Threats',
+    definition:
+      'Malicious code that attaches to files and spreads when they are shared or opened.',
+    awarenessTip:
+      'Keep antivirus protection active and scan unfamiliar files before opening.',
+    difficulty: 'easy',
+    active: true,
+  },
+  {
+    id: 'TERM_036',
+    term: 'Worm',
+    category: 'Threats',
+    definition:
+      'Self-spreading malware that moves across networks without needing a host file.',
+    awarenessTip:
+      'Keep systems patched to close the gaps worms use to spread.',
+    difficulty: 'hard',
+    active: true,
+  },
+  {
+    id: 'TERM_037',
+    term: 'Insider Threat',
+    category: 'Threats',
+    definition:
+      'Risk to the organization that comes from an employee or trusted insider, intentional or not.',
+    awarenessTip:
+      'Follow access policies closely and report any suspicious internal activity.',
+    difficulty: 'hard',
+    active: true,
+  },
+
+  // --- Identity & Access ---
+  {
+    id: 'TERM_038',
+    term: 'Password',
+    category: 'Identity & Access',
+    definition:
+      'The secret credential that proves your identity when logging in.',
+    awarenessTip:
+      'Never share your password, and make each one unique and hard to guess.',
+    difficulty: 'easy',
+    active: true,
+  },
+  {
+    id: 'TERM_039',
+    term: 'Brute Force Attack',
+    category: 'Identity & Access',
+    definition:
+      'Repeatedly guessing passwords, often automatically, until one works.',
+    awarenessTip:
+      'Use long, unique passwords and enable account lockout or MFA to resist guessing.',
+    difficulty: 'medium',
+    active: true,
+  },
+  {
+    id: 'TERM_040',
+    term: 'Account Takeover',
+    category: 'Identity & Access',
+    definition:
+      'When an attacker gains full control of your account using stolen credentials.',
+    awarenessTip:
+      'Enable MFA and report any login activity you do not recognize right away.',
+    difficulty: 'medium',
+    active: true,
+  },
+  {
+    id: 'TERM_041',
+    term: 'Access Control',
+    category: 'Identity & Access',
+    definition:
+      'The rules and systems that decide who can view or use specific resources.',
+    awarenessTip:
+      'Respect access boundaries and never share your access with others.',
+    difficulty: 'medium',
+    active: true,
+  },
+  {
+    id: 'TERM_042',
+    term: 'Zero Trust',
+    category: 'Identity & Access',
+    definition:
+      'A security approach that verifies every user and device, never trusting by default.',
+    awarenessTip:
+      'Expect to verify your identity often — it is a safeguard, not an inconvenience.',
+    difficulty: 'hard',
+    active: true,
+  },
+  {
+    id: 'TERM_043',
+    term: 'Cyber Hygiene',
+    category: 'Identity & Access',
+    definition:
+      'The everyday habits that keep your accounts and devices secure.',
+    awarenessTip:
+      'Build simple routines like updating software and reviewing account activity regularly.',
+    difficulty: 'easy',
+    active: true,
+  },
+  {
+    id: 'TERM_044',
+    term: 'Incident Reporting',
+    category: 'Identity & Access',
+    definition:
+      'Promptly telling IT security about anything suspicious you notice.',
+    awarenessTip:
+      'Report suspicious activity immediately — early reporting limits the damage.',
+    difficulty: 'easy',
+    active: true,
+  },
+  {
+    id: 'TERM_045',
+    term: 'Security Awareness',
+    category: 'Identity & Access',
+    definition:
+      'Understanding common threats so you can recognize and avoid them.',
+    awarenessTip:
+      'Stay curious and keep learning — awareness is your first line of defence.',
+    difficulty: 'easy',
+    active: true,
+  },
+
+  // --- Data Protection ---
+  {
+    id: 'TERM_046',
+    term: 'Data Privacy',
+    category: 'Data Protection',
+    definition:
+      'The right and practice of keeping personal information controlled and protected.',
+    awarenessTip:
+      'Only collect and share personal data that is actually needed.',
+    difficulty: 'medium',
+    active: true,
+  },
+  {
+    id: 'TERM_047',
+    term: 'Data Breach',
+    category: 'Data Protection',
+    definition:
+      'An incident where protected information is accessed or exposed without authorization.',
+    awarenessTip:
+      'Report any suspected data exposure immediately so it can be contained.',
+    difficulty: 'hard',
+    active: true,
+  },
+
+  // --- Network Security ---
+  {
+    id: 'TERM_048',
+    term: 'HTTPS',
+    category: 'Network Security',
+    definition:
+      'The secure version of the web protocol that encrypts data between you and a site.',
+    awarenessTip:
+      'Check for HTTPS and a valid padlock icon before entering sensitive information.',
+    difficulty: 'easy',
+    active: true,
+  },
+
+  // --- Email Security ---
+  {
+    id: 'TERM_049',
+    term: 'Spam',
+    category: 'Email Security',
+    definition:
+      'Unwanted bulk email that can carry scams, malware, or phishing attempts.',
+    awarenessTip:
+      'Mark spam as junk and never click links or attachments in it.',
+    difficulty: 'easy',
+    active: true,
+  },
+
+  // --- Device / Physical Security ---
+  {
+    id: 'TERM_050',
+    term: 'Software Update',
+    category: 'Device / Physical Security',
+    definition:
+      'A release that fixes bugs and closes security gaps in your apps and systems.',
+    awarenessTip:
+      'Install software updates promptly instead of postponing them.',
+    difficulty: 'easy',
     active: true,
   },
 ]
