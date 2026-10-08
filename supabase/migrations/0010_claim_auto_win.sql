@@ -234,13 +234,50 @@ begin
   end if;
 
   -- VALID claim (every gate passed): attempt to atomically win the prize.
+  --
+  -- BUGFIX (post-0010 hotfix, applied directly to this migration file since
+  -- it has not yet been successfully applied to any live project): the
+  -- original version of this block inserted into `winners` BEFORE `claims`,
+  -- passing `v_claim_id` as `winners.claim_id`. But `winners.claim_id` has
+  -- `references claims(id)` (0001_schema.sql) — a NOT NULL foreign key — so
+  -- that insert always failed with a 23503 foreign-key-violation (sqlstate
+  -- "insert or update on table winners violates foreign key constraint
+  -- winners_claim_id_fkey") for EVERY valid claim, every time, with zero
+  -- concurrency required to trigger it. This was caught by load testing
+  -- (a direct single-caller RPC test against a fresh eligible player
+  -- reproduced the 409 every time) before this migration was ever
+  -- successfully live. The fix: insert the `claims` row FIRST (so the FK
+  -- target exists), THEN attempt the atomic `winners` insert, THEN UPDATE
+  -- the claims row's outcome based on whether the winners insert won. The
+  -- atomicity guarantee is unchanged — `insert into winners ... on conflict
+  -- (game_id, prize_id) do nothing returning id` is still the single
+  -- statement that decides the race — only the ORDER of operations changed
+  -- to satisfy the foreign key, and claims now transiently holds
+  -- host_decision='PENDING' for the few milliseconds between the two
+  -- inserts within the same transaction (invisible to other callers until
+  -- commit, since Postgres transactions are atomic — no other transaction
+  -- can observe this intermediate state).
+  v_claim_id := gen_random_uuid();
+
+  insert into claims(
+      id, game_id, player_id, ticket_id, prize_id, validation_status,
+      host_decision, rejection_reason, prize_label, player_name, ticket_ref
+    )
+    values (
+      v_claim_id, v_game.id, v_player.id, v_ticket.id, p_prize_id,
+      'VALID',
+      'PENDING',
+      null,
+      coalesce(v_prize_label, 'Unknown prize'),
+      coalesce(v_player.display_name, 'Unknown player'),
+      coalesce(v_ticket.ref, 'Unknown ticket')
+    );
+
   -- `insert ... on conflict (game_id, prize_id) do nothing returning id` is
   -- the idiomatic Postgres "first writer wins" pattern — the existing
   -- unique(game_id, prize_id) constraint on `winners` (0001_schema.sql) is
   -- the hard backstop that makes this safe under concurrent callers, even
   -- two submit_claim calls committing at nearly the same instant.
-  v_claim_id := gen_random_uuid();
-
   insert into winners(game_id, prize_id, player_id, ticket_id, claim_id, prize_label, player_name, ticket_ref)
     values (v_game.id, p_prize_id, v_player.id, v_ticket.id, v_claim_id, v_prize_label, v_player.display_name, v_ticket.ref)
     on conflict (game_id, prize_id) do nothing
@@ -248,39 +285,15 @@ begin
 
   if v_won_winner_id is not null then
     -- This transaction won the race: the claim is auto-confirmed.
-    insert into claims(
-        id, game_id, player_id, ticket_id, prize_id, validation_status,
-        host_decision, rejection_reason, decided_at, prize_label, player_name, ticket_ref
-      )
-      values (
-        v_claim_id, v_game.id, v_player.id, v_ticket.id, p_prize_id,
-        'VALID',
-        'CONFIRMED',
-        null,
-        now(),
-        coalesce(v_prize_label, 'Unknown prize'),
-        coalesce(v_player.display_name, 'Unknown player'),
-        coalesce(v_ticket.ref, 'Unknown ticket')
-      )
+    update claims set host_decision = 'CONFIRMED', rejection_reason = null, decided_at = now()
+      where id = v_claim_id
       returning * into v_claim;
   else
     -- Another transaction already won this prize a moment earlier: this
     -- claim WAS validly eligible, it just lost the race. Recorded as
     -- auto-rejected with a reason code distinct from every gate 1-10 code.
-    insert into claims(
-        id, game_id, player_id, ticket_id, prize_id, validation_status,
-        host_decision, rejection_reason, decided_at, prize_label, player_name, ticket_ref
-      )
-      values (
-        v_claim_id, v_game.id, v_player.id, v_ticket.id, p_prize_id,
-        'VALID',
-        'REJECTED',
-        'PRIZE_ALREADY_WON',
-        now(),
-        coalesce(v_prize_label, 'Unknown prize'),
-        coalesce(v_player.display_name, 'Unknown player'),
-        coalesce(v_ticket.ref, 'Unknown ticket')
-      )
+    update claims set host_decision = 'REJECTED', rejection_reason = 'PRIZE_ALREADY_WON', decided_at = now()
+      where id = v_claim_id
       returning * into v_claim;
   end if;
 

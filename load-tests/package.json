@@ -1,0 +1,10 @@
+{
+  "name": "cyber-tambola-load-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "k6 load/soak tests for Cyber Tambola Game (Supabase RPC + Realtime). Not part of the app build.",
+  "scripts": {
+    "bootstrap": "node scripts/bootstrap-game.mjs",
+    "cleanup": "node scripts/cleanup-game.mjs"
+  }
+}

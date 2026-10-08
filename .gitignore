@@ -9,3 +9,7 @@ dist-ssr
 .DS_Store
 *.log
 *.tsbuildinfo
+
+# Load testing (load-tests/) — never commit staging credentials or results
+load-tests/.env
+load-tests/results/*.json
