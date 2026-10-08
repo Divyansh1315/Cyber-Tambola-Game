@@ -60,9 +60,23 @@
 
 /* State: marked */
 .ticket-cell--marked {
+  position: relative;
   background: var(--state-marked-bg);
   border-color: var(--color-accent-strong);
   color: var(--state-marked-ink);
+}
+
+/* Diagonal strike overlay, additive to the existing checkmark icon */
+.ticket-cell--marked::after {
+  content: '';
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 50%;
+  height: 2px;
+  background: var(--color-accent-strong);
+  transform: translateY(-50%) rotate(-18deg);
+  pointer-events: none;
 }
 
 /* Slightly larger cells from small-tablet width upward */

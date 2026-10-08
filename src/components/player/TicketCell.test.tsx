@@ -138,6 +138,39 @@ describe('TicketCell', () => {
     )
   })
 
+  // Feature: player-ux-improvements, Property 8: The diagonal strike CSS hook is present if
+  // and only if the cell is MARKED, and term text is always preserved
+  //
+  // For any termId/term/state, the rendered root className includes `ticket-cell--marked` iff
+  // cell.state === 'MARKED'; the existing checkmark icon is present iff cell.state === 'MARKED';
+  // and `.ticket-cell__term` text content always equals cell.term exactly regardless of state.
+  //
+  // **Validates: Requirements 5.1, 5.2, 5.5**
+  it('Property 8: diagonal strike class hook tracks MARKED state and term text is always preserved', () => {
+    fc.assert(
+      fc.property(TERM_ID_ARB, TERM_ARB, STATE_ARB, (termId, term, state) => {
+        const onToggle = vi.fn()
+        const cell = buildCell(termId, term, state)
+        const { container, unmount } = render(<TicketCell cell={cell} onToggle={onToggle} />)
+
+        try {
+          const button = container.querySelector('button') as HTMLButtonElement
+          const isMarked = state === 'MARKED'
+
+          expect(button.classList.contains('ticket-cell--marked')).toBe(isMarked)
+          expect(container.querySelector('.ticket-cell__icon') !== null).toBe(isMarked)
+
+          const termEl = container.querySelector('.ticket-cell__term')
+          expect(termEl).not.toBeNull()
+          expect(termEl?.textContent).toBe(term)
+        } finally {
+          unmount()
+        }
+      }),
+      { numRuns: 100 },
+    )
+  })
+
   describe('example tests', () => {
     it('renders a checkmark icon only when MARKED', () => {
       const onToggle = vi.fn()

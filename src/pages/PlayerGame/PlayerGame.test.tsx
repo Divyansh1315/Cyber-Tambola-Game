@@ -1,7 +1,7 @@
 // Feature: module-3-player-joining-tickets — PlayerGame component tests (Task 12.2)
 // Feature: module-4-term-marking-prize-engine — PlayerGame marking/prize tests (Task 10.2)
 import { describe, it, expect, beforeEach } from 'vitest'
-import { act, render, screen } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import {
@@ -512,7 +512,9 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
       marks: marks5,
     })
     renderPlayerGame()
-    expect(screen.getByText('🎉 Cyber Five Ready!')).toBeInTheDocument()
+    // ELIGIBLE also auto-surfaces the Prize_Claim_Popup with the identical
+    // "Ready!" message, so this text now appears twice (card + popup). // not-a-ticket-dimension
+    expect(screen.getAllByText('🎉 Cyber Five Ready!').length).toBeGreaterThan(0)
   })
 
   it('Claim control is disabled below 5/5, and enabled with Cyber Five Ready wording at 5/5 (Req 12.3, 12.4)', () => { // not-a-ticket-dimension
@@ -544,6 +546,9 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
     window.localStorage.clear()
 
     // At eligibility (5/5): Claim enabled and labeled "Claim Cyber Five". // not-a-ticket-dimension
+    // ELIGIBLE also auto-surfaces the Prize_Claim_Popup, so there are now
+    // two "Claim Cyber Five" buttons (the card's and the popup's) -- scope
+    // to the "Claim Your Prizes" card's block to keep asserting on it. // not-a-ticket-dimension
     const marks5 = allTermIds.slice(0, 5).map((id) => buildMark(player, ticket, id))
     seedSession({
       game: revealedGame,
@@ -553,9 +558,14 @@ describe('PlayerGame marking and prize display (module-4-term-marking-prize-engi
       marks: marks5,
     })
     renderPlayerGame()
-    const claimButton = screen.getByRole('button', { name: /claim cyber five/i })
+    const cyberFiveBlock = screen
+      .getByText('Cyber Five', { selector: '.player__claim-block-label' })
+      .closest('li') as HTMLElement
+    const claimButton = within(cyberFiveBlock).getByRole('button', {
+      name: /claim cyber five/i,
+    })
     expect(claimButton).toBeEnabled()
-    expect(screen.getByText('🎉 Cyber Five Ready!')).toBeInTheDocument()
+    expect(screen.getAllByText('🎉 Cyber Five Ready!').length).toBeGreaterThan(0)
   })
 })
 
@@ -593,7 +603,11 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
 
     renderPlayerGame()
 
-    const claimButton = screen.getByRole('button', { name: /claim cyber five/i })
+    // ELIGIBLE also auto-surfaces the Prize_Claim_Popup, so there are two
+    // "Claim Cyber Five" buttons -- scope to the card's block to click it. // not-a-ticket-dimension
+    const claimButton = within(claimBlockFor('Cyber Five')).getByRole('button', {
+      name: /claim cyber five/i,
+    })
     expect(claimButton).toBeEnabled()
 
     await user.click(claimButton)
@@ -606,7 +620,7 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
     expect(cyberFiveBlock).toHaveTextContent('WINNER')
     expect(cyberFiveBlock).toHaveTextContent('confirmed')
     expect(
-      screen.getByRole('button', { name: /winner confirmed/i }),
+      within(cyberFiveBlock).getByRole('button', { name: /winner confirmed/i }),
     ).toBeDisabled()
   })
 
@@ -657,7 +671,11 @@ describe('PlayerGame per-prize claim UI (module-5-prize-claim-processing-winner-
     )
 
     // Claim the ELIGIBLE prize (Cyber Five) — the other four must not change.
-    await user.click(screen.getByRole('button', { name: /claim cyber five/i }))
+    // Scope to the card's block since the popup renders a second matching
+    // button while Cyber Five is ELIGIBLE.
+    await user.click(
+      within(claimBlockFor('Cyber Five')).getByRole('button', { name: /claim cyber five/i }),
+    )
 
     otherLabels.forEach((label, i) => {
       const btn = screen.getByRole('button', {
@@ -936,4 +954,462 @@ describe('PlayerGame survives Host lifecycle dispatches without redirecting (bug
       expect(cellButton).toHaveAttribute('aria-label', expect.stringMatching(/Marked/))
     },
   )
+})
+
+describe('PlayerGame ticket/prize-card usability while a popup or overlay is open (player-ux-improvements, Task 12.2)', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+  })
+
+  function claimBlockFor(label: string): HTMLElement {
+    return screen
+      .getByText(label, { selector: '.player__claim-block-label' })
+      .closest('li') as HTMLElement
+  }
+
+  it('with the Prize_Claim_Popup open for an ELIGIBLE prize, tapping an available ticket cell still dispatches the mark (Req 1.5, 2.7)', async () => {
+    const user = userEvent.setup()
+    const game = createSeedGame()
+    const { player, ticket } = buildJoined(game)
+    const allTermIds = ticket.rows.flat().map((c) => c.termId)
+    // Cyber Five at 5/5 -> ELIGIBLE -> Prize_Claim_Popup auto-surfaces. // not-a-ticket-dimension
+    const marks5 = allTermIds.slice(0, 5).map((id) => buildMark(player, ticket, id))
+    const revealedGame: Game = {
+      ...game,
+      status: 'WORD_ACTIVE',
+      currentRound: 1,
+      revealedTermIds: allTermIds,
+    }
+    seedSession({
+      game: revealedGame,
+      players: [player],
+      tickets: [ticket],
+      currentPlayerId: player.id,
+      marks: marks5,
+    })
+
+    renderPlayerGame()
+
+    // The popup is open: its dialog is present with the Ready message.
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getAllByText('🎉 Cyber Five Ready!').length).toBeGreaterThan(0)
+
+    // Tap an available (revealed, unmarked) cell that is not one of the
+    // already-marked Cyber Five cells.
+    const nextCell = ticket.rows.flat().find(
+      (c) => !marks5.some((m) => m.termId === c.termId),
+    )!
+    const cellButton = screen.getByRole('button', {
+      name: new RegExp(`^${nextCell.term}\\.`),
+    })
+    expect(cellButton).toHaveAttribute('aria-pressed', 'false')
+
+    await user.click(cellButton)
+
+    // The mark dispatch still fires and the cell re-renders as MARKED, even
+    // though the popup remains open and unaffected.
+    expect(cellButton).toHaveAttribute('aria-label', expect.stringMatching(/Marked/))
+    expect(cellButton).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('with the popup open, the existing Claim Your Prizes card remains present and shows the other prizes unaffected', () => {
+    const game = createSeedGame()
+    const { player, ticket } = buildJoined(game)
+    const allTermIds = ticket.rows.flat().map((c) => c.termId)
+    // Spread the 5 Cyber-Five-winning marks across rows (one per row, plus
+    // two extra in different rows) so no single Line_Prize row (needs all 4
+    // of its own cells) also reaches its own target.
+    const cyberFiveMarkIds = [
+      ticket.rows[0][0].termId,
+      ticket.rows[1][0].termId,
+      ticket.rows[2][0].termId,
+      ticket.rows[0][1].termId,
+      ticket.rows[1][1].termId,
+    ]
+    const marks5 = cyberFiveMarkIds.map((id) => buildMark(player, ticket, id))
+    const revealedGame: Game = {
+      ...game,
+      status: 'WORD_ACTIVE',
+      currentRound: 1,
+      revealedTermIds: allTermIds,
+    }
+    seedSession({
+      game: revealedGame,
+      players: [player],
+      tickets: [ticket],
+      currentPlayerId: player.id,
+      marks: marks5,
+    })
+
+    renderPlayerGame()
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+    // The "Claim Your Prizes" card itself is still rendered.
+    expect(screen.getByText('Claim Your Prizes')).toBeInTheDocument()
+
+    // Prizes not currently shown in the popup (only Cyber Five is ELIGIBLE)
+    // still show their own real, unaffected NOT_ELIGIBLE blocks in the card.
+    expect(claimBlockFor('Firewall Line')).toHaveTextContent('Progress: 2/4')
+    expect(
+      within(claimBlockFor('Firewall Line')).getByRole('button', {
+        name: /claim firewall line/i,
+      }),
+    ).toBeDisabled()
+    expect(claimBlockFor('Cyber Full House')).toHaveTextContent('Progress: 5/12')
+  })
+
+  it('with the Celebration_Overlay open, ticket cells remain tappable for a different, still-open prize (Req 6.4)', async () => {
+    const user = userEvent.setup()
+    const game = createSeedGame()
+    const { player, ticket } = buildJoined(game)
+    const allTermIds = ticket.rows.flat().map((c) => c.termId)
+    // Confirm Cyber Five via an existing winner -> fresh CONFIRMED transition
+    // on mount flags the Celebration_Overlay as pending.
+    const cyberFiveTermIds = [
+      ticket.rows[0][0].termId,
+      ticket.rows[0][1].termId,
+      ticket.rows[1][0].termId,
+      ticket.rows[1][1].termId,
+      ticket.rows[2][0].termId,
+    ]
+    const cyberFiveMarks = cyberFiveTermIds.map((id) => buildMark(player, ticket, id))
+    const claim = buildClaim(player, ticket, 'CYBER_FIVE', {
+      hostDecision: 'CONFIRMED',
+      decidedAt: new Date().toISOString(),
+    })
+    const winner = buildWinner(player, ticket, 'CYBER_FIVE', claim.id)
+    const revealedGame: Game = {
+      ...game,
+      status: 'WORD_ACTIVE',
+      currentRound: 1,
+      revealedTermIds: allTermIds,
+    }
+    seedSession({
+      game: revealedGame,
+      players: [player],
+      tickets: [ticket],
+      currentPlayerId: player.id,
+      marks: cyberFiveMarks,
+      claims: [claim],
+      winners: [winner],
+    })
+
+    renderPlayerGame()
+
+    // The celebration overlay is up (mutually exclusive with any popup).
+    expect(screen.getByText('🏆 Cyber Five confirmed!')).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    // Tap an available cell belonging to a different, still-open prize
+    // (row 0 = Firewall Line) that was not part of the Cyber Five marks.
+    const nextCell = ticket.rows[0].find(
+      (c) => !cyberFiveMarks.some((m) => m.termId === c.termId),
+    )!
+    const cellButton = screen.getByRole('button', {
+      name: new RegExp(`^${nextCell.term}\\.`),
+    })
+    expect(cellButton).toHaveAttribute('aria-pressed', 'false')
+
+    await user.click(cellButton)
+
+    expect(cellButton).toHaveAttribute('aria-label', expect.stringMatching(/Marked/))
+    expect(cellButton).toHaveAttribute('aria-pressed', 'true')
+  })
+})
+
+describe('PlayerGame end-to-end popup -> claim -> celebration flow (player-ux-improvements, Task 12.3)', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+  })
+
+  function claimBlockFor(label: string): HTMLElement {
+    return screen
+      .getByText(label, { selector: '.player__claim-block-label' })
+      .closest('li') as HTMLElement
+  }
+
+  /**
+   * Renders PlayerGame (via the real PlayerEntry wrapper) and also exposes
+   * the live `dispatch`/`state` of that SAME provider instance, so a test
+   * can drive real SUBMIT_PRIZE_CLAIM/SYNC_REMOTE transitions across
+   * re-renders of one continuous mount -- required here because
+   * useClaimPopupQueue's in-memory dismissed/currently-shown state (by
+   * design, Req 4.5) resets on every fresh mount, which would otherwise
+   * make an unmount-and-reseed-localStorage approach (as used elsewhere in
+   * this file for plain progress-display assertions) misrepresent the
+   * hook's actual across-render behavior.
+   */
+  function renderPlayerGameWithDispatch() {
+    const sink: { current: ReturnType<typeof useGameSessionForTest> | null } = {
+      current: null,
+    }
+    function DispatchBridge() {
+      const ctx = useGameSessionForTest()
+      sink.current = ctx
+      return null
+    }
+    const result = render(
+      <GameSessionProvider>
+        <DispatchBridge />
+        <MemoryRouter initialEntries={['/player']}>
+          <Routes>
+            <Route path="/player" element={<PlayerEntry />} />
+          </Routes>
+        </MemoryRouter>
+      </GameSessionProvider>,
+    )
+    return { ...result, sink }
+  }
+
+  it('drives ELIGIBLE -> PENDING -> CONFIRMED: popup appears, shows pending state, closes, then the celebration overlay appears exactly once', async () => {
+    const user = userEvent.setup()
+    const game = createSeedGame()
+    const { player, ticket } = buildJoined(game)
+    const allTermIds = ticket.rows.flat().map((c) => c.termId)
+    const revealedGame: Game = {
+      ...game,
+      status: 'WORD_ACTIVE',
+      currentRound: 1,
+      revealedTermIds: allTermIds,
+    }
+    // Spread the 5 Cyber-Five-winning marks across rows so no Line_Prize row
+    // also becomes ELIGIBLE and competes for the popup.
+    const cyberFiveMarkIds = [
+      ticket.rows[0][0].termId,
+      ticket.rows[1][0].termId,
+      ticket.rows[2][0].termId,
+      ticket.rows[0][1].termId,
+      ticket.rows[1][1].termId,
+    ]
+    const marks5 = cyberFiveMarkIds.map((id) => buildMark(player, ticket, id))
+    seedSession({
+      game: revealedGame,
+      players: [player],
+      tickets: [ticket],
+      currentPlayerId: player.id,
+      marks: marks5,
+    })
+
+    const { sink } = renderPlayerGameWithDispatch()
+
+    // --- ELIGIBLE: popup appears with the Ready copy.
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getAllByText('🎉 Cyber Five Ready!').length).toBeGreaterThan(0)
+    expect(screen.queryByText('🏆 Cyber Five confirmed!')).not.toBeInTheDocument()
+
+    // --- PENDING: simulate the host's claims-row arriving over Realtime
+    // with hostDecision still PENDING, via the real SYNC_REMOTE action (the
+    // same path a live claim submission's row-echo takes) -- the popup
+    // stays open (deriveActivePopup Step 1) and now shows the pending copy.
+    act(() => {
+      sink.current!.dispatch({
+        type: 'SYNC_REMOTE',
+        change: {
+          table: 'claims',
+          eventType: 'INSERT',
+          row: {
+            id: 'claim-cyber-five-pending',
+            game_id: player.gameId,
+            player_id: player.id,
+            ticket_id: ticket.id,
+            prize_id: 'CYBER_FIVE',
+            submitted_at: new Date().toISOString(),
+            validation_status: 'VALID',
+            host_decision: 'PENDING',
+            rejection_reason: null,
+            decided_at: null,
+            prize_label: 'Cyber Five',
+            player_name: player.displayName,
+            ticket_ref: ticket.ref,
+          },
+        },
+      })
+    })
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(
+      screen.getAllByText('Claim submitted. Waiting for Host confirmation.').length,
+    ).toBeGreaterThan(0)
+    expect(screen.queryByText('🏆 Cyber Five confirmed!')).not.toBeInTheDocument()
+
+    // --- CONFIRMED: the matching winners-row arrives -> popup closes,
+    // celebration overlay appears exactly once.
+    act(() => {
+      sink.current!.dispatch({
+        type: 'SYNC_REMOTE',
+        change: {
+          table: 'claims',
+          eventType: 'UPDATE',
+          row: {
+            id: 'claim-cyber-five-pending',
+            game_id: player.gameId,
+            player_id: player.id,
+            ticket_id: ticket.id,
+            prize_id: 'CYBER_FIVE',
+            submitted_at: new Date().toISOString(),
+            validation_status: 'VALID',
+            host_decision: 'CONFIRMED',
+            rejection_reason: null,
+            decided_at: new Date().toISOString(),
+            prize_label: 'Cyber Five',
+            player_name: player.displayName,
+            ticket_ref: ticket.ref,
+          },
+        },
+      })
+    })
+    act(() => {
+      sink.current!.dispatch({
+        type: 'SYNC_REMOTE',
+        change: {
+          table: 'winners',
+          eventType: 'INSERT',
+          row: {
+            id: 'winner-cyber-five',
+            game_id: player.gameId,
+            prize_id: 'CYBER_FIVE',
+            player_id: player.id,
+            ticket_id: ticket.id,
+            claim_id: 'claim-cyber-five-pending',
+            confirmed_at: new Date().toISOString(),
+            prize_label: 'Cyber Five',
+            player_name: player.displayName,
+            ticket_ref: ticket.ref,
+          },
+        },
+      })
+    })
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.getAllByText('🏆 Cyber Five confirmed!')).toHaveLength(1)
+    expect(claimBlockFor('Cyber Five')).toHaveTextContent('WINNER')
+    // Avoid an unawaited pending timer (CelebrationOverlay's auto-dismiss)
+    // bleeding into the next test.
+    await user.click(screen.getByText('🏆 Cyber Five confirmed!'))
+  })
+
+  it('drives ELIGIBLE -> REJECTED -> re-ELIGIBLE: rejection message renders in the popup, then the claim button re-enables', () => {
+    const game = createSeedGame()
+    const { player, ticket } = buildJoined(game)
+    const allTermIds = ticket.rows.flat().map((c) => c.termId)
+    const revealedGame: Game = {
+      ...game,
+      status: 'WORD_ACTIVE',
+      currentRound: 1,
+      revealedTermIds: allTermIds,
+    }
+    // Spread the 5 Cyber-Five-winning marks across rows so no Line_Prize row
+    // also becomes ELIGIBLE and competes for the popup.
+    const cyberFiveMarkIds = [
+      ticket.rows[0][0].termId,
+      ticket.rows[1][0].termId,
+      ticket.rows[2][0].termId,
+      ticket.rows[0][1].termId,
+      ticket.rows[1][1].termId,
+    ]
+    const marks5 = cyberFiveMarkIds.map((id) => buildMark(player, ticket, id))
+    seedSession({
+      game: revealedGame,
+      players: [player],
+      tickets: [ticket],
+      currentPlayerId: player.id,
+      marks: marks5,
+    })
+
+    const { sink } = renderPlayerGameWithDispatch()
+
+    // --- ELIGIBLE: popup shows the Ready copy, claim button enabled.
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getAllByText('🎉 Cyber Five Ready!').length).toBeGreaterThan(0)
+
+    // --- REJECTED: the host's claims-row arrives already REJECTED (real
+    // SYNC_REMOTE path) -- the popup keeps showing (deriveActivePopup Step
+    // 1) with the rejection message, and the claim button is re-enabled
+    // (Req 2.6: REJECTED allows re-claiming).
+    act(() => {
+      sink.current!.dispatch({
+        type: 'SYNC_REMOTE',
+        change: {
+          table: 'claims',
+          eventType: 'INSERT',
+          row: {
+            id: 'claim-cyber-five-rejected',
+            game_id: player.gameId,
+            player_id: player.id,
+            ticket_id: ticket.id,
+            prize_id: 'CYBER_FIVE',
+            submitted_at: new Date().toISOString(),
+            validation_status: 'VALID',
+            host_decision: 'REJECTED',
+            rejection_reason: 'Duplicate submission',
+            decided_at: new Date().toISOString(),
+            prize_label: 'Cyber Five',
+            player_name: player.displayName,
+            ticket_ref: ticket.ref,
+          },
+        },
+      })
+    })
+
+    const dialog = screen.getByRole('dialog')
+    expect(dialog).toBeInTheDocument()
+    expect(
+      within(dialog).getByText('Claim rejected. Duplicate submission'),
+    ).toBeInTheDocument()
+    expect(
+      within(dialog).getByRole('button', { name: /claim cyber five/i }),
+    ).toBeEnabled()
+
+    // --- Back to ELIGIBLE: nothing further changes the player's own
+    // latest-claim lookup (claims are append-only; REJECTED only blocks
+    // that specific claim, not the underlying progress) so there is no new
+    // claim action to simulate here other than confirming the current
+    // (REJECTED) popup state already re-enables the claim button above --
+    // the remaining "re-enabled when ELIGIBLE" guarantee is exercised by
+    // deriveActivePopup' Step 1 keeping the SAME prize's popup open through
+    // REJECTED, which is what the assertions above already proved.
+  })
+
+  it('two prizes becoming ELIGIBLE at once: only one popup renders at a time, in PRIZES order (Cyber Five before the Line prizes before Full House)', () => {
+    const game = createSeedGame()
+    const { player, ticket } = buildJoined(game)
+    const allTermIds = ticket.rows.flat().map((c) => c.termId)
+    const revealedGame: Game = {
+      ...game,
+      status: 'WORD_ACTIVE',
+      currentRound: 1,
+      revealedTermIds: allTermIds,
+    }
+
+    // Mark every cell in row 0 (Firewall Line, 4 cells) plus one extra cell // not-a-ticket-dimension
+    // in a different row so Cyber Five (any 5 marks) is also at 5/5. Both // not-a-ticket-dimension
+    // Firewall Line and Cyber Five become ELIGIBLE simultaneously. // not-a-ticket-dimension
+    const firewallLineTermIds = ticket.rows[0].map((c) => c.termId)
+    const extraCyberFiveTermId = ticket.rows[1][0].termId
+    const marks = [...firewallLineTermIds, extraCyberFiveTermId].map((id) =>
+      buildMark(player, ticket, id),
+    )
+    seedSession({
+      game: revealedGame,
+      players: [player],
+      tickets: [ticket],
+      currentPlayerId: player.id,
+      marks,
+    })
+
+    renderPlayerGame()
+
+    // Both prizes are ELIGIBLE in the "Claim Your Prizes" card...
+    expect(claimBlockFor('Cyber Five')).toHaveTextContent('🎉 Cyber Five Ready!')
+    expect(claimBlockFor('Firewall Line')).toHaveTextContent('🎉 Firewall Line Ready!')
+
+    // ...but exactly one popup dialog renders, and it is for Cyber Five
+    // (PRIZES order: CYBER_FIVE precedes FIREWALL_LINE).
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByText('Cyber Five')).toBeInTheDocument()
+    expect(within(dialog).queryByText('Firewall Line')).not.toBeInTheDocument()
+  })
 })

@@ -5,9 +5,12 @@ import { Card } from '../../components/common/Card'
 import { ConnectionStatusBanner } from '../../components/common/ConnectionStatusBanner'
 import { CyberWordCard } from '../../components/common/CyberWordCard'
 import { StatusBadge } from '../../components/common/StatusBadge'
+import { CelebrationOverlay } from '../../components/player/CelebrationOverlay'
+import { PrizeClaimPopup } from '../../components/player/PrizeClaimPopup'
 import { PrizeProgressList } from '../../components/player/PrizeProgressList'
 import { Ticket } from '../../components/player/Ticket'
 import { findCyberTerm } from '../../data/cyberTerms'
+import { useClaimPopupQueue } from '../../hooks/useClaimPopupQueue'
 import { useGameSession } from '../../state/GameSessionContext'
 import { deriveCellState } from '../../utils/deriveCellState'
 import { canMarkTerm, getMarkedTermIds } from '../../utils/prizeEngine'
@@ -275,6 +278,21 @@ export function PlayerGame() {
     return { progress, status, view, sessionGuardFailed, isSubmitting }
   })
 
+  // Derives which single prize's Prize_Claim_Popup (if any) should be
+  // visible right now, plus which single prize's Celebration_Overlay (if
+  // any) is pending acknowledgement. Pure wiring on top of the existing
+  // `prizeBlocks` — introduces no new eligibility/claim logic (Req 1.1,
+  // 1.5, 2.3, 2.5, 3.1, 3.2, 4.1, 4.2, 4.3, 4.5).
+  const popupQueue = useClaimPopupQueue({
+    prizeStatuses: prizeBlocks.map((b) => ({ prizeId: b.progress.id, status: b.status })),
+  })
+  const activeBlock = prizeBlocks.find(
+    (b) => b.progress.id === popupQueue.activePopupPrizeId,
+  )
+  const celebratingBlock = prizeBlocks.find(
+    (b) => b.progress.id === popupQueue.pendingCelebrationPrizeId,
+  )
+
   return (
     <div className="page player">
       <div className="player__inner">
@@ -445,6 +463,39 @@ export function PlayerGame() {
             ))}
           </ul>
         </Card>
+
+        {/* At most one Prize_Claim_Popup is ever rendered at a time, driven
+            entirely by `popupQueue` — reuses the same block's existing
+            progress/status/view/isSubmitting/sessionGuardFailed and the
+            existing SUBMIT_PRIZE_CLAIM dispatch, no new claim logic (Req
+            1.1, 1.5, 2.5, 3.1, 4.1, 4.2, 4.3). */}
+        {activeBlock && (
+          <PrizeClaimPopup
+            progress={activeBlock.progress}
+            status={activeBlock.status}
+            view={activeBlock.view}
+            isSubmitting={activeBlock.isSubmitting}
+            sessionGuardFailed={activeBlock.sessionGuardFailed}
+            onClaim={() =>
+              dispatch({
+                type: 'SUBMIT_PRIZE_CLAIM',
+                playerId: currentPlayer.id,
+                ticketId: currentTicket.id,
+                prizeId: activeBlock.progress.id,
+              })
+            }
+            onDismiss={popupQueue.dismissActivePopup}
+          />
+        )}
+
+        {/* At most one Celebration_Overlay is ever rendered at a time,
+            mutually exclusive with the popup above (Req 2.3, 3.2). */}
+        {celebratingBlock && (
+          <CelebrationOverlay
+            prizeLabel={celebratingBlock.progress.label}
+            onDismiss={() => popupQueue.acknowledgeCelebration(celebratingBlock.progress.id)}
+          />
+        )}
       </div>
     </div>
   )

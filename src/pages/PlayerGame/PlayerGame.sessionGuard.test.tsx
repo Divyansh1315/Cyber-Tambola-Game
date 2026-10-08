@@ -32,7 +32,7 @@
 //
 // Validates: Requirements 2.3
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useEffect, useRef } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -282,7 +282,9 @@ async function mountUnconfirmedEligibleSession(client: MockSupabaseClient) {
 
   await waitFor(() => {
     expect(
-      tab.getByRole('button', { name: /claim cyber five/i }).hasAttribute('disabled'),
+      within(claimBlockFor('Cyber Five'))
+        .getByRole('button', { name: /claim cyber five/i })
+        .hasAttribute('disabled'),
     ).toBe(false)
   })
 
@@ -307,7 +309,11 @@ describe('PlayerGame session guard recovery message (claim-player-ticket-identit
     const tab = await mountUnconfirmedEligibleSession(mockClient!)
 
     expect(tab.getByText('Your Cyber Word Ticket')).toBeInTheDocument()
-    const claimButton = tab.getByRole('button', { name: /claim cyber five/i })
+    // ELIGIBLE also auto-surfaces the Prize_Claim_Popup, so there are two
+    // "Claim Cyber Five" buttons -- scope to the card's block to click it. // not-a-ticket-dimension
+    const claimButton = within(claimBlockFor('Cyber Five')).getByRole('button', {
+      name: /claim cyber five/i,
+    })
     expect(claimButton).toBeEnabled()
 
     await user.click(claimButton)
@@ -345,7 +351,9 @@ describe('PlayerGame session guard recovery message (claim-player-ticket-identit
     ]
     const otherBlocksTextBefore = otherLabels.map((label) => claimBlockFor(label).textContent)
 
-    await user.click(tab.getByRole('button', { name: /claim cyber five/i }))
+    await user.click(
+      within(claimBlockFor('Cyber Five')).getByRole('button', { name: /claim cyber five/i }),
+    )
 
     await waitFor(() => {
       expect(claimBlockFor('Cyber Five')).toHaveTextContent(
@@ -364,7 +372,9 @@ describe('PlayerGame session guard recovery message (claim-player-ticket-identit
     const user = userEvent.setup()
     const tab = await mountUnconfirmedEligibleSession(mockClient!)
 
-    await user.click(tab.getByRole('button', { name: /claim cyber five/i }))
+    await user.click(
+      within(claimBlockFor('Cyber Five')).getByRole('button', { name: /claim cyber five/i }),
+    )
 
     await waitFor(() => {
       expect(tab.getByRole('button', { name: /refresh/i })).toBeInTheDocument()
@@ -426,8 +436,13 @@ describe('PlayerGame session guard recovery message (claim-player-ticket-identit
       })
 
       await waitFor(() => {
+        // PENDING keeps the Prize_Claim_Popup showing (the hook's "poppable"
+        // statuses include PENDING), so this message now also appears a
+        // second time in the popup -- scope to the card's block.
         expect(
-          tab.getByText('Claim could not be validated. Your current progress is 4/5.'), // not-a-ticket-dimension
+          within(claimBlockFor('Cyber Five')).getByText(
+            'Claim could not be validated. Your current progress is 4/5.', // not-a-ticket-dimension
+          ),
         ).toBeInTheDocument()
       })
       expect(screen.queryByText(/session is out of date/i)).not.toBeInTheDocument()

@@ -25,7 +25,7 @@
 // Validates: Requirements 1.1, 1.2, 1.4, 1.5, 2.1, 2.2, 2.4, 2.6, 2.8, 3.1,
 // 3.4, 3.6
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { act, fireEvent, render, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, waitFor, within } from '@testing-library/react'
 import { useEffect, useRef } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import {
@@ -346,6 +346,20 @@ async function mountConsistentSession(
 }
 
 /**
+ * Scopes a query to the "Claim Your Prizes" card's block for the given
+ * prize label. Needed because an ELIGIBLE prize now also auto-surfaces a
+ * Prize_Claim_Popup with a second, identically-labeled claim button.
+ */
+function claimBlockFor(
+  tab: ReturnType<typeof render>,
+  label: string,
+): HTMLElement {
+  return tab
+    .getByText(label, { selector: '.player__claim-block-label' })
+    .closest('li') as HTMLElement
+}
+
+/**
  * Mounts the real `PlayerGame` component (via `PlayerEntry`), with
  * `get_active_game` resolving immediately (backend confirmed), joins a
  * structurally-consistent player/ticket directly, and reveals/marks 5 terms
@@ -425,7 +439,9 @@ async function mountConsistentEligiblePlayerGame(client: MockSupabaseClient) {
 
   await waitFor(() => {
     expect(
-      tab.getByRole('button', { name: /claim cyber five/i }).hasAttribute('disabled'),
+      within(claimBlockFor(tab, 'Cyber Five'))
+        .getByRole('button', { name: /claim cyber five/i })
+        .hasAttribute('disabled'),
     ).toBe(false)
   })
 
@@ -499,7 +515,9 @@ describe('Regression (claim-duplicate-submission): six required scenarios + full
 
     client.queueRpcResponse('submit_claim', { data: buildClaimRow({ id: 'SERVER_CLAIM_DBLCLICK', player_id: 'P_1', ticket_id: 'T_1' }) })
 
-    const claimButton = tab.getByRole('button', { name: /claim cyber five/i })
+    const claimButton = within(claimBlockFor(tab, 'Cyber Five')).getByRole('button', {
+      name: /claim cyber five/i,
+    })
 
     // Two near-simultaneous clicks, same tick -- the second click is a
     // no-op because the button is already disabled via isSubmittingClaim.
@@ -1206,7 +1224,9 @@ describe('Regression (claim-duplicate-submission): six required scenarios + full
     })
     client.queueRpcResponse('submit_claim', { data: serverRow })
 
-    const claimButton = tab.getByRole('button', { name: /claim cyber five/i })
+    const claimButton = within(claimBlockFor(tab, 'Cyber Five')).getByRole('button', {
+      name: /claim cyber five/i,
+    })
     fireEvent.click(claimButton)
 
     await waitFor(() => {

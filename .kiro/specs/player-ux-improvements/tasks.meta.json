@@ -1,0 +1,374 @@
+{
+  "pbtResults": {
+    "10.2 Write property test for the Diagonal Strike CSS hook": {
+      "status": "passed",
+      "lastRunTimestamp": 1791435751724
+    },
+    "4.2 Write property tests for `deriveActivePopup`": {
+      "status": "passed",
+      "lastRunTimestamp": 1791435769508
+    },
+    "8.2 Write property test for `CelebrationOverlay`": {
+      "status": "passed",
+      "lastRunTimestamp": 1791436418236
+    },
+    "6.2 Write property tests for `PrizeClaimPopup`": {
+      "status": "passed",
+      "lastRunTimestamp": 1791436521376
+    }
+  },
+  "executionHistory": {
+    "1. Create the feature branch": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435615046
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435623491
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435663511
+      }
+    ],
+    "2.1 Implement `src/components/common/Modal.tsx` and `Modal.css`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435615204
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435670801
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435800029
+      }
+    ],
+    "3. Checkpoint — `Modal` passes": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435615377
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436232845
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436539755
+      }
+    ],
+    "4.1 Implement `deriveActivePopup` in `src/hooks/useClaimPopupQueue.ts`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435615562
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435671817
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435802119
+      }
+    ],
+    "4.3 Implement the celebration-transition tracking and `useClaimPopupQueue` hook wrapper": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435615708
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435809139
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436045275
+      }
+    ],
+    "5. Checkpoint — queue-derivation logic passes": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435615843
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436084320
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436206392
+      }
+    ],
+    "6.1 Implement `src/components/player/PrizeClaimPopup.tsx`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435616023
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436242284
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436541012
+      }
+    ],
+    "7. Checkpoint — `PrizeClaimPopup` passes": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435616178
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437736581
+      }
+    ],
+    "8.1 Implement `src/components/player/CelebrationOverlay.tsx` and its CSS": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435616393
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436243002
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436541952
+      }
+    ],
+    "9. Checkpoint — `CelebrationOverlay` passes": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435616559
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437746564
+      }
+    ],
+    "10.1 Update `src/components/player/Ticket.css`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435616769
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435672722
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435801119
+      }
+    ],
+    "11. Checkpoint — Diagonal Strike passes": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435616992
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437752565
+      }
+    ],
+    "12.1 Add `useClaimPopupQueue` wiring to `src/pages/PlayerGame/PlayerGame.tsx`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435617151
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436552922
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437168776
+      }
+    ],
+    "13. Checkpoint — full feature integration passes": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435617331
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437759444
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437892813
+      }
+    ],
+    "14. Final verification pass": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435617518
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437914028
+      },
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791438072968
+      }
+    ],
+    "2. Build the generic `Modal` primitive": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435800182
+      }
+    ],
+    "10. Add the Diagonal Strike CSS hook to `TicketCell`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791435801260
+      }
+    ],
+    "4. Implement the pure popup-queue derivation logic": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436045463
+      }
+    ],
+    "4.2 Write property tests for `deriveActivePopup`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436076868
+      }
+    ],
+    "4.4 Write property tests for the `useClaimPopupQueue` hook wrapper": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436077609
+      }
+    ],
+    "2.2 Write unit tests for `Modal`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436227460
+      }
+    ],
+    "10.2 Write property test for the Diagonal Strike CSS hook": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436233731
+      }
+    ],
+    "6. Implement `PrizeClaimPopup`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436541148
+      }
+    ],
+    "8. Implement `CelebrationOverlay`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436542150
+      }
+    ],
+    "6.2 Write property tests for `PrizeClaimPopup`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436543208
+      }
+    ],
+    "6.3 Write unit test for the session-guard-failed branch": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436544056
+      }
+    ],
+    "8.2 Write property test for `CelebrationOverlay`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436544991
+      }
+    ],
+    "8.3 Write unit tests for auto-dismiss timing and DOM cleanup": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791436545992
+      }
+    ],
+    "12. Wire everything together in `PlayerGame.tsx`": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437168964
+      }
+    ],
+    "12.2 Write unit tests for ticket/prize-card usability while a popup or overlay is open": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437724588
+      }
+    ],
+    "12.3 Write integration test for end-to-end popup → claim → celebration flow": [
+      {
+        "executionId": "95463cd7-6e77-46a8-a90d-a1712e63d52b",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791437725209
+      }
+    ]
+  }
+}

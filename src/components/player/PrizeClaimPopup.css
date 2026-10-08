@@ -1,0 +1,26 @@
+.prize-claim-popup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.prize-claim-popup__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.prize-claim-popup__message {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-ink);
+}
+
+.prize-claim-popup__message--session-guard {
+  color: var(--color-danger-strong);
+}
+
+.prize-claim-popup__btn {
+  width: 100%;
+}
