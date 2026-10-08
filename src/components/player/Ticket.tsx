@@ -5,6 +5,7 @@ import './Ticket.css'
 interface TicketProps {
   ticket: TicketData
   onToggleCell: (termId: string) => void
+  awardedTermIds: ReadonlySet<string>
 }
 
 /**
@@ -12,7 +13,7 @@ interface TicketProps {
  * Renders a responsive grid of cells; long terms wrap gracefully and the grid
  * never causes horizontal page scroll on narrow mobile widths.
  */
-export function Ticket({ ticket, onToggleCell }: TicketProps) {
+export function Ticket({ ticket, onToggleCell, awardedTermIds }: TicketProps) {
   return (
     <div
       className="ticket-grid"
@@ -23,7 +24,11 @@ export function Ticket({ ticket, onToggleCell }: TicketProps) {
         <div className="ticket-grid__row" role="row" key={rowIndex}>
           {row.map((cell) => (
             <div role="gridcell" key={cell.termId}>
-              <TicketCell cell={cell} onToggle={onToggleCell} />
+              <TicketCell
+                cell={cell}
+                onToggle={onToggleCell}
+                isAwarded={awardedTermIds.has(cell.termId)}
+              />
             </div>
           ))}
         </div>

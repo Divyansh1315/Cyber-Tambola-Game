@@ -24,6 +24,10 @@ Concretely, this feature:
 - **Mobile container**: `.player__inner` in `PlayerGame.css` is `max-width: 460px`, the de facto mobile-first frame for everything in scope here.
 - **No existing modal/dialog component and no existing animation dependency** were found in the codebase (`src/components/common`, `package.json`). This feature introduces the first of each; both are scoped as "new, minimal, reusable" rather than feature-specific one-offs, so later features can reuse them.
 
+### Scope: Post-Implementation Refinements
+
+Requirements 10-12 below were added after Requirements 1-9 were implemented and merged, based on further live gameplay testing of the already-built feature. They refine three already-shipped visuals — `TicketCell.tsx`/`Ticket.css`'s Diagonal_Strike, `CelebrationOverlay.tsx`'s confetti, and (newly) a greyed appearance for ticket cells belonging to a prize pattern this player has already won — rather than introducing new business logic. Each builds strictly on the existing, unmodified data sources already named above (`Player_Claim_Status`, `Prize_Progress`, the authoritative `Winner` records, and `prizeEngine.ts`'s `LINE_PRIZE_ROWS`/row-and-ticket cell mapping). No ticket generation, called-word, delayed-marking, prize-eligibility, claim-validation, first-valid-claim-wins, multiplayer-sync, reconnect, or host-control logic is touched by Requirements 10-12, consistent with Requirement 8.
+
 ## Glossary
 
 - **Player_Screen**: The `PlayerGame` React component (`src/pages/PlayerGame/PlayerGame.tsx`) and its rendered subtree.
@@ -36,6 +40,9 @@ Concretely, this feature:
 - **Diagonal_Strike**: The new CSS visual overlay drawn across a `MARKED` Ticket_Cell.
 - **Ticket_Cell**: The existing `TicketCell` component and its rendered `.ticket-cell` element.
 - **Reduced_Motion_Preference**: The user agent's `prefers-reduced-motion: reduce` media feature.
+- **Fixed_Pattern_Prize**: A Prize_Id whose winning cells are a determinable, fixed set of Ticket_Cells on a given Ticket: `FIREWALL_LINE` (`ticket.rows[0]`), `SECURITY_LINE` (`ticket.rows[1]`), `DATA_DEFENDER_LINE` (`ticket.rows[2]`), and `CYBER_FULL_HOUSE` (all of `ticket.rows`). `CYBER_FIVE` is explicitly excluded — it has no fixed cell set, since any 5 marked terms anywhere on the ticket qualify.
+- **Awarded_Prize_Pattern**: For the current player and a given Fixed_Pattern_Prize, the condition that a `Winner` record exists (`src/types/prize.ts`) with `winner.playerId` equal to the current player's id, `winner.prizeId` equal to that Prize_Id, and `winner.gameId` equal to the current `state.game.id`.
+- **Awarded_Cell_Overlay**: The new CSS visual applied to a Ticket_Cell that belongs to a Fixed_Pattern_Prize's fixed cell set once that prize has an Awarded_Prize_Pattern for the current player.
 
 ## Requirements
 
@@ -148,6 +155,46 @@ Concretely, this feature:
 
 *(Note: this requirement is operational/process-only. No branch is created during spec authoring; branch creation happens at task-execution time.)*
 
+### Requirement 10: Diagonal Strike Color Correction
+
+**User Story:** As a player, I want the diagonal strike on a marked Cyber Word to appear in a dark, neutral color instead of green, so that it reads clearly as a "crossed off" mark rather than looking like a status or success indicator.
+
+#### Acceptance Criteria
+
+1. WHEN a Ticket_Cell's state is `MARKED`, THE Diagonal_Strike SHALL render in a dark, near-black color instead of `var(--color-accent-strong)`.
+2. THE Diagonal_Strike SHALL remain a single thin line, consistent with Requirement 5's existing visual, after its color is changed.
+3. THE Diagonal_Strike SHALL NOT obscure the readability of the `.ticket-cell__term` text after its color is changed, consistent with Acceptance Criterion 5.3.
+4. WHEN a Ticket_Cell's state is not `MARKED`, THE Ticket_Cell SHALL NOT render the Diagonal_Strike, consistent with Acceptance Criterion 5.5.
+
+### Requirement 11: Stronger Celebration Effect
+
+**User Story:** As a player, I want the celebration animation on a confirmed claim to feel more like a firecracker burst, so that winning feels more exciting than the current subtle confetti.
+
+#### Acceptance Criteria
+
+1. WHEN a Prize_Id's Player_Claim_Status for the current player transitions to `CONFIRMED`, THE Player_Screen SHALL display the Celebration_Overlay with greater visual intensity than its previously-shipped 24-piece confetti effect, by increasing one or more of: confetti piece count, piece size, color brightness/variety, or burst/spread pattern.
+2. THE Celebration_Overlay SHALL continue to use only CSS (including CSS animations and pseudo-elements) to render its increased-intensity effect, introducing no new runtime dependency, unless a genuine CSS limitation is identified that prevents a firecracker-like effect.
+3. THE Player_Screen SHALL NOT change the existing trigger condition for the Celebration_Overlay: it SHALL continue to display only when a Prize_Id's Player_Claim_Status transitions to `CONFIRMED` (per Acceptance Criterion 6.1 and 6.2), and never on "CLAIM PRIZE" activation or any other status.
+4. THE Celebration_Overlay SHALL automatically dismiss itself, consistent with Acceptance Criterion 6.3, SHALL remain within the mobile container width defined by `.player__inner` (`max-width: 460px`) consistent with Acceptance Criterion 6.7, and SHALL remove every DOM element it added upon dismissal consistent with Acceptance Criterion 6.5, after its intensity is increased.
+5. WHERE the Reduced_Motion_Preference is active, THE Player_Screen SHALL continue to display the existing static success state in place of the increased-intensity animated Celebration_Overlay, consistent with Acceptance Criterion 6.6.
+
+### Requirement 12: Awarded Prize Pattern Greying
+
+**User Story:** As a player who has won a prize, I want the ticket cells that make up that prize's winning pattern to appear greyed out, so that I can see at a glance which parts of my ticket are already "locked in" as a win.
+
+#### Acceptance Criteria
+
+1. WHEN a Fixed_Pattern_Prize has an Awarded_Prize_Pattern for the current player, THE Player_Screen SHALL render the Awarded_Cell_Overlay on every Ticket_Cell in that prize's fixed cell set.
+2. THE Player_Screen SHALL determine each Fixed_Pattern_Prize's fixed cell set using the same row mapping `prizeEngine.ts` already uses (`FIREWALL_LINE` → `ticket.rows[0]`, `SECURITY_LINE` → `ticket.rows[1]`, `DATA_DEFENDER_LINE` → `ticket.rows[2]`, `CYBER_FULL_HOUSE` → all of `ticket.rows`), introducing no new row-to-prize mapping.
+3. THE Player_Screen SHALL NOT render an Awarded_Cell_Overlay for `CYBER_FIVE`, since `CYBER_FIVE` is not a Fixed_Pattern_Prize and has no fixed cell set.
+4. THE Player_Screen SHALL derive each Fixed_Pattern_Prize's Awarded_Prize_Pattern solely from the existing `state.winners` records for the current `state.game.id`, matched against the current player's id, without introducing any new backend field, Supabase schema change, or client-only local flag.
+5. IF a Fixed_Pattern_Prize's `Winner` record belongs to a player other than the current player (the `CLOSED_BY_OTHER_WINNER` case), THEN THE Player_Screen SHALL NOT render an Awarded_Cell_Overlay on the current player's Ticket_Cells for that prize.
+6. WHILE a Fixed_Pattern_Prize's Player_Claim_Status for the current player is `ELIGIBLE`, `PENDING`, `REJECTED`, or `NOT_ELIGIBLE`, THE Player_Screen SHALL NOT render an Awarded_Cell_Overlay for that prize's cells.
+7. WHEN more than one Fixed_Pattern_Prize has an Awarded_Prize_Pattern for the current player at the same time, THE Player_Screen SHALL render the Awarded_Cell_Overlay independently on each prize's own fixed cell set, including on any Ticket_Cell belonging to more than one awarded prize's fixed cell set (e.g. a row cell that is also part of an awarded `CYBER_FULL_HOUSE`).
+8. THE Awarded_Cell_Overlay SHALL be rendered as an additional visual layer on a `MARKED` Ticket_Cell, preserving the existing checkmark icon and the Diagonal_Strike, and SHALL NOT remove or replace either.
+9. THE Awarded_Cell_Overlay SHALL NOT reduce the readability of the `.ticket-cell__term` text below the existing contrast provided for a `MARKED`, non-awarded Ticket_Cell.
+10. WHEN the Player_Screen is refreshed or the current player reconnects, THE Player_Screen SHALL continue to render the Awarded_Cell_Overlay for every Fixed_Pattern_Prize that has an Awarded_Prize_Pattern for the current player, since it is derived solely from synced `state.winners`.
+
 ## Acceptance Criteria Test Scenario Coverage
 
 The following gameplay-testing scenarios are covered by the acceptance criteria above:
@@ -163,3 +210,16 @@ The following gameplay-testing scenarios are covered by the acceptance criteria 
 9. **Mobile layout** → Requirement 7 (AC 7.1-7.4)
 10. **Realtime update during eligibility** → Requirement 4 (AC 4.5, status-driven not client-cached), Requirement 1 (AC 1.1, reacts to live status transitions)
 11. **Reconnect** → Requirement 4 (AC 4.5, no client-only persisted "already shown" state to lose or desync on reconnect)
+
+### Post-Implementation Refinement Scenarios (Requirements 10-12)
+
+12. **Marked tile line color** → Requirement 10 (AC 10.1-10.3)
+13. **Uncalled word** → Requirement 10 (AC 10.4, cell not `MARKED` still renders no strike, unaffected by the color change)
+14. **Successful claim celebration** → Requirement 11 (AC 11.1-11.4)
+15. **Rejected claim** → Requirement 11 (AC 11.3, Celebration_Overlay trigger condition is unchanged and does not fire on a rejected claim, consistent with AC 2.4/6.2)
+16. **Awarded prize tile greying** → Requirement 12 (AC 12.1, 12.2, 12.4, 12.8, 12.9)
+17. **Eligibility without award (no greying yet)** → Requirement 12 (AC 12.6, `ELIGIBLE`/`PENDING`/`REJECTED`/`NOT_ELIGIBLE` statuses render no Awarded_Cell_Overlay)
+18. **Another player wins (no greying for this player)** → Requirement 12 (AC 12.5, `CLOSED_BY_OTHER_WINNER` case)
+19. **Multiple prize wins (independent greying)** → Requirement 12 (AC 12.7, independent per-prize overlay including overlapping cells)
+20. **Reconnect/refresh (greying persists)** → Requirement 12 (AC 12.10, derived from synced `state.winners`)
+21. **Mobile UI** → Requirement 10 (AC 10.2-10.3, strike still thin/readable at mobile width per Requirement 7), Requirement 11 (AC 11.4, overlay stays within `.player__inner` at increased intensity), Requirement 12 (AC 12.8-12.9, overlay remains readable at mobile width)

@@ -13,7 +13,7 @@ import { findCyberTerm } from '../../data/cyberTerms'
 import { useClaimPopupQueue } from '../../hooks/useClaimPopupQueue'
 import { useGameSession } from '../../state/GameSessionContext'
 import { deriveCellState } from '../../utils/deriveCellState'
-import { canMarkTerm, getMarkedTermIds } from '../../utils/prizeEngine'
+import { canMarkTerm, getAwardedCellTermIds, getMarkedTermIds } from '../../utils/prizeEngine'
 import {
   derivePlayerClaimStatus,
   getWinnerForPrize,
@@ -222,6 +222,15 @@ export function PlayerGame() {
     }
   }
 
+  // The set of Marked_Term_Ids that belong to a Fixed_Pattern_Prize's fixed
+  // cell set for which this exact player+game already has a Winner (Req
+  // 12.1, 12.4, 12.10). currentPlayer/currentTicket are non-null here — both
+  // redirect guards above have already run.
+  const awardedTermIds = useMemo(
+    () => getAwardedCellTermIds(currentTicket, state.winners, currentPlayer.id, state.game.id),
+    [currentTicket, state.winners, currentPlayer, state.game.id],
+  )
+
   // Per-prize claim blocks: each Prize_Id gets its own independently derived
   // status, so claiming one prize never reads/affects another's block (Req
   // 2.5, 12.1, 12.2, 13.2). currentPlayer/currentTicket are non-null here —
@@ -396,7 +405,7 @@ export function PlayerGame() {
 
         {/* Cyber word ticket */}
         <Card title="Your Cyber Word Ticket" className="player__ticket-card">
-          <Ticket ticket={renderedTicket} onToggleCell={handleTap} />
+          <Ticket ticket={renderedTicket} onToggleCell={handleTap} awardedTermIds={awardedTermIds} />
         </Card>
 
         {/* Prize progress */}

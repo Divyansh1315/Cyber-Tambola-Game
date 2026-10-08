@@ -1,6 +1,6 @@
 import type { Game } from '../types/game'
 import type { Mark } from '../types/mark'
-import type { Prize, PrizeProgress } from '../types/prize'
+import type { Prize, PrizeProgress, Winner } from '../types/prize'
 import type { Ticket } from '../types/ticket'
 import { TICKET_COLUMNS, TICKET_SIZE } from './ticketGenerator'
 
@@ -14,7 +14,7 @@ export const PRIZES: readonly Prize[] = [
 ]
 
 /** Row index (0-2) backing each Line_Prize; used by getAllPrizeProgress. */
-const LINE_PRIZE_ROWS: Record<
+export const LINE_PRIZE_ROWS: Record<
   'FIREWALL_LINE' | 'SECURITY_LINE' | 'DATA_DEFENDER_LINE',
   number
 > = {
@@ -227,4 +227,39 @@ export function canMarkTerm(
   termId: string,
 ): boolean {
   return validateMarkAttempt(state, termId).valid
+}
+
+/** The four Fixed_Pattern_Prizes with a determinable, fixed cell set (Req 12). CYBER_FIVE is deliberately excluded — it has no fixed cell set (Req 12.3). */
+const FIXED_PATTERN_PRIZE_IDS = [
+  'FIREWALL_LINE',
+  'SECURITY_LINE',
+  'DATA_DEFENDER_LINE',
+  'CYBER_FULL_HOUSE',
+] as const
+
+export function getAwardedCellTermIds(
+  ticket: Ticket,
+  winners: readonly Winner[],
+  playerId: string,
+  gameId: string,
+): Set<string> {
+  const result = new Set<string>()
+
+  for (const prizeId of FIXED_PATTERN_PRIZE_IDS) {
+    const won = winners.some(
+      (w) => w.gameId === gameId && w.playerId === playerId && w.prizeId === prizeId,
+    )
+    if (!won) continue
+
+    const cells =
+      prizeId === 'CYBER_FULL_HOUSE'
+        ? ticket.rows.flat()
+        : ticket.rows[LINE_PRIZE_ROWS[prizeId]] ?? []
+
+    for (const cell of cells) {
+      result.add(cell.termId)
+    }
+  }
+
+  return result
 }

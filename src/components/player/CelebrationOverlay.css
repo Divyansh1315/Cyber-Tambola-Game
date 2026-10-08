@@ -36,19 +36,27 @@
 .celebration-overlay__piece {
   position: absolute;
   top: -12px;
-  width: 8px;
-  height: 14px;
+  width: 10px;
+  height: 16px;
   background: var(--color-accent-strong);
   pointer-events: none;
-  animation: celebration-overlay-fall 1.8s linear infinite;
+  animation: celebration-overlay-fall 1.6s linear infinite;
 }
 
-.celebration-overlay__piece:nth-child(3n) {
+.celebration-overlay__piece:nth-child(4n) {
   background: var(--color-primary);
 }
 
-.celebration-overlay__piece:nth-child(3n + 1) {
+.celebration-overlay__piece:nth-child(4n + 1) {
   background: var(--color-warning);
+}
+
+.celebration-overlay__piece:nth-child(4n + 2) {
+  background: var(--color-accent);
+}
+
+.celebration-overlay__piece:nth-child(4n + 3) {
+  background: var(--color-danger);
 }
 
 @keyframes celebration-overlay-fall {

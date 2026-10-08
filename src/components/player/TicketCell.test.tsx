@@ -171,6 +171,42 @@ describe('TicketCell', () => {
     )
   })
 
+  // Feature: player-ux-improvements, Property 14: The awarded CSS hook is present if and only
+  // if isAwarded is true, additively alongside the existing marked hook
+  //
+  // For any TicketCellData and boolean isAwarded, rendered className includes
+  // `ticket-cell--awarded` iff isAwarded is true (independent of cell.state), and whenever
+  // cell.state === 'MARKED' the className continues to include `ticket-cell--marked` and the
+  // checkmark icon continues to render regardless of isAwarded's value.
+  //
+  // **Validates: Requirements 12.8**
+  it('Property 14: awarded class hook tracks isAwarded additively alongside the marked hook', () => {
+    fc.assert(
+      fc.property(TERM_ID_ARB, TERM_ARB, STATE_ARB, fc.boolean(), (termId, term, state, isAwarded) => {
+        const onToggle = vi.fn()
+        const cell = buildCell(termId, term, state)
+        const { container, unmount } = render(
+          <TicketCell cell={cell} onToggle={onToggle} isAwarded={isAwarded} />,
+        )
+
+        try {
+          const button = container.querySelector('button') as HTMLButtonElement
+          const isMarked = state === 'MARKED'
+
+          expect(button.classList.contains('ticket-cell--awarded')).toBe(isAwarded)
+
+          if (isMarked) {
+            expect(button.classList.contains('ticket-cell--marked')).toBe(true)
+            expect(container.querySelector('.ticket-cell__icon')).not.toBeNull()
+          }
+        } finally {
+          unmount()
+        }
+      }),
+      { numRuns: 100 },
+    )
+  })
+
   describe('example tests', () => {
     it('renders a checkmark icon only when MARKED', () => {
       const onToggle = vi.fn()
@@ -225,6 +261,35 @@ describe('TicketCell', () => {
       const button = container.querySelector('button') as HTMLButtonElement
       button.click()
       expect(onToggle).toHaveBeenCalledWith('term-42')
+    })
+
+    // CSS-cascade regression check for the awarded state winning over marked.
+    //
+    // jsdom's getComputedStyle does not resolve rules from imported stylesheets (no CSS engine
+    // backs it), so a plain getComputedStyle(...).background assertion would always read the
+    // browser default rather than the cascaded value from Ticket.css. Since source order is
+    // what guarantees `.ticket-cell--awarded` beats `.ticket-cell--marked` at equal
+    // specificity (both are single class selectors), we assert the className composition and
+    // ordering as a proxy: `ticket-cell--awarded` must be present and appear after
+    // `ticket-cell--marked` in the className string, matching the source-order placement of
+    // the two rules in Ticket.css.
+    it('places ticket-cell--awarded after ticket-cell--marked in className when both apply (CSS-cascade proxy)', () => {
+      const onToggle = vi.fn()
+      const { container } = render(
+        <TicketCell
+          cell={buildCell('t1', 'Phishing', 'MARKED')}
+          onToggle={onToggle}
+          isAwarded={true}
+        />,
+      )
+      const button = container.querySelector('button') as HTMLButtonElement
+      expect(button).toHaveClass('ticket-cell--marked')
+      expect(button).toHaveClass('ticket-cell--awarded')
+
+      const markedIndex = button.className.indexOf('ticket-cell--marked')
+      const awardedIndex = button.className.indexOf('ticket-cell--awarded')
+      expect(markedIndex).toBeGreaterThanOrEqual(0)
+      expect(awardedIndex).toBeGreaterThan(markedIndex)
     })
   })
 })

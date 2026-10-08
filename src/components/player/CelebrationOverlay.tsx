@@ -5,7 +5,7 @@ import './CelebrationOverlay.css'
 export const CELEBRATION_DURATION_MS = 3000
 
 /** Fixed number of CSS-only confetti pieces rendered in the animated branch. */
-const CONFETTI_COUNT = 24
+const CONFETTI_COUNT = 56
 
 interface CelebrationOverlayProps {
   prizeLabel: string

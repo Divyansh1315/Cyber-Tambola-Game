@@ -33,7 +33,9 @@ describe('Ticket grid DOM structure', () => {
   it('renders exactly 3 role="row" elements, each containing exactly 4 role="gridcell" elements', () => {
     const ticket = build3x4Ticket()
     const onToggleCell = vi.fn()
-    const { container } = render(<Ticket ticket={ticket} onToggleCell={onToggleCell} />)
+    const { container } = render(
+      <Ticket ticket={ticket} onToggleCell={onToggleCell} awardedTermIds={new Set()} />,
+    )
 
     const rows = container.querySelectorAll('[role="row"]')
     expect(rows).toHaveLength(3)
@@ -50,7 +52,9 @@ describe('Ticket grid DOM structure', () => {
   it('wraps the rows in a single role="grid" container', () => {
     const ticket = build3x4Ticket()
     const onToggleCell = vi.fn()
-    const { container } = render(<Ticket ticket={ticket} onToggleCell={onToggleCell} />)
+    const { container } = render(
+      <Ticket ticket={ticket} onToggleCell={onToggleCell} awardedTermIds={new Set()} />,
+    )
 
     const grids = container.querySelectorAll('[role="grid"]')
     expect(grids).toHaveLength(1)

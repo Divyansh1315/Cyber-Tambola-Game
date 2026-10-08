@@ -3,6 +3,7 @@ import type { TicketCell as TicketCellData } from '../../types/game'
 interface TicketCellProps {
   cell: TicketCellData
   onToggle: (termId: string) => void
+  isAwarded?: boolean
 }
 
 /** Icon + label describing each state (never color alone). */
@@ -21,14 +22,14 @@ const STATE_META = {
  * State is conveyed with an icon and `aria-label`/`aria-pressed` in addition
  * to color for accessibility.
  */
-export function TicketCell({ cell, onToggle }: TicketCellProps) {
+export function TicketCell({ cell, onToggle, isAwarded = false }: TicketCellProps) {
   const meta = STATE_META[cell.state]
   const isMarked = cell.state === 'MARKED'
 
   return (
     <button
       type="button"
-      className={`ticket-cell ${isMarked ? 'ticket-cell--marked' : 'ticket-cell--unmarked'}`}
+      className={`ticket-cell ${isMarked ? 'ticket-cell--marked' : 'ticket-cell--unmarked'} ${isAwarded ? 'ticket-cell--awarded' : ''}`}
       onClick={() => onToggle(cell.termId)}
       aria-pressed={isMarked}
       aria-label={`${cell.term}. ${meta.hint}`}

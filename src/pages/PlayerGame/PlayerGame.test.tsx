@@ -1413,3 +1413,110 @@ describe('PlayerGame end-to-end popup -> claim -> celebration flow (player-ux-im
     expect(within(dialog).queryByText('Firewall Line')).not.toBeInTheDocument()
   })
 })
+
+describe('PlayerGame awarded-cell CSS hook wiring (player-ux-improvements, Task 23.2-23.4)', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+  })
+
+  it('a MARKED cell belonging to a CONFIRMED line prize renders ticket-cell--awarded (Req 12.1, 12.6)', () => {
+    const game = createSeedGame()
+    const { player, ticket } = buildJoined(game)
+    const firewallLineTermIds = ticket.rows[0].map((c) => c.termId)
+    const marks = firewallLineTermIds.map((id) => buildMark(player, ticket, id))
+    const claim = buildClaim(player, ticket, 'FIREWALL_LINE', {
+      hostDecision: 'CONFIRMED',
+      decidedAt: new Date().toISOString(),
+    })
+    const winner = buildWinner(player, ticket, 'FIREWALL_LINE', claim.id)
+    seedSession({
+      game,
+      players: [player],
+      tickets: [ticket],
+      currentPlayerId: player.id,
+      marks,
+      claims: [claim],
+      winners: [winner],
+    })
+
+    renderPlayerGame()
+
+    for (const cell of ticket.rows[0]) {
+      const cellButton = screen.getByRole('button', {
+        name: new RegExp(`^${cell.term}\\.`),
+      })
+      expect(cellButton).toHaveClass('ticket-cell--awarded')
+    }
+  })
+
+  it('multi-prize overlap (line + full house) renders ticket-cell--awarded on every ticket cell (Req 12.7)', () => {
+    const game = createSeedGame()
+    const { player, ticket } = buildJoined(game)
+    const allTermIds = ticket.rows.flat().map((c) => c.termId)
+    const marks = allTermIds.map((id) => buildMark(player, ticket, id))
+
+    const lineClaim = buildClaim(player, ticket, 'FIREWALL_LINE', {
+      hostDecision: 'CONFIRMED',
+      decidedAt: new Date().toISOString(),
+    })
+    const lineWinner = buildWinner(player, ticket, 'FIREWALL_LINE', lineClaim.id)
+
+    const fullHouseClaim = buildClaim(player, ticket, 'CYBER_FULL_HOUSE', {
+      hostDecision: 'CONFIRMED',
+      decidedAt: new Date().toISOString(),
+    })
+    const fullHouseWinner = buildWinner(player, ticket, 'CYBER_FULL_HOUSE', fullHouseClaim.id)
+
+    seedSession({
+      game,
+      players: [player],
+      tickets: [ticket],
+      currentPlayerId: player.id,
+      marks,
+      claims: [lineClaim, fullHouseClaim],
+      winners: [lineWinner, fullHouseWinner],
+    })
+
+    renderPlayerGame()
+
+    for (const cell of ticket.rows.flat()) {
+      const cellButton = screen.getByRole('button', {
+        name: new RegExp(`^${cell.term}\\.`),
+      })
+      expect(cellButton).toHaveClass('ticket-cell--awarded')
+    }
+  })
+
+  it('a Winner belonging to a different player does not award the current player\'s cells (Req 12.4, 12.5)', () => {
+    const game = createSeedGame()
+    const { player, ticket } = buildJoined(game)
+    const otherPlayer: Player = { ...player, id: 'other-player-id' }
+    const firewallLineTermIds = ticket.rows[0].map((c) => c.termId)
+    const marks = firewallLineTermIds.map((id) => buildMark(player, ticket, id))
+
+    const claim = buildClaim(otherPlayer, ticket, 'FIREWALL_LINE', {
+      hostDecision: 'CONFIRMED',
+      decidedAt: new Date().toISOString(),
+    })
+    const winner = buildWinner(otherPlayer, ticket, 'FIREWALL_LINE', claim.id)
+
+    seedSession({
+      game,
+      players: [player],
+      tickets: [ticket],
+      currentPlayerId: player.id,
+      marks,
+      claims: [claim],
+      winners: [winner],
+    })
+
+    renderPlayerGame()
+
+    for (const cell of ticket.rows[0]) {
+      const cellButton = screen.getByRole('button', {
+        name: new RegExp(`^${cell.term}\\.`),
+      })
+      expect(cellButton).not.toHaveClass('ticket-cell--awarded')
+    }
+  })
+})

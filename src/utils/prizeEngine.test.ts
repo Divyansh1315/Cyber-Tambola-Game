@@ -203,3 +203,191 @@ describe('Property 16: Cyber Full House requires exactly 12 marks', () => {
     expect(isPrizeEligible(twelveProgress)).toBe(true)
   })
 })
+
+// ---------------------------------------------------------------------------
+// getAwardedCellTermIds — Properties 10-13
+// ---------------------------------------------------------------------------
+
+import { getAwardedCellTermIds } from './prizeEngine'
+import type { Winner, PrizeId } from '../types/prize'
+
+const FIXED_PATTERN_PRIZE_IDS = [
+  'FIREWALL_LINE',
+  'SECURITY_LINE',
+  'DATA_DEFENDER_LINE',
+  'CYBER_FULL_HOUSE',
+] as const
+
+const LINE_PRIZE_ROWS_FOR_TEST: Record<string, number> = {
+  FIREWALL_LINE: 0,
+  SECURITY_LINE: 1,
+  DATA_DEFENDER_LINE: 2,
+}
+
+function fixedCellSet(ticket: Ticket, prizeId: string): Set<string> {
+  const cells =
+    prizeId === 'CYBER_FULL_HOUSE'
+      ? ticket.rows.flat()
+      : ticket.rows[LINE_PRIZE_ROWS_FOR_TEST[prizeId]] ?? []
+  return new Set(cells.map((c) => c.termId))
+}
+
+function makeWinner(overrides: Partial<Winner>): Winner {
+  return {
+    id: `winner-${Math.random()}`,
+    gameId: 'game-1',
+    prizeId: 'FIREWALL_LINE' as PrizeId,
+    playerId: 'player-1',
+    ticketId: 'ticket-1',
+    claimId: 'claim-1',
+    confirmedAt: '2024-01-01T00:00:00.000Z',
+    prizeLabel: 'Firewall Line',
+    playerName: 'Player One',
+    ticketRef: 'Ticket #TEST',
+    ...overrides,
+  }
+}
+
+const prizeIdArb = fc.constantFrom(
+  'CYBER_FIVE',
+  'FIREWALL_LINE',
+  'SECURITY_LINE',
+  'DATA_DEFENDER_LINE',
+  'CYBER_FULL_HOUSE',
+)
+
+const playerIdArb = fc.constantFrom('player-1', 'player-2', 'player-3')
+const gameIdArb = fc.constantFrom('game-1', 'game-2')
+
+/** Arbitrary winner whose fields are drawn from a small fixed pool, to produce realistic overlaps. */
+const winnerArb = fc.record({
+  gameId: gameIdArb,
+  prizeId: prizeIdArb,
+  playerId: playerIdArb,
+}).map((partial) => makeWinner(partial as Partial<Winner>))
+
+const winnersArb = fc.array(winnerArb, { maxLength: 8 })
+
+// Feature: player-ux-improvements, Property 10: a termId is awarded iff some Fixed_Pattern_Prize winner matches and the term is in that prize's fixed cell set
+describe('Property 10: a termId is awarded iff some Fixed_Pattern_Prize winner matches and the term is in that prize fixed cell set', () => {
+  it('matches the exact union-of-matching-prizes-fixed-cell-sets definition', () => {
+    const ticket = makeTicket()
+
+    fc.assert(
+      fc.property(winnersArb, (winners) => {
+        const result = getAwardedCellTermIds(
+          ticket,
+          winners,
+          'player-1',
+          'game-1',
+        )
+
+        const expected = new Set<string>()
+        for (const prizeId of FIXED_PATTERN_PRIZE_IDS) {
+          const won = winners.some(
+            (w) =>
+              w.gameId === 'game-1' &&
+              w.playerId === 'player-1' &&
+              w.prizeId === prizeId,
+          )
+          if (!won) continue
+          for (const termId of fixedCellSet(ticket, prizeId)) {
+            expected.add(termId)
+          }
+        }
+
+        expect(result).toEqual(expected)
+      }),
+      { numRuns: RUNS },
+    )
+  })
+})
+
+// Feature: player-ux-improvements, Property 11: CYBER_FIVE never contributes termIds
+describe('Property 11: CYBER_FIVE never contributes termIds', () => {
+  it('result is identical whether or not CYBER_FIVE winners are present', () => {
+    const ticket = makeTicket()
+
+    fc.assert(
+      fc.property(winnersArb, (winners) => {
+        const withCyberFive = [
+          ...winners,
+          makeWinner({ prizeId: 'CYBER_FIVE', gameId: 'game-1', playerId: 'player-1' }),
+        ]
+        const withoutCyberFive = winners.filter((w) => w.prizeId !== 'CYBER_FIVE')
+
+        const resultWith = getAwardedCellTermIds(
+          ticket,
+          withCyberFive,
+          'player-1',
+          'game-1',
+        )
+        const resultWithout = getAwardedCellTermIds(
+          ticket,
+          withoutCyberFive,
+          'player-1',
+          'game-1',
+        )
+
+        expect(resultWith).toEqual(resultWithout)
+      }),
+      { numRuns: RUNS },
+    )
+  })
+})
+
+// Feature: player-ux-improvements, Property 12: a Winner for a different player or game never contributes termIds
+describe('Property 12: a Winner for a different playerId or gameId never contributes termIds', () => {
+  it('only exact playerId+gameId matches contribute', () => {
+    const ticket = makeTicket()
+
+    fc.assert(
+      fc.property(
+        fc.array(fc.constantFrom(...FIXED_PATTERN_PRIZE_IDS), { minLength: 1, maxLength: 4 }),
+        fc.constantFrom('player-2', 'player-3'),
+        fc.constantFrom('game-2'),
+        (prizeIds, otherPlayerId, otherGameId) => {
+          const winners: Winner[] = prizeIds.flatMap((prizeId) => [
+            makeWinner({ prizeId, playerId: otherPlayerId, gameId: 'game-1' }),
+            makeWinner({ prizeId, playerId: 'player-1', gameId: otherGameId }),
+          ])
+
+          const result = getAwardedCellTermIds(ticket, winners, 'player-1', 'game-1')
+          expect(result.size).toBe(0)
+        },
+      ),
+      { numRuns: RUNS },
+    )
+  })
+})
+
+// Feature: player-ux-improvements, Property 13: overlapping awarded cell sets de-duplicate via Set semantics
+describe('Property 13: overlapping awarded cell sets de-duplicate via Set semantics', () => {
+  it('a line prize + CYBER_FULL_HOUSE both awarded equals the union of each prize own cell set', () => {
+    const ticket = makeTicket()
+
+    fc.assert(
+      fc.property(
+        fc.constantFrom('FIREWALL_LINE', 'SECURITY_LINE', 'DATA_DEFENDER_LINE'),
+        (linePrizeId) => {
+          const winners: Winner[] = [
+            makeWinner({ prizeId: linePrizeId as PrizeId, playerId: 'player-1', gameId: 'game-1' }),
+            makeWinner({ prizeId: 'CYBER_FULL_HOUSE', playerId: 'player-1', gameId: 'game-1' }),
+          ]
+
+          const result = getAwardedCellTermIds(ticket, winners, 'player-1', 'game-1')
+
+          const expected = new Set<string>([
+            ...fixedCellSet(ticket, linePrizeId),
+            ...fixedCellSet(ticket, 'CYBER_FULL_HOUSE'),
+          ])
+
+          expect(result).toEqual(expected)
+          // CYBER_FULL_HOUSE covers the whole ticket, so the union collapses to it.
+          expect(result).toEqual(fixedCellSet(ticket, 'CYBER_FULL_HOUSE'))
+        },
+      ),
+      { numRuns: RUNS },
+    )
+  })
+})

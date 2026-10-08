@@ -168,14 +168,133 @@ Scope is limited to exactly the files/components design.md names: the new
   - Ask the user if questions arise
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
+- [x] 15. Fix the Diagonal Strike color (Requirement 10)
+  - [x] 15.1 Update `src/components/player/Ticket.css`
+    - Change `.ticket-cell--marked::after`'s `background` from `var(--color-accent-strong)` to `var(--color-ink)`
+    - No other property on the rule changes; no new CSS variable is introduced; the selector remains scoped to `.ticket-cell--marked::after` only
+    - _Requirements: 10.1, 10.2, 10.3, 10.4_
+
+  - [x]* 15.2 Regression-check the Diagonal Strike's existing presence/absence test
+    - File `src/components/player/TicketCell.test.tsx` (existing): confirm Property 8's existing assertions (presence iff `MARKED`) still pass unchanged, since they assert the class, not the color; if any existing assertion hardcodes the old `--color-accent-strong` value, update it to `--color-ink`
+    - _Requirements: 10.1_
+
+- [x] 16. Checkpoint — Diagonal Strike color fix passes
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 17. Tune the Celebration effect (Requirement 11)
+  - [x] 17.1 Update `src/components/player/CelebrationOverlay.tsx` and `CelebrationOverlay.css`
+    - Change `CONFETTI_COUNT` from `24` to `56`; leave `CELEBRATION_DURATION_MS` unchanged
+    - In `CelebrationOverlay.css`, update `.celebration-overlay__piece`'s `width`/`height` from `8px`/`14px` to `10px`/`16px`, and its `animation` duration from `1.8s` to `1.6s`
+    - Replace the 2-color `:nth-child(3n)`/`:nth-child(3n + 1)` rules with 4-color `:nth-child(4n)`/`:nth-child(4n + 1)`/`:nth-child(4n + 2)`/`:nth-child(4n + 3)` rules using `var(--color-primary)`, `var(--color-warning)`, `var(--color-accent)`, `var(--color-danger)` respectively
+    - Do not change the trigger condition in `useClaimPopupQueue`, the auto-dismiss `useEffect`/cleanup, or the `reducedMotion` branch
+    - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
+
+  - [x]* 17.2 Update the confetti-count test
+    - File `src/components/player/CelebrationOverlay.test.tsx` (extended): update/add an assertion that rendering with `reducedMotion={false}` produces exactly `56` `.celebration-overlay__piece` elements
+    - Confirm the existing trigger/dismiss/cleanup/reduced-motion tests pass unchanged
+    - _Requirements: 11.1_
+
+- [x] 18. Checkpoint — Celebration tuning passes
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 19. Implement `getAwardedCellTermIds` in `prizeEngine.ts` (Requirement 12, part 1)
+  - [x] 19.1 Export `LINE_PRIZE_ROWS` and add `getAwardedCellTermIds`
+    - Add the `export` keyword to the existing private `LINE_PRIZE_ROWS` const; no change to its three existing key/value pairs
+    - Add `Winner` to the existing `Prize, PrizeProgress` import from `../types/prize`
+    - Add the new exported pure function `getAwardedCellTermIds(ticket: Ticket, winners: readonly Winner[], playerId: string, gameId: string): Set<string>` per design.md's Addendum section 1, including the `FIXED_PATTERN_PRIZE_IDS` const (`FIREWALL_LINE`, `SECURITY_LINE`, `DATA_DEFENDER_LINE`, `CYBER_FULL_HOUSE` — `CYBER_FIVE` excluded)
+    - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.7, 12.8_
+
+  - [x]* 19.2 Write property test for Property 10
+    - File `src/utils/prizeEngine.test.ts` (extended); tag `// Feature: player-ux-improvements, Property 10: {title}`; ≥100 iterations
+    - **Property 10: A termId is awarded if and only if it belongs to a Fixed_Pattern_Prize's fixed cell set for which this exact player+game has a Winner** — Validates Requirements 12.1, 12.2, 12.4
+    - _Requirements: 12.1, 12.2, 12.4_
+
+  - [x]* 19.3 Write property test for Property 11
+    - File `src/utils/prizeEngine.test.ts` (extended); tag `// Feature: player-ux-improvements, Property 11: {title}`; ≥100 iterations
+    - **Property 11: CYBER_FIVE never contributes termIds** — Validates Requirements 12.3
+    - _Requirements: 12.3_
+
+  - [x]* 19.4 Write property test for Property 12
+    - File `src/utils/prizeEngine.test.ts` (extended); tag `// Feature: player-ux-improvements, Property 12: {title}`; ≥100 iterations
+    - **Property 12: A Winner for a different player or a different game never contributes termIds** — Validates Requirements 12.4, 12.5
+    - _Requirements: 12.4, 12.5_
+
+  - [x]* 19.5 Write property test for Property 13
+    - File `src/utils/prizeEngine.test.ts` (extended); tag `// Feature: player-ux-improvements, Property 13: {title}`; ≥100 iterations
+    - **Property 13: Overlapping awarded cell sets de-duplicate via Set semantics** — Validates Requirements 12.7
+    - _Requirements: 12.7_
+
+- [x] 20. Checkpoint — `getAwardedCellTermIds` passes
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 21. Thread the Awarded Cell CSS hook through `TicketCell`/`Ticket` (Requirement 12, part 2)
+  - [x] 21.1 Add the two new state-color tokens to `src/styles/global.css`
+    - Append `--state-awarded-bg: #cbd5e1;` and `--state-awarded-ink: #334155;` to the existing "State colors for ticket / status" block, following its existing `--state-{name}-bg`/`--state-{name}-ink` naming convention
+    - _Requirements: 12.9_
+
+  - [x] 21.2 Add the `.ticket-cell--awarded` rule to `src/components/player/Ticket.css`
+    - Add `.ticket-cell--awarded { background: var(--state-awarded-bg); border-color: var(--state-awarded-ink); color: var(--state-awarded-ink); }`, positioned after `.ticket-cell--marked` in source order so it wins the cascade on specificity-equal overlap
+    - _Requirements: 12.6, 12.8, 12.9_
+
+  - [x] 21.3 Add the `isAwarded` prop to `src/components/player/TicketCell.tsx`
+    - Add optional `isAwarded?: boolean` (default `false`) to `TicketCellProps`
+    - Add `isAwarded ? 'ticket-cell--awarded' : ''` additively to the existing className array; no other change to markup, `onToggle`, `aria-label`, or `aria-pressed`
+    - _Requirements: 12.6, 12.8_
+
+  - [x] 21.4 Add the `awardedTermIds` prop to `src/components/player/Ticket.tsx`
+    - Add `awardedTermIds: ReadonlySet<string>` to `TicketProps`
+    - Pass `isAwarded={awardedTermIds.has(cell.termId)}` to each rendered `<TicketCell>`
+    - _Requirements: 12.1, 12.6_
+
+  - [x]* 21.5 Write property test for Property 14
+    - File `src/components/player/TicketCell.test.tsx` (extended); tag `// Feature: player-ux-improvements, Property 14: {title}`; ≥100 iterations
+    - **Property 14: The awarded CSS hook is present if and only if `isAwarded` is true, additively alongside the existing marked hook** — Validates Requirements 12.8
+    - _Requirements: 12.8_
+
+  - [x]* 21.6 Write the CSS-cascade regression unit test
+    - File `src/components/player/TicketCell.test.tsx` (extended): render `TicketCell` with `cell.state === 'MARKED'` and `isAwarded={true}`, assert via `getComputedStyle` that the resolved `background` matches `--state-awarded-bg`, not `--state-marked-bg`
+    - _Requirements: 12.6, 12.9_
+
+- [x] 22. Checkpoint — Awarded Cell CSS hook passes
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 23. Wire `awardedTermIds` into `PlayerGame.tsx` (Requirement 12, part 3)
+  - [x] 23.1 Compute and pass `awardedTermIds` in `src/pages/PlayerGame/PlayerGame.tsx`
+    - Add `const awardedTermIds = useMemo(() => currentTicket ? getAwardedCellTermIds(currentTicket, state.winners, currentPlayer?.id ?? '', state.game.id) : new Set<string>(), [currentTicket, state.winners, currentPlayer, state.game.id])`, placed after the existing redirect guard alongside the existing `prizeBlocks` derivation
+    - Pass `awardedTermIds={awardedTermIds}` to the existing `<Ticket>` element; make no other change to `PlayerGame.tsx`'s existing logic, state, or JSX ordering
+    - _Requirements: 12.1, 12.4, 12.10_
+
+  - [x]* 23.2 Write unit test: MARKED cell in a CONFIRMED prize's cell set renders `ticket-cell--awarded`
+    - File `src/pages/PlayerGame/PlayerGame.test.tsx` (extended): render `PlayerGame` with a `Winner` record for the current player/game for one line prize, assert that line's `MARKED` ticket cells render `ticket-cell--awarded`
+    - _Requirements: 12.1, 12.6_
+
+  - [x]* 23.3 Write unit test: multi-prize overlap renders awarded on every cell
+    - File `src/pages/PlayerGame/PlayerGame.test.tsx` (extended): render `PlayerGame` with `Winner` records for both a line prize and `CYBER_FULL_HOUSE` for the current player/game, assert every ticket cell renders `ticket-cell--awarded`, not just the full-house-exclusive ones
+    - _Requirements: 12.7_
+
+  - [x]* 23.4 Write unit test: `CLOSED_BY_OTHER_WINNER` prize does not award the current player
+    - File `src/pages/PlayerGame/PlayerGame.test.tsx` (extended): render `PlayerGame` with a `Winner` record whose status is `CLOSED_BY_OTHER_WINNER`/whose `playerId` differs from the current player for one prize, assert that prize's cells do NOT render `ticket-cell--awarded` for the current player
+    - _Requirements: 12.4, 12.5_
+
+- [x] 24. Checkpoint — `PlayerGame.tsx` wiring passes
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 25. Final checkpoint — Requirements 10-12 full regression pass
+  - Run the full test suite (`npm test` / `vitest run`) and confirm all tests pass
+  - Run the production build (`npm run build`) and confirm zero TypeScript errors
+  - Confirm no existing test file for the reducer, `winnerEngine.ts`, or the existing "Claim Your Prizes" card's rendering was modified, and that tasks 1-14's existing tests still pass unchanged
+  - Ask the user if questions arise
+  - _Requirements: 10.1, 10.2, 10.3, 10.4, 11.1, 11.2, 11.3, 11.4, 11.5, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 12.10_
+
 ## Notes
 
 - Tasks marked with `*` are optional test sub-tasks and can be skipped for a faster MVP; core implementation tasks are never optional.
 - Each task references specific requirement sub-clauses for traceability.
-- Checkpoints (tasks 3, 5, 7, 9, 11, 13) ensure incremental validation as `Modal`, the queue-derivation logic, `PrizeClaimPopup`, `CelebrationOverlay`, the Diagonal Strike, and the full `PlayerGame.tsx` wiring come together.
-- Property tests validate the 9 universal correctness properties from `design.md`; each test is tagged `// Feature: player-ux-improvements, Property {n}: {title}` and runs ≥100 iterations using `fast-check` (already a devDependency).
-- The following requirements/acceptance criteria from `design.md`'s Testing Strategy are explicitly **not** covered by automated tests and are called out as required manual/visual review before merge: Requirements 5.3, 5.4, 7.1, 7.2, 7.3, 7.4 (diagonal-strike legibility and layout fit at mobile widths), consistent with design.md's "Not covered by automated tests" section.
+- Checkpoints (tasks 3, 5, 7, 9, 11, 13, 16, 18, 20, 22, 24, 25) ensure incremental validation as `Modal`, the queue-derivation logic, `PrizeClaimPopup`, `CelebrationOverlay`, the Diagonal Strike, the full `PlayerGame.tsx` wiring, and (for Requirements 10-12) the color fix, celebration tuning, `getAwardedCellTermIds`, the Awarded Cell CSS hook, and its `PlayerGame.tsx` wiring come together.
+- Property tests validate the 9 universal correctness properties from `design.md`'s original Correctness Properties section plus Properties 10-14 from its Addendum; each test is tagged `// Feature: player-ux-improvements, Property {n}: {title}` and runs ≥100 iterations using `fast-check` (already a devDependency).
+- The following requirements/acceptance criteria from `design.md`'s Testing Strategy are explicitly **not** covered by automated tests and are called out as required manual/visual review before merge: Requirements 5.3, 5.4, 7.1, 7.2, 7.3, 7.4 (diagonal-strike legibility and layout fit at mobile widths), 11.1 (the visual "firecracker" feel of the tuned celebration effect), and 12.9 (final visual confirmation of the awarded-cell grey background's legibility at real device widths), consistent with design.md's "Not covered by automated tests" sections.
 - Requirement 9.1 (branch creation) is handled by task 1 and is the only operational/non-code task in this plan.
+- Requirements 10-12 (tasks 15-25) are post-implementation refinements building on the already-shipped Requirements 1-9 (tasks 1-14); they touch no ticket generation, reveal, marking, prize-eligibility, claim-validation, sync, reconnect, or host-control logic.
 
 ## Task Dependency Graph
 
@@ -189,7 +308,13 @@ Scope is limited to exactly the files/components design.md names: the new
     { "id": 4, "tasks": ["6.1", "8.1"] },
     { "id": 5, "tasks": ["6.2", "6.3", "8.2", "8.3"] },
     { "id": 6, "tasks": ["12.1"] },
-    { "id": 7, "tasks": ["12.2", "12.3"] }
+    { "id": 7, "tasks": ["12.2", "12.3"] },
+    { "id": 8, "tasks": ["15.1", "17.1", "19.1"] },
+    { "id": 9, "tasks": ["15.2", "17.2", "19.2", "19.3", "19.4", "19.5", "21.1"] },
+    { "id": 10, "tasks": ["21.2", "21.3", "21.4"] },
+    { "id": 11, "tasks": ["21.5", "21.6"] },
+    { "id": 12, "tasks": ["23.1"] },
+    { "id": 13, "tasks": ["23.2", "23.3", "23.4"] }
   ]
 }
 ```

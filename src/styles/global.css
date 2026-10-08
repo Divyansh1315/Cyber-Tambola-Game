@@ -36,6 +36,8 @@
   --state-available-ink: #0a5f90;
   --state-marked-bg: #0c8f6a;
   --state-marked-ink: #ffffff;
+  --state-awarded-bg: #cbd5e1;
+  --state-awarded-ink: #334155;
 
   /* Typography */
   --font-sans: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial,

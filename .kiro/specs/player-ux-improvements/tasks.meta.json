@@ -369,6 +369,316 @@
         "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
         "timestamp": 1791437725209
       }
+    ],
+    "15.1 Update `src/components/player/Ticket.css`": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440487858
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440499045
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440697502
+      }
+    ],
+    "16. Checkpoint — Diagonal Strike color fix passes": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440488172
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440713381
+      }
+    ],
+    "17.1 Update `src/components/player/CelebrationOverlay.tsx` and `CelebrationOverlay.css`": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440488369
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440500129
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440699626
+      }
+    ],
+    "18. Checkpoint — Celebration tuning passes": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440488615
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440714397
+      }
+    ],
+    "19.1 Export `LINE_PRIZE_ROWS` and add `getAwardedCellTermIds`": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440488865
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440501098
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440701834
+      }
+    ],
+    "20. Checkpoint — `getAwardedCellTermIds` passes": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440489133
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440715332
+      }
+    ],
+    "21.1 Add the two new state-color tokens to `src/styles/global.css`": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440489378
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440723577
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440973491
+      }
+    ],
+    "21.2 Add the `.ticket-cell--awarded` rule to `src/components/player/Ticket.css`": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440489637
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440974183
+      }
+    ],
+    "21.3 Add the `isAwarded` prop to `src/components/player/TicketCell.tsx`": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440489939
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440975587
+      }
+    ],
+    "21.4 Add the `awardedTermIds` prop to `src/components/player/Ticket.tsx`": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440490186
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440976385
+      }
+    ],
+    "22. Checkpoint — Awarded Cell CSS hook passes": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440490430
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440988461
+      }
+    ],
+    "23.1 Compute and pass `awardedTermIds` in `src/pages/PlayerGame/PlayerGame.tsx`": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440490682
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440989293
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791441195751
+      }
+    ],
+    "24. Checkpoint — `PlayerGame.tsx` wiring passes": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440490929
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791441205966
+      }
+    ],
+    "25. Final checkpoint — Requirements 10-12 full regression pass": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440491177
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791441206730
+      },
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791441479665
+      }
+    ],
+    "15. Fix the Diagonal Strike color (Requirement 10)": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440697816
+      }
+    ],
+    "15.2 Regression-check the Diagonal Strike's existing presence/absence test": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440698569
+      }
+    ],
+    "17. Tune the Celebration effect (Requirement 11)": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440699890
+      }
+    ],
+    "17.2 Update the confetti-count test": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440700714
+      }
+    ],
+    "19. Implement `getAwardedCellTermIds` in `prizeEngine.ts` (Requirement 12, part 1)": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440702091
+      }
+    ],
+    "19.2 Write property test for Property 10": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440702928
+      }
+    ],
+    "19.3 Write property test for Property 11": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440703642
+      }
+    ],
+    "19.4 Write property test for Property 12": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440704684
+      }
+    ],
+    "19.5 Write property test for Property 13": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440705438
+      }
+    ],
+    "21. Thread the Awarded Cell CSS hook through `TicketCell`/`Ticket` (Requirement 12, part 2)": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440976678
+      }
+    ],
+    "21.5 Write property test for Property 14": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440977439
+      }
+    ],
+    "21.6 Write the CSS-cascade regression unit test": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791440978028
+      }
+    ],
+    "23.2 Write unit test: MARKED cell in a CONFIRMED prize's cell set renders `ticket-cell--awarded`": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791441195015
+      }
+    ],
+    "23. Wire `awardedTermIds` into `PlayerGame.tsx` (Requirement 12, part 3)": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791441196156
+      }
+    ],
+    "23.3 Write unit test: multi-prize overlap renders awarded on every cell": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791441196655
+      }
+    ],
+    "23.4 Write unit test: `CLOSED_BY_OTHER_WINNER` prize does not award the current player": [
+      {
+        "executionId": "c9d398d1-faed-4a07-bbe7-5459614508c4",
+        "chatSessionId": "sess_d610850d-076b-4466-824a-944e4450241b",
+        "timestamp": 1791441197765
+      }
     ]
   }
 }

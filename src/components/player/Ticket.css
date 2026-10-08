@@ -66,6 +66,13 @@
   color: var(--state-marked-ink);
 }
 
+/* State: awarded (additive — wins the cascade over .ticket-cell--marked when both apply) */
+.ticket-cell--awarded {
+  background: var(--state-awarded-bg);
+  border-color: var(--state-awarded-ink);
+  color: var(--state-awarded-ink);
+}
+
 /* Diagonal strike overlay, additive to the existing checkmark icon */
 .ticket-cell--marked::after {
   content: '';
@@ -74,7 +81,7 @@
   right: 6%;
   top: 50%;
   height: 2px;
-  background: var(--color-accent-strong);
+  background: var(--color-ink);
   transform: translateY(-50%) rotate(-18deg);
   pointer-events: none;
 }

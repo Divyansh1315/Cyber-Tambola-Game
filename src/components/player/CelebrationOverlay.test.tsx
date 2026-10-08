@@ -42,6 +42,17 @@ describe('CelebrationOverlay - Property 9 (identical confirmed-win information u
   })
 })
 
+describe('CelebrationOverlay - confetti count', () => {
+  it('renders exactly 56 confetti pieces when reducedMotion is false', () => {
+    const { container } = render(
+      <CelebrationOverlay prizeLabel="Cyber Five" onDismiss={() => {}} reducedMotion={false} />,
+    )
+
+    const confetti = container.querySelectorAll('.celebration-overlay__piece')
+    expect(confetti.length).toBe(56)
+  })
+})
+
 describe('CelebrationOverlay - auto-dismiss timing and DOM cleanup', () => {
   it('calls onDismiss exactly once after CELEBRATION_DURATION_MS', () => {
     vi.useFakeTimers()
